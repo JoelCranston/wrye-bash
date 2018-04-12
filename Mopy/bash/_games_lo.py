@@ -1212,6 +1212,14 @@ class SkyrimSE(AsteriskGame):
                         format_date(master_mtime)))
         return add
 
+class SkyrimVR(SkyrimSE):
+    must_be_active_if_present = (bolt.GPath(u'Update.esm'),
+                                 bolt.GPath(u'Dawnguard.esm'),
+                                 bolt.GPath(u'Hearthfires.esm'),
+                                 bolt.GPath(u'Dragonborn.esm'),
+                                 bolt.GPath(u'SkyrimVR.esm'),)
+    _ccc_filename = u''
+
 # Game factory
 def game_factory(game_fsName, mod_infos, plugins_txt_path,
                  loadorder_txt_path=None):
@@ -1221,6 +1229,8 @@ def game_factory(game_fsName, mod_infos, plugins_txt_path,
         return Enderal(mod_infos, plugins_txt_path, loadorder_txt_path)
     elif game_fsName == u'Skyrim Special Edition':
         return SkyrimSE(mod_infos, plugins_txt_path)
+    elif game_fsName == u'Skyrim VR':
+        return SkyrimVR(mod_infos, plugins_txt_path)
     elif game_fsName == u'Fallout4':
         return Fallout4(mod_infos, plugins_txt_path)
     elif game_fsName == u'Fallout4VR':
