@@ -160,7 +160,7 @@ class Mod_OrderByName(EnabledLink):
         message += (u'\n\n' + _(
             u'Note that some mods need to be in a specific order to work '
             u'correctly, and this sort operation may break that order.'))
-        if not self._askContinue(message, 'bash.sortMods.continue',
+        if not self._askContinue(message, u'bash.sortMods.continue',
                                  _(u'Sort Mods')): return
         #--Do it
         self.selected.sort()
@@ -469,7 +469,7 @@ class _Mod_Groups_Import(ItemLink):
         message = _(
             u"Import groups from a text file ? This will assign to selected "
             u"mods the group they are assigned in the text file, if any.")
-        if not self._askContinue(message, 'bash.groups.import.continue',
+        if not self._askContinue(message, u'bash.groups.import.continue',
                                  _(u'Import Groups')): return
         textDir = bass.dirs[u'patches']
         #--File dialog
@@ -1351,7 +1351,7 @@ class Mod_RemoveWorldOrphans(EnabledLink):
 
     def Execute(self):
         message = _(u"In some circumstances, editing a mod will leave orphaned cell records in the world group. This command will remove such orphans.")
-        if not self._askContinue(message, 'bash.removeWorldOrphans.continue',
+        if not self._askContinue(message, u'bash.removeWorldOrphans.continue',
                                  _(u'Remove World Orphans')): return
         for index, (fileName, fileInfo) in enumerate(self.iselected_pairs()):
             if bosh.reOblivion.match(fileName.s):
@@ -1387,7 +1387,7 @@ class Mod_FogFixer(ItemLink):
 
     def Execute(self):
         message = _(u'Apply Nvidia fog fix.  This modify fog values in interior cells to avoid the Nvidia black screen bug.')
-        if not self._askContinue(message, 'bash.cleanMod.continue',
+        if not self._askContinue(message, u'bash.cleanMod.continue',
                                  _(u'Nvidia Fog Fix')): return
         with balt.Progress(_(u'Nvidia Fog Fix')) as progress:
             progress.setFull(len(self.selected))
@@ -1421,7 +1421,7 @@ class Mod_UndeleteRefs(EnabledLink):
             not bosh.reOblivion.match(self.selected[0].s))
 
     def Execute(self):
-        if not self._askContinue(self.warn, 'bash.undeleteRefs.continue',
+        if not self._askContinue(self.warn, u'bash.undeleteRefs.continue',
                                  self._text): return
         with balt.Progress(self._text) as progress:
             progress.setFull(len(self.selected))
@@ -1461,7 +1461,7 @@ class Mod_AddMaster(OneItemLink):
                     u"master to list of masters, thus ceding ownership of "
                     u"new content of this mod to the new master. Useful for "
                     u"splitting mods into esm/esp pairs.")
-        if not self._askContinue(message, 'bash.addMaster.continue',
+        if not self._askContinue(message, u'bash.addMaster.continue',
                                  _(u'Add Master')): return
         wildcard = bosh.modInfos.plugin_wildcard(_(u'Masters'))
         masterPaths = self._askOpenMulti(title=_(u'Add master:'),
@@ -1557,7 +1557,7 @@ class Mod_DecompileAll(EnabledLink):
 
     def Execute(self):
         message = _(u"This command will remove the effects of a 'compile all' by removing all scripts whose texts appear to be identical to the version that they override.")
-        if not self._askContinue(message, 'bash.decompileAll.continue',
+        if not self._askContinue(message, u'bash.decompileAll.continue',
                                  _(u'Decompile All')): return
         for fileName, fileInfo in self.iselected_pairs():
             if bosh.reOblivion.match(fileName.s):
@@ -1655,7 +1655,7 @@ class Mod_FlipEsm(_Esm_Esl_Flip):
               u'with the ".esm" and ".esl" extension are always forced to '
               u'load as masters. Therefore, we disallow selecting those '
               u'plugins for ESP/ESM conversion on newer games.'))
-        if not self._askContinue(message, 'bash.flipToEsmp.continue',
+        if not self._askContinue(message, u'bash.flipToEsmp.continue',
                                  _(u'Flip to ESM')): return
         for modInfo in self.iselected_infos():
             header = modInfo.header
@@ -1694,7 +1694,7 @@ class Mod_FlipEsl(_Esm_Esl_Flip):
               u'plugin. We therefore disallow selecting files with the .esl '
               u'extension for converting into a light plugin (as they '
               u'implicitly are light plugins already).'))
-        if not self._askContinue(message, 'bash.flipToEslp.continue',
+        if not self._askContinue(message, u'bash.flipToEslp.continue',
                                  _(u'Flip to ESL')): return
         for modInfo in self.iselected_infos():
             header = modInfo.header
@@ -1736,7 +1736,7 @@ class Mod_FlipMasters(OneItemLink, _Esm_Esl_Flip):
                     u'of all ESP masters of the selected plugin. Useful for '
                     u'loading ESP-mastered mods in the %(ck_name)s.') % (
                     {u'ck_name': bush.game.Ck.long_name})
-        if not self._askContinue(message, 'bash.flipMasters.continue'): return
+        if not self._askContinue(message, u'bash.flipMasters.continue'): return
         updated = [self._selected_item]
         for masterPath in self.espMasters:
             master_mod_info = bosh.modInfos.get(masterPath,None)
@@ -1762,7 +1762,7 @@ class Mod_SetVersion(OneItemLink):
                 int(10 * self._selected_info.header.version) != 8)
 
     def Execute(self):
-        if not self._askContinue(self.message, 'bash.setModVersion.continue',
+        if not self._askContinue(self.message, u'bash.setModVersion.continue',
                                  _(u'Set File Version')): return
         self._selected_info.makeBackup()
         self._selected_info.header.version = 0.8
@@ -1791,7 +1791,7 @@ class Mod_Fids_Replace(OneItemLink):
         return CBash_FidReplacer() if CBashApi.Enabled else FidReplacer()
 
     def Execute(self):
-        if not self._askContinue(self.message, 'bash.formIds.replace.continue',
+        if not self._askContinue(self.message, u'bash.formIds.replace.continue',
                                  _(u'Import Form IDs')): return
         textDir = bass.dirs[u'patches']
         #--File dialog
@@ -1974,7 +1974,7 @@ class Mod_ActorLevels_Export(_Mod_Export_Link):
         message = (_(u'This command will export the level info for NPCs whose level is offset with respect to the PC.  The exported file can be edited with most spreadsheet programs and then reimported.')
                    + u'\n\n' +
                    _(u'See the Bash help file for more info.'))
-        if not self._askContinue(message, 'bash.actorLevels.export.continue',
+        if not self._askContinue(message, u'bash.actorLevels.export.continue',
                                  _(u'Export NPC Levels')): return
         super(Mod_ActorLevels_Export, self).Execute()
 
@@ -2646,7 +2646,7 @@ class MasterList_AddMasters(ItemLink): # CRUFT
             u"master to list of masters, thus ceding ownership of new content "
             u"of this mod to the new master.  Useful for splitting mods into "
             u"esm/esp pairs.")
-        if not self._askContinue(message, 'bash.addMaster.continue',
+        if not self._askContinue(message, u'bash.addMaster.continue',
                                  _(u'Add Masters')): return
         modInfo = self.window.fileInfo
         wildcard = bosh.modInfos.plugin_wildcard(_(u'Masters'))
@@ -2683,7 +2683,7 @@ class MasterList_CleanMasters(AppendableLink, ItemLink): # CRUFT
 
     def Execute(self):
         message = _(u"WARNING!  For advanced modders only!  Removes masters that are not referenced in any records.")
-        if not self._askContinue(message, 'bash.cleanMaster.continue',
+        if not self._askContinue(message, u'bash.cleanMaster.continue',
                                  _(u'Clean Masters')): return
         modInfo = self.window.fileInfo
         mpath = modInfo.getPath()

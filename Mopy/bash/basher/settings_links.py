@@ -491,7 +491,7 @@ class Settings_DumpTranslator(AppendableLink, ItemLink):
             u'This function is for translating Bash itself (NOT mods) into '
             u'non-English languages.  For more info, '
             u'see Internationalization section of Bash readme.')
-        if not self._askContinue(message, 'bash.dump_translator.continue',
+        if not self._askContinue(message, u'bash.dump_translator.continue',
                                 _(u'Dump Translator')): return
         outPath = bass.dirs[u'l10n']
         with balt.BusyCursor():
