@@ -932,7 +932,7 @@ class _Mod_Patch_Update(_Mod_BP_Link):
         self._text = _(u'Rebuild Patch (CBash *BETA*)...') if doCBash else _(
             u'Rebuild Patch...')
         self._help = _(u'Rebuild the Bashed Patch (CBash)') if doCBash else _(
-                    u'Rebuild the Bashed Patch')
+            u'Rebuild the Bashed Patch')
 
     def _initData(self, window, selection):
         super(_Mod_Patch_Update, self)._initData(window, selection)
@@ -941,6 +941,7 @@ class _Mod_Patch_Update(_Mod_BP_Link):
                                              'bash.patch.configs', {})
         thisIsCBash = configIsCBash(config)
         self.CBashMismatch = bool(thisIsCBash != self.doCBash)
+        self.mods_to_reselect = set()
 
     @balt.conversation
     def Execute(self):
@@ -949,6 +950,12 @@ class _Mod_Patch_Update(_Mod_BP_Link):
             if not self._Execute(): return # prevent settings save
         except CancelError:
             return # prevent settings save
+        finally:
+            if self.mods_to_reselect: # may be cleared in PatchDialog#PatchExecute
+                for mod in self.mods_to_reselect:
+                    bosh.modInfos.lo_activate(mod, doSave=False)
+                bosh.modInfos.cached_lo_save_active()
+                self.window.RefreshUI(refreshSaves=True)
         # save data to disc in case of later improper shutdown leaving the
         # user guessing as to what options they built the patch with
         Link.Frame.SaveSettings()
@@ -1029,7 +1036,7 @@ class _Mod_Patch_Update(_Mod_BP_Link):
                 liststyle=u'tree',bOk=_(u'Continue Despite Errors')) as dialog:
                    if not dialog.show_modal(): return
         with PatchDialog(self.window, self._selected_info, self.doCBash,
-                         importConfig) as patchDialog:
+                         importConfig, self.mods_to_reselect) as patchDialog:
             patchDialog.show_modal()
         return self._selected_item
 
@@ -1087,7 +1094,10 @@ class _Mod_Patch_Update(_Mod_BP_Link):
                                (noMerge, noMergeKey),
                                (deactivate, deactivateKey), ]:
                 deselect |= set(dialog.getChecked(key, lst))
-            if not deselect: return
+            if not deselect:
+                return
+            else:
+                self.mods_to_reselect = set(noMerge) & deselect
         with balt.BusyCursor():
             bosh.modInfos.lo_deactivate(deselect, doSave=True)
         self.window.RefreshUI(refreshSaves=True)
