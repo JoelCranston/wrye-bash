@@ -24,6 +24,7 @@
 
 __author__ = "Ganda"
 
+from collections import defaultdict
 import wx
 import wx.wizard as wiz
 
@@ -164,13 +165,8 @@ class InstallerFomod(wiz.Wizard):
             msg = "This installer cannot start due to the following unmet conditions:\n"
             for line in str(exc).splitlines():
                 msg += "  {}\n".format(line)
-            dialog = wx.MessageDialog(
-                self,
-                msg,
-                caption="Cannot Run Installer",
-                style=wx.OK | wx.CENTER | wx.ICON_EXCLAMATION,
-            )
-            dialog.ShowModal()
+            balt.showWarning(self, msg, title="Cannot Run Installer",
+                             do_center=True)
             self.ret.cancelled = True
         else:
             if first_page is not None:  # if installer has any gui pages
@@ -243,6 +239,15 @@ class PageError(PageInstaller):
 #  that item is selected
 # ------------------------------------------------------------
 class PageSelect(PageInstaller):
+    _option_type_string = defaultdict(str)
+    _option_type_string["Required"] = "=== This option is required ===\n\n"
+    _option_type_string["Recommended"] = \
+        "=== This option is recommended ===\n\n"
+    _option_type_string["CouldBeUsable"] = \
+        "=== This option could result in instability ===\n\n"
+    _option_type_string["NotUsable"] = \
+        "=== This option cannot be selected ===\n\n"
+
     def __init__(self, parent, page):
         PageInstaller.__init__(self, parent)
 
@@ -250,9 +255,8 @@ class PageSelect(PageInstaller):
         self.group_option_map = {}
 
         sizer_main = wx.FlexGridSizer(2, 1, 10, 10)
-        label_step_name = wx.StaticText(
-            self, wx.ID_ANY, page.name, style=wx.ALIGN_CENTER
-        )
+        label_step_name = balt.StaticText(self, page.name,
+                                          style=wx.ALIGN_CENTER)
         label_step_name.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
         sizer_main.Add(label_step_name, 0, wx.EXPAND)
         sizer_content = wx.GridSizer(1, 2, 5, 5)
@@ -294,17 +298,13 @@ class PageSelect(PageInstaller):
             )
 
             for option in group:
-                if option is group[0]:
-                    radio_style = wx.RB_GROUP
-                else:
-                    radio_style = 0
-
                 if group.type in ("SelectExactlyOne", "SelectAtMostOne"):
+                    radio_style = wx.RB_GROUP if option is group[0] else 0
                     button = wx.RadioButton(
                         panel_groups, label=option.name, style=radio_style
                     )
                 else:
-                    button = wx.CheckBox(panel_groups, label=option.name)
+                    button = balt.checkBox(panel_groups, label=option.name)
                     if group.type == "SelectAll":
                         button.SetValue(True)
                         any_selected = True
@@ -377,28 +377,15 @@ class PageSelect(PageInstaller):
         else:
             self.bmp_item.SetBitmap(None)
         self.bmp_item.Thaw()
-
-        if option.type == "Required":
-            prefix = "=== This option is required ===\n\n"
-        elif option.type == "Recommended":
-            prefix = "=== This option is recommended ===\n\n"
-        elif option.type == "CouldBeUsable":
-            prefix = "=== This option could result in instability ===\n\n"
-        elif option.type == "NotUsable":
-            prefix = "=== This option cannot be selected ===\n\n"
-        else:
-            prefix = ""
-        self.text_item.SetValue(prefix + option.description)
+        self.text_item.SetValue(
+            self._option_type_string[option.type] + option.description)
 
     def on_error(self, msg):
         msg += (
             "\nPlease ensure the fomod files are correct and "
             "contact the Wrye Bash Dev Team."
         )
-        dialog = wx.MessageDialog(
-            self, msg, caption="Warning", style=wx.OK | wx.CENTER | wx.ICON_EXCLAMATION
-        )
-        dialog.ShowModal()
+        balt.showWarning(self, msg, title="Warning", do_center=True)
 
     def on_next(self):
         selection = []
