@@ -263,6 +263,7 @@ class PageSelect(PageInstaller):
 
         sizer_extra = wx.GridSizer(2, 1, 5, 5)
         self.bmp_item = balt.Picture(self, 0, 0, background=None)
+        self._img_cache = {} # creating images can be really expensive
         self.text_item = balt.RoTextCtrl(self, autotooltip=False)
         sizer_extra.Add(self.bmp_item, 1, wx.EXPAND | wx.ALL)
         sizer_extra.Add(self.text_item, 1, wx.EXPAND | wx.ALL)
@@ -371,11 +372,12 @@ class PageSelect(PageInstaller):
 
         self.bmp_item.Freeze()
         img = self.parent.archive_path.join(option.image)
-        if img.isfile():
-            image = wx.Bitmap(img.s)
-            self.bmp_item.SetBitmap(image)
-        else:
-            self.bmp_item.SetBitmap(None)
+        try:
+            image = self._img_cache[img]
+        except KeyError:
+            image = self._img_cache.setdefault(img, (
+                    img.isfile() and balt.Image(img.s).GetBitmap()) or None)
+        self.bmp_item.SetBitmap(image)
         self.bmp_item.Thaw()
         self.text_item.SetValue(
             self._option_type_string[option.type] + option.description)

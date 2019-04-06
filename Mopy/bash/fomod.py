@@ -21,7 +21,7 @@
 #  https://github.com/wrye-bash
 #
 # =============================================================================
-
+"""TODO: notes on the data model here"""
 
 __author__ = "Ganda"
 
@@ -327,14 +327,13 @@ class FomodInstaller(object):
             raise FailedCondition("\n".join(failed))
 
     @staticmethod
-    def _order_list(unordered_list, order):
+    def _order_list(unordered_list, order, _valid_values=frozenset(
+        ("Explicit", "Ascending", "Descending"))):
         if order == "Explicit":
             return unordered_list
-        elif order == "Ascending":
-            return sorted(unordered_list, key=lambda x: x.name)
-        elif order == "Descending":
-            return sorted(unordered_list, key=lambda x: x.name, reverse=True)
-        else:
+        if order not in _valid_values:
             raise ValueError(
                 "Arguments are incorrect: {}, {}".format(unordered_list, order)
             )
+        return sorted(unordered_list, key=lambda x: x.name,
+                      reverse=order == "Descending")
