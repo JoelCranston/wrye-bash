@@ -116,7 +116,7 @@ class PageInfo(object):
         self.options = options
 
 
-class FileInfo(object):
+class _FomodFileInfo(object):
     def __init__(self, source, destination, priority):
         self.source = source
         self.destination = destination
@@ -159,11 +159,18 @@ class FileInfo(object):
 
 
 class FomodInstaller(object):
-    def __init__(self, root, file_list, dst_path, game_version):
+    def __init__(self, root, file_list, dst_dir, game_version):
+        """
+
+        :param root:
+        :param file_list: the list of recognized files of the parent installer
+        :param dst_dir: the destination directory - <Game>/Data
+        :param game_version: version of the game launch exe
+        """
         self.tree = etree.parse(root)
         self.fomod_name = self.tree.findtext("moduleName", "").strip()
         self.file_list = file_list
-        self.dst_path = dst_path
+        self.dst_dir = dst_dir
         self.game_version = game_version
         self._current_page = None
         self._previous_pages = []
@@ -219,7 +226,7 @@ class FomodInstaller(object):
         required_files = []
         required_files_elem = self.tree.find("requiredInstallFiles")
         if required_files_elem is not None:
-            required_files = FileInfo.process_files(required_files_elem, self.file_list)
+            required_files = _FomodFileInfo.process_files(required_files_elem, self.file_list)
         user_files = []
         selected_options = [
             option._object for info in self._previous_pages for option in info.options
@@ -227,7 +234,7 @@ class FomodInstaller(object):
         for option in selected_options:
             option_files = option.find("files")
             if option_files is not None:
-                user_files.extend(FileInfo.process_files(option_files, self.file_list))
+                user_files.extend(_FomodFileInfo.process_files(option_files, self.file_list))
         conditional_files = []
         for pattern in self.tree.findall("conditionalFileInstalls/patterns/pattern"):
             conditions = pattern.find("dependencies")
@@ -237,7 +244,7 @@ class FomodInstaller(object):
             except FailedCondition:
                 pass
             else:
-                conditional_files.extend(FileInfo.process_files(files, self.file_list))
+                conditional_files.extend(_FomodFileInfo.process_files(files, self.file_list))
         file_dict = {}  # dst -> src
         priority_dict = {}  # dst -> priority
         for info in required_files + user_files + conditional_files:
@@ -266,16 +273,14 @@ class FomodInstaller(object):
                 flag_dict[flag_name] = flag_value
         return flag_dict
 
-    def _test_file_condition(self, file_name, file_type):
-        file_path = self.dst_path.join(file_name)
-        if not file_path.exists():
+    def _test_file_condition(self, condition):
+        file_name = condition.get("file")
+        file_type = condition.get("state")
+        file_path = self.dst_dir.join(file_name)
+        if not file_path.exists(): # TODO: ghosts?
             actual_type = "Missing"
         else:
-            is_active = cached_is_active(file_name)
-            if is_active:
-                actual_type = "Active"
-            else:
-                actual_type = "Inactive"
+            actual_type = "Active" if cached_is_active(file_name) else "Inactive"
         if actual_type != file_type:
             raise FailedCondition(
                 "File {} should be {} but is {} instead.".format(
@@ -283,7 +288,9 @@ class FomodInstaller(object):
                 )
             )
 
-    def _test_flag_condition(self, flag_name, flag_value):
+    def _test_flag_condition(self, condition):
+        flag_name = condition.get("flag")
+        flag_value = condition.get("value")
         actual_value = self._flags().get(flag_name, None)
         if actual_value != flag_value:
             raise FailedCondition(
@@ -292,12 +299,14 @@ class FomodInstaller(object):
                 )
             )
 
-    def _test_version_condition(self, version):
+    def _test_version_condition(self, condition):
+        version = condition.get("version")
         game_version = LooseVersion(self.game_version)
         version = LooseVersion(version)
         if game_version < version:
             raise FailedCondition(
-                "Game version is {} but {} is required.".format(game_version, version)
+                "Game version is {} but {} is required.".format(
+                    game_version, version)
             )
 
     def _test_conditions(self, conditions):
@@ -306,25 +315,20 @@ class FomodInstaller(object):
         condition_list = conditions.findall("*")
         for condition in condition_list:
             try:
-                if condition.tag == "fileDependency":
-                    file_name = condition.get("file")
-                    file_type = condition.get("state")
-                    self._test_file_condition(file_name, file_type)
-                elif condition.tag == "flagDependency":
-                    flag_name = condition.get("flag")
-                    flag_value = condition.get("value")
-                    self._test_flag_condition(flag_name, flag_value)
-                elif condition.tag == "gameDependency":
-                    version = condition.get("version")
-                    self._test_version_condition(version)
-                elif condition.tag == "dependencies":
-                    self._test_conditions(condition)
+                test_func = self._condition_tests.get(condition.tag, None)
+                if test_func:
+                    test_func(self, condition)
             except FailedCondition as exc:
                 failed.extend([a for a in str(exc).splitlines()])
                 if op == "And":
                     raise FailedCondition("\n".join(failed))
         if op == "Or" and len(failed) == len(condition_list):
             raise FailedCondition("\n".join(failed))
+
+    _condition_tests = {"fileDependency": _test_file_condition,
+                        "flagDependency": _test_flag_condition,
+                        "gameDependency": _test_version_condition,
+                        "dependencies": _test_conditions, }
 
     @staticmethod
     def _order_list(unordered_list, order, _valid_values=frozenset(

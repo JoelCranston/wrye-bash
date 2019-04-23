@@ -293,20 +293,21 @@ class PageSelect(PageInstaller):
             required_disable = False
 
             # group type forces selection
-            group_force_selection = group.type in (
+            group_type = group.type
+            group_force_selection = group_type in (
                 "SelectExactlyOne",
                 "SelectAtLeastOne",
             )
 
             for option in group:
-                if group.type in ("SelectExactlyOne", "SelectAtMostOne"):
+                if group_type in ("SelectExactlyOne", "SelectAtMostOne"):
                     radio_style = wx.RB_GROUP if option is group[0] else 0
                     button = wx.RadioButton(
                         panel_groups, label=option.name, style=radio_style
                     )
                 else:
                     button = balt.checkBox(panel_groups, label=option.name)
-                    if group.type == "SelectAll":
+                    if group_type == "SelectAll":
                         button.SetValue(True)
                         any_selected = True
                         button.Disable()
@@ -314,7 +315,7 @@ class PageSelect(PageInstaller):
                 if option.type == "Required":
                     button.SetValue(True)
                     any_selected = True
-                    if group.type in ("SelectExactlyOne", "SelectAtMostOne"):
+                    if group_type in ("SelectExactlyOne", "SelectAtMostOne"):
                         required_disable = True
                     else:
                         button.Disable()
@@ -343,7 +344,7 @@ class PageSelect(PageInstaller):
                 for button in self.group_option_map[sizer_group]:
                     button.Disable()
 
-            if group.type == "SelectAtMostOne":
+            if group_type == "SelectAtMostOne":
                 none_button = wx.RadioButton(panel_groups, label="None")
                 if not any_selected:
                     none_button.SetValue(True)
