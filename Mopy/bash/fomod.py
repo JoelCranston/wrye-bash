@@ -278,7 +278,7 @@ class FomodInstaller(object):
                 actual_type = "Inactive"
         if actual_type != file_type:
             raise FailedCondition(
-                "File {} should be {} but is {} intead.".format(
+                "File {} should be {} but is {} instead.".format(
                     file_name, file_type, actual_type
                 )
             )

@@ -55,7 +55,7 @@ class InstallerFomod(wiz.Wizard):
         # while the parser is running to return the _actual_ next page
         self.block_change = True
         # 'finishing' is to allow the "Next" button to be used
-        # when it's name is changed to 'Finish' on the last page of the wizard
+        # when its name is changed to 'Finish' on the last page of the wizard
         self.finishing = False
         # saving this list allows for faster processing of the files the fomod
         # installer will return.
