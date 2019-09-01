@@ -73,7 +73,7 @@ class InstallerFomod(wiz.Wizard):
         wiz.Wizard.__init__(
             self,
             parent_window,
-            title=_(u"Fomod Installer - " + self.parser.fomod_name),
+            title=_(u"FOMOD Installer - " + self.parser.fomod_name),
             pos=pos,
             style=style,
         )
