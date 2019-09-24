@@ -167,16 +167,11 @@ class _InstallLink(_InstallerLink):
         return bool(self._installables)
 
 #------------------------------------------------------------------------------
-
-
 class Installer_Fomod(OneItemLink, _InstallerLink):
     """Runs the FOMOD installer"""
     parentWindow = ''
+    _text = _(u'FOMOD Installer...')
     help = _(u"Run the FOMOD installer.")
-
-    def __init__(self):
-        super(Installer_Fomod, self).__init__()
-        self._text = _(u'FOMOD Installer...')
 
     def _enable(self):
         is_single = super(Installer_Fomod, self)._enable()
