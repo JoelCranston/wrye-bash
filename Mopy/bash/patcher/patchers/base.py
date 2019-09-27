@@ -490,22 +490,24 @@ class ImportPatcher(AImportPatcher, ListPatcher):
     # helpers WIP
     def _parse_sources(self, progress, parser):
         if not self.isActive: return None
-        fullNames = parser(aliases=self.patchFile.aliases)
+        parser_instance = parser()
+        parser_instance.aliases = self.patchFile.aliases
+        parser_instance.called_from_patcher = True
         progress.setFull(len(self.srcs))
         for srcFile in self.srcs:
             srcPath = GPath(srcFile)
             if bosh.ModInfos.rightFileType(srcPath):
                 if srcPath not in bosh.modInfos: continue
                 srcInfo = bosh.modInfos[srcPath]
-                fullNames.readFromMod(srcInfo)
+                parser_instance.readFromMod(srcInfo)
             else:
                 if srcPath not in self.patches_set: continue
                 try:
-                    fullNames.readFromText(getPatchesPath(srcFile))
+                    parser_instance.readFromText(getPatchesPath(srcFile))
                 except UnicodeError as e: # originally in NamesPatcher, keep ?
                     print(srcPath.stail, u'is not saved in UTF-8 format:', e)
             progress.plus()
-        return fullNames
+        return parser_instance
 
 class CBash_ImportPatcher(AImportPatcher, CBash_ListPatcher, SpecialPatcher):
     scanRequiresChecked = True
