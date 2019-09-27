@@ -1277,8 +1277,8 @@ class ImportFactions(_SimpleImporter, _AImportFactions):
         actorFactions = self._parse_sources(progress, parser=ActorFactions)
         if not actorFactions: return
         #--Finish
-        id_factions= self.id_data
-        for type,aFid_factions in actorFactions.type_id_factions.iteritems():
+        id_factions = self.id_data
+        for type, aFid_factions in actorFactions.id_stored_info.iteritems():
             if type not in ('CREA','NPC_'): continue
             self.activeTypes.append(type)
             for longid,factions in aFid_factions.iteritems():
