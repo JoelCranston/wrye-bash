@@ -515,6 +515,13 @@ class GameInfo(object):
     # Human-readable names for each actor value
     actor_values = []
 
+    #--------------------------------------------------------------------------
+    # Relations Patcher
+    #--------------------------------------------------------------------------
+    relations_attrs = ()
+    relations_csv_header = u''
+    relations_csv_row_format = u''
+
     # Record type to name dictionary
     record_type_name = {}
 
@@ -562,9 +569,10 @@ class GameInfo(object):
         u'hostile_effects', u'inventoryTypes', u'keywords_types', u'listTypes',
         u'mgef_basevalue', u'mgef_name', u'mgef_school', u'namesTypes',
         u'object_bounds_types', u'pricesTypes', u'record_type_name',
-        u'save_rec_types', u'scripts_types', u'soundsLongsTypes',
-        u'soundsTypes', u'spell_stats_attrs', u'statsHeaders', u'statsTypes',
-        u'text_long_types', u'text_types',
+        u'relations_attrs', u'relations_csv_header',
+        u'relations_csv_row_format', u'save_rec_types', u'scripts_types',
+        u'soundsLongsTypes', u'soundsTypes', u'spell_stats_attrs',
+        u'statsHeaders', u'statsTypes', u'text_long_types', u'text_types',
     }
 
     @classmethod
