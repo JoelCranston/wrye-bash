@@ -78,7 +78,7 @@ class InstallerWizard(WizardDialog):
     pages based on a script."""
     _def_size = (600, 500)
 
-    def __init__(self, parent, installer, bAuto, subs):
+    def __init__(self, parent, installer, bAuto):
         super(InstallerWizard, self).__init__(parent,
             title=_(u'Installer Wizard'), sizes_dict=bass.settings,
             size_key=u'bash.wizard.size', pos_key=u'bash.wizard.pos')
@@ -95,7 +95,7 @@ class InstallerWizard(WizardDialog):
         self.finishing = False
         #parser that will spit out the pages
         self.wizard_file = installer.wizard_file()
-        self.parser = WryeParser(self, installer, subs, bAuto)
+        self.parser = WryeParser(self, installer, bAuto)
         #Intercept the changing event so we can implement 'blockChange'
         self.on_wiz_page_change.subscribe(self.on_page_change)
         self.ret = WizInstallInfo()
@@ -614,7 +614,7 @@ class WryeParser(ScriptParser.Parser):
             outLines = outLines[:lastBlank]
         return outLines
 
-    def __init__(self, wiz_parent, installer, subs, bAuto, codebox=False):
+    def __init__(self, wiz_parent, installer, bAuto, codebox=False):
         ScriptParser.Parser.__init__(self)
         if not codebox:
             self._wiz_parent = wiz_parent
