@@ -26,7 +26,7 @@
 __author__ = "Ganda"
 
 import os
-from collections import Sequence
+from collections import OrderedDict, Sequence
 from distutils.version import LooseVersion
 from xml.etree import ElementTree as etree
 
@@ -110,12 +110,6 @@ class InstallerOption(object):
                 self.type = default
 
 
-class PageInfo(object):
-    def __init__(self, page, options):
-        self.page = page
-        self.options = options
-
-
 class _FomodFileInfo(object):
     def __init__(self, source, destination, priority):
         self.source = source
@@ -171,7 +165,7 @@ class FomodInstaller(object):
         self.dst_dir = dst_dir
         self.game_version = game_version
         self._current_page = None
-        self._previous_pages = []
+        self._previous_pages = OrderedDict()
         self._has_finished = False
 
     def start(self):
@@ -189,7 +183,7 @@ class FomodInstaller(object):
             return None
         sort_list = [option for group in self._current_page for option in group]
         sorted_selection = sorted(selection, key=sort_list.index)
-        self._previous_pages.append(PageInfo(self._current_page, sorted_selection))
+        self._previous_pages[self._current_page] = sorted_selection
         ordered_pages = self._order_list(
             self.tree.findall("installSteps/installStep"),
             self.tree.find("installSteps").get("order", "Ascending"),
@@ -213,10 +207,10 @@ class FomodInstaller(object):
     def previous(self):
         self._has_finished = False
         try:
-            info = self._previous_pages.pop()
-            self._current_page = info.page
-            return info.page, info.options
-        except IndexError:
+            page, options = self._previous_pages.popitem(last=True)
+            self._current_page = page
+            return page, options
+        except KeyError:
             self._current_page = None
             return None
 
@@ -227,7 +221,7 @@ class FomodInstaller(object):
             required_files = _FomodFileInfo.process_files(required_files_elem, self.file_list)
         user_files = []
         selected_options = [
-            option._object for info in self._previous_pages for option in info.options
+            option._object for options in self._previous_pages.values() for option in options
         ]
         for option in selected_options:
             option_files = option.find("files")
@@ -259,8 +253,8 @@ class FomodInstaller(object):
         flag_dict = {}
         flags_list = [
             option._object.find("conditionFlags")
-            for info in self._previous_pages
-            for option in info.options
+            for options in self._previous_pages.values()
+            for option in options
         ]
         for flags in flags_list:
             if flags is None:
