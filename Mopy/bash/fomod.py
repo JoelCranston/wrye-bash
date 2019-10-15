@@ -126,7 +126,6 @@ class _FomodFileInfo(object):
     def process_files(cls, files_elem, file_list):
         result = []
         for file_object in files_elem.findall("*"):
-            print etree.tostring(file_object)
             source = file_object.get("source")
             if source.endswith(("/", "\\")):
                 source = source[:-1]
@@ -145,7 +144,6 @@ class _FomodFileInfo(object):
                 # destination still needs normalizing
                 destination = Path(destination)
             priority = int(file_object.get("priority", "0"))
-            print source, destination, priority
             for fname in file_list:
                 if fname.lower() == source.s.lower():  # it's a file
                     result.append(cls(source, destination, priority))
