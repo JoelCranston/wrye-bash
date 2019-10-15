@@ -21,7 +21,24 @@
 #  https://github.com/wrye-bash
 #
 # =============================================================================
-"""TODO: notes on the data model here"""
+
+"""
+Requirement for further reading: https://github.com/wrye-bash/wrye-bash/wiki/%5Bdev%5D-Fomod-for-Devs
+
+This is a very simplistic backend installer for FOMOD. Ported from GandaG/pyfomod
+
+Only entry point is FomodInstaller. Parsing of the xml tree is done via
+Python's std lib and only as-needed (so that instancing this class isn't
+too performance-heavy and the burden is divided between installer pages)
+
+The only return values (other than exceptions) a user is expected to have
+out of the FomodInstaller methods are the three wrapper classes:
+InstallerPage, that wraps 'installStep'; InstallerGroup, that wraps 'group';
+InstallerOption, that wraps 'plugin'. These allow for a more pythonic
+interaction with the FOMOD tree - they mimic ElementTree elements such that
+their children are available by iteration (subclassing Sequence) and useful
+xml attributes/text are available via instance attributes.
+"""
 
 __author__ = "Ganda"
 
@@ -35,13 +52,27 @@ from .load_order import cached_is_active
 
 
 class FailedCondition(Exception):
+    """
+    Exception used to signal when a dependencies check is failed.
+    Message passed to it should be human-readable and proper for
+    a user to understand.
+    """
     pass
 
 
 class InstallerPage(Sequence):
     def __init__(self, installer, page):
+        """
+        Wrapper around the ElementTree element 'installStep'.
+
+        Provides the page's name via the `name` instance attribute
+        and the page's groups via Sequence API (this behaves like a list)
+
+        :param installer: the parent FomodInstaller
+        :param page: the ElementTree element for an 'installStep'
+        """
         self._installer = installer
-        self._object = page
+        self._object = page  # the original ElementTree element
         self._group_list = installer._order_list(
             [
                 InstallerGroup(installer, group)
@@ -60,6 +91,16 @@ class InstallerPage(Sequence):
 
 class InstallerGroup(Sequence):
     def __init__(self, installer, group):
+        """
+        Wrapper around the ElementTree element 'group'.
+
+        Provides the group's name and type via the `name` and `type` instance
+        attributes, respectively, and the group's option via Sequence API
+        (this behaves like a list)
+
+        :param installer: the parent FomodInstaller
+        :param page: the ElementTree element for an 'group'
+        """
         self._installer = installer
         self._object = group
         self._option_list = installer._order_list(
@@ -81,6 +122,15 @@ class InstallerGroup(Sequence):
 
 class InstallerOption(object):
     def __init__(self, installer, option):
+        """
+        Wrapper around the ElementTree element 'plugin'.
+
+        Provides the option's name, description, image path and type
+        via instance attributes with the same names.
+
+        :param installer: the parent FomodInstaller
+        :param page: the ElementTree element for an 'plugin'
+        """
         self._installer = installer
         self._object = option
         self.name = option.get("name")
@@ -112,12 +162,34 @@ class InstallerOption(object):
 
 class _FomodFileInfo(object):
     def __init__(self, source, destination, priority):
+        """
+        Stores file info.
+
+        :param source: string source path
+        :param destination: string destination path
+        :param priority: file priority
+        """
         self.source = source
         self.destination = destination
         self.priority = priority
 
     @classmethod
     def process_files(cls, files_elem, file_list):
+        """
+        Processes the elements in *files_elem* into a list of _FomodFileInfo.
+
+        When parsing these elements there are a number of edge cases that must
+        be taken into account, like a missing destination attribute having the
+        same value as the source attribute or a 'file' element installing a
+        folder.
+
+        The returned list consists only of "src file" -> "dst file" mappings
+        and never any folders to simplify installationlater on (python has a
+        hard time copying folders)
+
+        :param files_elem: list of ElementTree elements 'file' and 'folder'
+        :param file_list: list of files in the mod being installed
+        """
         result = []
         for file_object in files_elem.findall("*"):
             source = file_object.get("source")
@@ -153,9 +225,28 @@ class _FomodFileInfo(object):
 class FomodInstaller(object):
     def __init__(self, root, file_list, dst_dir, game_version):
         """
+        Represents the installer itself. Keeps parsing on instancing to a
+        minimum to reduce performance impact.
 
-        :param root:
-        :param file_list: the list of recognized files of the parent installer
+        To evaluate 'moduleDependencies' and receive the first page (InstallerPage),
+        call `start()`. If you receive `None` it's because the installer had no visible
+        pages and has finished.
+
+        Once the user has performed their selections (a list of InstallerOption), you can
+        pass these to `next_(selections)` to receive the next page. Keep in mind these
+        selections are not validated at all - this must be done by the callers of this method.
+        If you receive `None` it's because you have reached the end of the installer's pages.
+
+        If the user desires to go to a previous page, you can call `previous()`. It will return
+        a tuple of the previous InstallerPage and a list of the selected InstallerOption on that
+        page. If you receive `None` it's because you have reached the start of the installer.
+
+        Once the installer has finished, you may call `files()` to receive a mapping of
+        "file source string" -> "file destination string". These are the files to be installed.
+        This installer does not install or provide any way to do so, leaving that at your discretion.
+
+        :param root: string path to "ModuleConfig.xml"
+        :param file_list: the list of recognized files of the mod being installed
         :param dst_dir: the destination directory - <Game>/Data
         :param game_version: version of the game launch exe
         """
@@ -250,6 +341,10 @@ class FomodInstaller(object):
         return {a.s: b.s for a, b in file_dict.iteritems()}
 
     def _flags(self):
+        """
+        Returns a mapping of "flag name" -> "flag value".
+        Useful for either debugging or testing flag dependencies.
+        """
         flag_dict = {}
         flags_list = [
             option._object.find("conditionFlags")
