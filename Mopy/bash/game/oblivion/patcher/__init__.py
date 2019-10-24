@@ -26,25 +26,27 @@
 contains the data structures that are dynamically set on a per game basis in
 bush."""
 from ....patcher import PatcherInfo as pi
-from .importers import *
-from .special import * # defines the __all__ directive
+from .importers import RoadImporter, CBash_RoadImporter
+from .special import AlchemicalCatalogs, CBash_AlchemicalCatalogs, \
+    SEWorldEnforcer, CBash_SEWorldEnforcer, CoblExhaustion, \
+    CBash_CoblExhaustion, MFactMarker, CBash_MFactMarker
 
 gameSpecificPatchers = {
     # special
-    "AlchemicalCatalogs": pi(AlchemicalCatalogs, 'CBash_AlchemicalCatalogs'),
-    "CBash_AlchemicalCatalogs": pi(CBash_AlchemicalCatalogs, 'AlchemicalCatalogs'),
-    "SEWorldEnforcer": pi(SEWorldEnforcer, 'CBash_SEWorldEnforcer'),
-    "CBash_SEWorldEnforcer": pi(CBash_SEWorldEnforcer, 'SEWorldEnforcer'),
+    "AlchemicalCatalogs": pi(AlchemicalCatalogs, 'CBash_AlchemicalCatalogs', AlchemicalCatalogs.patcher_text),
+    "CBash_AlchemicalCatalogs": pi(CBash_AlchemicalCatalogs, 'AlchemicalCatalogs', CBash_AlchemicalCatalogs.patcher_text),
+    "SEWorldEnforcer": pi(SEWorldEnforcer, 'CBash_SEWorldEnforcer', SEWorldEnforcer.patcher_text),
+    "CBash_SEWorldEnforcer": pi(CBash_SEWorldEnforcer, 'SEWorldEnforcer', CBash_SEWorldEnforcer.patcher_text),
 }
 gameSpecificListPatchers = {
     # special
-    "CoblExhaustion": pi(CoblExhaustion, 'CBash_CoblExhaustion'),
-    "CBash_CoblExhaustion": pi(CBash_CoblExhaustion, 'CoblExhaustion'),
-    "MFactMarker": pi(MFactMarker, 'CBash_MFactMarker'),
-    "CBash_MFactMarker": pi(CBash_MFactMarker, 'MFactMarker'),
+    "CoblExhaustion": pi(CoblExhaustion, 'CBash_CoblExhaustion', CoblExhaustion.patcher_text),
+    "CBash_CoblExhaustion": pi(CBash_CoblExhaustion, 'CoblExhaustion', CBash_CoblExhaustion.patcher_text),
+    "MFactMarker": pi(MFactMarker, 'CBash_MFactMarker', MFactMarker.patcher_text),
+    "CBash_MFactMarker": pi(CBash_MFactMarker, 'MFactMarker', CBash_MFactMarker.patcher_text),
 }
 game_specific_import_patchers = {
     # importers
-    'RoadImporter': pi(RoadImporter, 'CBash_RoadImporter'),
-    'CBash_RoadImporter': pi(CBash_RoadImporter, 'RoadImporter'),
+    'RoadImporter': pi(RoadImporter, 'CBash_RoadImporter', RoadImporter.patcher_text),
+    'CBash_RoadImporter': pi(CBash_RoadImporter, 'RoadImporter', CBash_RoadImporter.patcher_text),
 }

@@ -54,9 +54,10 @@ def _PrintFormID(fid):
 
 class _AAlchemicalCatalogs(SpecialPatcher):
     """Updates COBL alchemical catalogs."""
-    name = _(u'Cobl Catalogs')
-    text = (_(u"Update COBL's catalogs of alchemical ingredients and effects.")
-            + u'\n\n' + _(u'Will only run if Cobl Main.esm is loaded.'))
+    patcher_name = _(u'Cobl Catalogs')
+    patcher_text = u'\n\n'.join(
+        [_(u"Update COBL's catalogs of alchemical ingredients and effects."),
+         _(u'Will only run if Cobl Main.esm is loaded.')])
     # CONFIG DEFAULTS
     default_isEnabled = True
 
@@ -358,9 +359,9 @@ class _ACoblExhaustion(SpecialPatcher):
     # -         longid = (aliases.get(mod,mod),int(objectIndex[2:],16))
     # +         longid = FormID(aliases.get(mod,mod),int(objectIndex[2:],16))
     name = _(u'Cobl Exhaustion')
-    text = (_(u"Modify greater powers to use Cobl's Power Exhaustion feature.")
-            + u'\n\n' + _(u'Will only run if Cobl Main v1.66 (or higher) is'
-                          u' active.'))
+    patcher_text = u'\n\n'.join(
+        [_(u"Modify greater powers to use Cobl's Power Exhaustion feature."),
+         _(u'Will only run if Cobl Main v1.66 (or higher) is active.')])
     canAutoItemCheck = False #--GUI: Whether new items are checked by default
     autoKey = {u'Exhaust'}
 
@@ -530,10 +531,9 @@ class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
 class _AMFactMarker(SpecialPatcher):
     """Mark factions that player can acquire while morphing."""
     name = _(u'Morph Factions')
-    text = (_(u"Mark factions that player can acquire while morphing.") +
-            u'\n\n' +
-            _(u"Requires Cobl 1.28 and Wrye Morph or similar.")
-            )
+    patcher_text = u'\n\n'.join(
+        [_(u"Mark factions that player can acquire while morphing."),
+         _(u"Requires Cobl 1.28 and Wrye Morph or similar.")])
     autoRe = re.compile(u'^UNDEFINED$', re.I | re.U)
     canAutoItemCheck = False #--GUI: Whether new items are checked by default
     srcsHeader = u'=== ' + _(u'Source Mods/Files')
@@ -751,9 +751,10 @@ class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
 #------------------------------------------------------------------------------
 class _ASEWorldEnforcer(SpecialPatcher):
     """Suspends Cyrodiil quests while in Shivering Isles."""
-    name = _(u'SEWorld Tests')
-    text = _(u"Suspends Cyrodiil quests while in Shivering Isles. I.e. "
-             u"re-instates GetPlayerInSEWorld tests as necessary.")
+    patcher_name = _(u'SEWorld Tests')
+    patcher_text = _(u"Suspends Cyrodiil quests while in Shivering Isles. "
+                     u"I.e. re-instates GetPlayerInSEWorld tests as "
+                     u"necessary.")
     # CONFIG DEFAULTS
     default_isEnabled = True
 

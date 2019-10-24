@@ -31,8 +31,8 @@ __all__ = ['RoadImporter', 'CBash_RoadImporter']
 class _ARoadImporter(AImportPatcher):
     """Imports roads."""
     name = _(u'Import Roads')
-    text = _(u"Import roads from source mods.")
-    tip = text
+    patcher_text = _(u"Import roads from source mods.")
+    tip = patcher_text
     autoKey = {u'Roads'}
 
 class RoadImporter(ImportPatcher, _ARoadImporter):

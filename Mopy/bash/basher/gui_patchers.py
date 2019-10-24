@@ -41,9 +41,10 @@ class _PatcherPanel(object):
     selectCommands = True # whether this panel displays De/Select All
     # CONFIG DEFAULTS
     default_isEnabled = False # is the patcher enabled on a new bashed patch ?
+    patcher_type = type
 
     def SetIsFirstLoad(self,isFirstLoad):
-        self._isFirstLoad = isFirstLoad
+        self.is_first_load = isFirstLoad
 
     def _EnsurePatcherEnabled(self):
         self.patch_dialog.CheckPatcher(self)
@@ -52,8 +53,8 @@ class _PatcherPanel(object):
     def _BoldPatcherLabel(self): self.patch_dialog.BoldPatcher(self)
 
     def _GetIsFirstLoad(self):
-        if hasattr(self, '_isFirstLoad'):
-            return self._isFirstLoad
+        if hasattr(self, 'is_first_load'):
+            return self.is_first_load
         else:
             return False
 
@@ -884,7 +885,7 @@ class _GmstTweakerPanel(_TweakPatcherPanel):
             tweak.init_tweak_config(config)
 
 #------------------------------------------------------------------------------
-# GUI Patcher classes - mixins of patchers and the GUI patchers defined above -
+# GUI Patcher classes
 # Do _not_ rename the gui patcher classes or you will break existing BP configs
 #------------------------------------------------------------------------------
 from ..patcher.patchers import base
@@ -895,8 +896,10 @@ from ..patcher.patchers import multitweak_actors, multitweak_assorted, \
 from ..patcher.patchers import special
 
 # Patchers 10 -----------------------------------------------------------------
-class AliasesPatcher(base.AliasesPatcher, _AliasesPatcherPanel): pass
-class CBash_AliasesPatcher(base.CBash_AliasesPatcher, _AliasesPatcherPanel):
+class AliasesPatcher(_AliasesPatcherPanel): patcher_type = base.AliasesPatcher
+class CBash_AliasesPatcher(_AliasesPatcherPanel):
+    patcher_type = base.CBash_AliasesPatcher
+
     def getConfig(self,configs):
         """Get config from configs dictionary and/or set to default."""
         config = super(CBash_AliasesPatcher,self).getConfig(configs)
@@ -904,129 +907,166 @@ class CBash_AliasesPatcher(base.CBash_AliasesPatcher, _AliasesPatcherPanel):
         # mods - but with the least processing required. ##: NOT HERE !
         return config
 
-class PatchMerger(base.PatchMerger, _MergerPanel): pass
-class CBash_PatchMerger(base.CBash_PatchMerger, _MergerPanel): pass
+class PatchMerger(_MergerPanel): patcher_type = base.PatchMerger
+class CBash_PatchMerger(_MergerPanel): patcher_type = base.CBash_PatchMerger
 
 # Patchers 20 -----------------------------------------------------------------
-class GraphicsPatcher(importers.GraphicsPatcher, _ImporterPatcherPanel): pass
-class CBash_GraphicsPatcher(importers.CBash_GraphicsPatcher,
-                            _ImporterPatcherPanel): pass
+class GraphicsPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.GraphicsPatcher
+class CBash_GraphicsPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_GraphicsPatcher
 
-class KFFZPatcher(importers.KFFZPatcher, _ImporterPatcherPanel): pass
-class CBash_KFFZPatcher(importers.CBash_KFFZPatcher, _ImporterPatcherPanel): pass
+class KFFZPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.KFFZPatcher
+class CBash_KFFZPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_KFFZPatcher
 
-class NPCAIPackagePatcher(importers.NPCAIPackagePatcher,
-                          _ImporterPatcherPanel): pass
-class CBash_NPCAIPackagePatcher(importers.CBash_NPCAIPackagePatcher,
-                                _ImporterPatcherPanel): pass
+class NPCAIPackagePatcher(_ImporterPatcherPanel):
+    patcher_type = importers.NPCAIPackagePatcher
+class CBash_NPCAIPackagePatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_NPCAIPackagePatcher
 
-class ActorImporter(importers.ActorImporter, _ImporterPatcherPanel): pass
-class CBash_ActorImporter(importers.CBash_ActorImporter,
-                          _ImporterPatcherPanel): pass
+class ActorImporter(_ImporterPatcherPanel):
+    patcher_type = importers.ActorImporter
+class CBash_ActorImporter(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_ActorImporter
 
-class DeathItemPatcher(importers.DeathItemPatcher, _ImporterPatcherPanel): pass
-class CBash_DeathItemPatcher(importers.CBash_DeathItemPatcher,
-                             _ImporterPatcherPanel): pass
+class DeathItemPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.DeathItemPatcher
+class CBash_DeathItemPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_DeathItemPatcher
 
-class CellImporter(importers.CellImporter, _ImporterPatcherPanel): pass
-class CBash_CellImporter(importers.CBash_CellImporter, _ImporterPatcherPanel): pass
+class CellImporter(_ImporterPatcherPanel):
+    patcher_type = importers.CellImporter
+class CBash_CellImporter(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_CellImporter
 
-class ImportFactions(importers.ImportFactions, _ImporterPatcherPanel): pass
-class CBash_ImportFactions(importers.CBash_ImportFactions,
-                           _ImporterPatcherPanel): pass
+class ImportFactions(_ImporterPatcherPanel):
+    patcher_type = importers.ImportFactions
+class CBash_ImportFactions(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_ImportFactions
 
-class ImportRelations(importers.ImportRelations, _ImporterPatcherPanel): pass
-class CBash_ImportRelations(importers.CBash_ImportRelations,
-                            _ImporterPatcherPanel): pass
+class ImportRelations(_ImporterPatcherPanel):
+    patcher_type = importers.ImportRelations
+class CBash_ImportRelations(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_ImportRelations
 
-class ImportInventory(importers.ImportInventory, _ImporterPatcherPanel): pass
-class CBash_ImportInventory(importers.CBash_ImportInventory,
-                            _ImporterPatcherPanel): pass
+class ImportInventory(_ImporterPatcherPanel):
+    patcher_type = importers.ImportInventory
+class CBash_ImportInventory(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_ImportInventory
 
-class ImportActorsSpells(importers.ImportActorsSpells, _ImporterPatcherPanel): pass
-class CBash_ImportActorsSpells(importers.CBash_ImportActorsSpells,
-                               _ImporterPatcherPanel): pass
+class ImportActorsSpells(_ImporterPatcherPanel):
+    patcher_type = importers.ImportActorsSpells
+class CBash_ImportActorsSpells(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_ImportActorsSpells
 
-class NamesPatcher(importers.NamesPatcher, _ImporterPatcherPanel): pass
-class CBash_NamesPatcher(importers.CBash_NamesPatcher, _ImporterPatcherPanel): pass
+class NamesPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.NamesPatcher
+class CBash_NamesPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_NamesPatcher
 
-class NpcFacePatcher(importers.NpcFacePatcher, _ImporterPatcherPanel): pass
-class CBash_NpcFacePatcher(importers.CBash_NpcFacePatcher,
-                           _ImporterPatcherPanel): pass
+class NpcFacePatcher(_ImporterPatcherPanel):
+    patcher_type = importers.NpcFacePatcher
+class CBash_NpcFacePatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_NpcFacePatcher
 
-class SoundPatcher(importers.SoundPatcher, _ImporterPatcherPanel): pass
-class CBash_SoundPatcher(importers.CBash_SoundPatcher, _ImporterPatcherPanel): pass
+class SoundPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.SoundPatcher
+class CBash_SoundPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_SoundPatcher
 
-class StatsPatcher(importers.StatsPatcher, _ImporterPatcherPanel): pass
-class CBash_StatsPatcher(importers.CBash_StatsPatcher, _ImporterPatcherPanel): pass
+class StatsPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.StatsPatcher
+class CBash_StatsPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_StatsPatcher
 
-class ImportScripts(importers.ImportScripts, _ImporterPatcherPanel): pass
-class CBash_ImportScripts(importers.CBash_ImportScripts,
-                          _ImporterPatcherPanel): pass
+class ImportScripts(_ImporterPatcherPanel):
+    patcher_type = importers.ImportScripts
+class CBash_ImportScripts(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_ImportScripts
 
-class SpellsPatcher(importers.SpellsPatcher, _ImporterPatcherPanel): pass
-class CBash_SpellsPatcher(importers.CBash_SpellsPatcher,
-                          _ImporterPatcherPanel): pass
+class SpellsPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.SpellsPatcher
+class CBash_SpellsPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.CBash_SpellsPatcher
 
-class DestructiblePatcher(importers.DestructiblePatcher, _ImporterPatcherPanel): pass
+class DestructiblePatcher(_ImporterPatcherPanel):
+    patcher_type = importers.DestructiblePatcher
 
-class WeaponModsPatcher(importers.WeaponModsPatcher, _ImporterPatcherPanel): pass
+class WeaponModsPatcher(_ImporterPatcherPanel):
+    patcher_type = importers.WeaponModsPatcher
 
-class KeywordsImporter(importers.KeywordsImporter, _ImporterPatcherPanel): pass
+class KeywordsImporter(_ImporterPatcherPanel):
+    patcher_type = importers.KeywordsImporter
 
-class TextImporter(importers.TextImporter, _ImporterPatcherPanel): pass
+class TextImporter(_ImporterPatcherPanel):
+    patcher_type = importers.TextImporter
 
-class ObjectBoundsImporter(importers.ObjectBoundsImporter, _ImporterPatcherPanel): pass
+class ObjectBoundsImporter(_ImporterPatcherPanel):
+    patcher_type = importers.ObjectBoundsImporter
 
 # Patchers 30 -----------------------------------------------------------------
-class AssortedTweaker(multitweak_assorted.AssortedTweaker,
-                      _TweakPatcherPanel): default_isEnabled = True
-class CBash_AssortedTweaker(multitweak_assorted.CBash_AssortedTweaker,
-                            _TweakPatcherPanel): default_isEnabled = True
+class AssortedTweaker(_TweakPatcherPanel):
+    patcher_type = multitweak_assorted.AssortedTweaker
+    default_isEnabled = True
+class CBash_AssortedTweaker(_TweakPatcherPanel):
+    patcher_type = multitweak_assorted.CBash_AssortedTweaker
+    default_isEnabled = True
 
-class ClothesTweaker(multitweak_clothes.ClothesTweaker,
-                     _TweakPatcherPanel): pass
-class CBash_ClothesTweaker(multitweak_clothes.CBash_ClothesTweaker,
-                           _TweakPatcherPanel): pass
+class ClothesTweaker(_TweakPatcherPanel):
+    patcher_type = multitweak_clothes.ClothesTweaker
+class CBash_ClothesTweaker(_TweakPatcherPanel):
+    patcher_type = multitweak_clothes.CBash_ClothesTweaker
 
-class GmstTweaker(multitweak_settings.GmstTweaker, _GmstTweakerPanel): pass
-class CBash_GmstTweaker(multitweak_settings.CBash_GmstTweaker,
-                        _GmstTweakerPanel): pass
+class GmstTweaker(_GmstTweakerPanel):
+    patcher_type = multitweak_settings.GmstTweaker
+class CBash_GmstTweaker(_GmstTweakerPanel):
+    patcher_type = multitweak_settings.CBash_GmstTweaker
 
-class NamesTweaker(multitweak_names.NamesTweaker, _TweakPatcherPanel): pass
-class CBash_NamesTweaker(multitweak_names.CBash_NamesTweaker,
-                         _TweakPatcherPanel): pass
+class NamesTweaker(_TweakPatcherPanel):
+    patcher_type = multitweak_names.NamesTweaker
+class CBash_NamesTweaker(_TweakPatcherPanel):
+    patcher_type = multitweak_names.CBash_NamesTweaker
 
-class TweakActors(multitweak_actors.TweakActors, _TweakPatcherPanel): pass
-class CBash_TweakActors(multitweak_actors.CBash_TweakActors,
-                        _TweakPatcherPanel): pass
+class TweakActors(_TweakPatcherPanel):
+    patcher_type = multitweak_actors.TweakActors
+class CBash_TweakActors(_TweakPatcherPanel):
+    patcher_type = multitweak_actors.CBash_TweakActors
 
 # Patchers 40 -----------------------------------------------------------------
-class UpdateReferences(base.UpdateReferences, _ListPatcherPanel):
+class UpdateReferences(_ListPatcherPanel):
+    patcher_type = base.UpdateReferences
     canAutoItemCheck = False #--GUI: Whether new items are checked by default.
-class CBash_UpdateReferences(base.CBash_UpdateReferences,
-                             _ListPatcherPanel):
+class CBash_UpdateReferences(_ListPatcherPanel):
+    patcher_type = base.CBash_UpdateReferences
     canAutoItemCheck = False #--GUI: Whether new items are checked by default.
 
-class RacePatcher(races_multitweaks.RacePatcher, _DoublePatcherPanel): pass
-class CBash_RacePatcher(races_multitweaks.CBash_RacePatcher,
-                        _DoublePatcherPanel): pass
+class RacePatcher(_DoublePatcherPanel):
+    patcher_type = races_multitweaks.RacePatcher
+class CBash_RacePatcher(_DoublePatcherPanel):
+    patcher_type = races_multitweaks.CBash_RacePatcher
 
-class ListsMerger(special.ListsMerger, _ListsMergerPanel):
+class ListsMerger(_ListsMergerPanel):
+    patcher_type = special.ListsMerger
     show_empty_sublist_checkbox = True
-class CBash_ListsMerger(special.CBash_ListsMerger, _ListsMergerPanel):
+class CBash_ListsMerger(_ListsMergerPanel):
+    patcher_type = special.CBash_ListsMerger
     show_empty_sublist_checkbox = True
 
-class FidListsMerger(special.FidListsMerger, _ListsMergerPanel):
+class FidListsMerger(_ListsMergerPanel):
+    patcher_type = special.FidListsMerger
     listLabel = _(u"Override Deflst Tags")
     forceItemCheck = False #--Force configChecked to True for all items
     choiceMenu = (u'Auto', u'----', u'Deflst')
     # CONFIG DEFAULTS
     default_isEnabled = False
 
-class ContentsChecker(special.ContentsChecker, _PatcherPanel):
+class ContentsChecker(_PatcherPanel):
+    patcher_type = special.ContentsChecker
     default_isEnabled = True
-class CBash_ContentsChecker(special.CBash_ContentsChecker, _PatcherPanel):
+class CBash_ContentsChecker(_PatcherPanel):
+    patcher_type = special.CBash_ContentsChecker
     default_isEnabled = True
 
 #------------------------------------------------------------------------------
@@ -1036,30 +1076,27 @@ from .patcher_dialog import PBash_gui_patchers, CBash_gui_patchers, \
     otherPatcherDict
 # Dynamically create game specific UI patcher classes and add them to module's
 # scope
-from importlib import import_module
-gamePatcher = import_module('.patcher', ##: move in bush.py !
-                            package=bush.game_mod.__name__)
 # Patchers with no options
-for patcher_name, p_info in gamePatcher.gameSpecificPatchers.items():
-    globals()[patcher_name] = type(
-        patcher_name, (p_info.clazz, _PatcherPanel), {})
-    if p_info.twinPatcher:
-        otherPatcherDict[patcher_name] = p_info.twinPatcher
+for patcher_name, p_info in bush.game.gameSpecificPatchers.items():
+    globals()[patcher_name] = type(patcher_name, (_PatcherPanel,),
+                                   {'patcher_type': p_info.clazz,
+                                    'patcher_text': p_info.patcher_text})
+    if p_info.twin_patcher:
+        otherPatcherDict[patcher_name] = p_info.twin_patcher
 # Simple list patchers
-for patcher_name, p_info in gamePatcher.gameSpecificListPatchers.items():
-    globals()[patcher_name] = type(
-        patcher_name, (p_info.clazz, _ListPatcherPanel), {})
-    if p_info.twinPatcher:
-        otherPatcherDict[patcher_name] = p_info.twinPatcher
+for patcher_name, p_info in bush.game.gameSpecificListPatchers.items():
+    globals()[patcher_name] = type(patcher_name, (_ListPatcherPanel,),
+                                   {'patcher_type': p_info.clazz,
+                                    'patcher_text': p_info.patcher_text})
+    if p_info.twin_patcher:
+        otherPatcherDict[patcher_name] = p_info.twin_patcher
 # Import patchers
-for patcher_name, p_info in \
-        gamePatcher.game_specific_import_patchers.items():
-    globals()[patcher_name] = type(
-        patcher_name, (p_info.clazz, _ImporterPatcherPanel), {})
-    if p_info.twinPatcher:
-        otherPatcherDict[patcher_name] = p_info.twinPatcher
-
-del import_module
+for patcher_name, p_info in bush.game.game_specific_import_patchers.items():
+    globals()[patcher_name] = type(patcher_name, (_ImporterPatcherPanel,),
+                                   {'patcher_type': p_info.clazz,
+                                    'patcher_text': p_info.patcher_text})
+    if p_info.twin_patcher:
+        otherPatcherDict[patcher_name] = p_info.twin_patcher
 
 # Init Patchers
 def initPatchers():
