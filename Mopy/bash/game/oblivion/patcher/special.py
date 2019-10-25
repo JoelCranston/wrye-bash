@@ -166,7 +166,7 @@ class AlchemicalCatalogs(_AAlchemicalCatalogs,Patcher):
                         buffWrite(u'\r\n')
                 book.text = re.sub(u'\r\n',u'<br>\r\n',buff.getvalue())
         #--Log
-        log.setHeader(u'= '+self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         log(u'* '+_(u'Ingredients Cataloged') + u': %d' % len(id_ingred))
         log(u'* '+_(u'Effects Cataloged') + u': %d' % len(effect_ingred))
 
@@ -337,7 +337,7 @@ class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
         #--Log
         id_ingred = self.id_ingred
         effect_ingred = self.effect_ingred
-        log.setHeader(u'= '+self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         log(u'* '+_(u'Ingredients Cataloged') + u': %d' % len(id_ingred))
         log(u'* '+_(u'Effects Cataloged') + u': %d' % len(effect_ingred))
 
@@ -358,7 +358,7 @@ class _ACoblExhaustion(SpecialPatcher):
     # TODO: readFromText differ only in (PBash -> CBash):
     # -         longid = (aliases.get(mod,mod),int(objectIndex[2:],16))
     # +         longid = FormID(aliases.get(mod,mod),int(objectIndex[2:],16))
-    name = _(u'Cobl Exhaustion')
+    patcher_name = _(u'Cobl Exhaustion')
     patcher_text = u'\n\n'.join(
         [_(u"Modify greater powers to use Cobl's Power Exhaustion feature."),
          _(u'Will only run if Cobl Main v1.66 (or higher) is active.')])
@@ -366,7 +366,7 @@ class _ACoblExhaustion(SpecialPatcher):
     autoKey = {u'Exhaust'}
 
     def _pLog(self, log, count):
-        log.setHeader(u'= ' + self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         log(u'* ' + _(u'Powers Tweaked') + u': %d' % sum(count.values()))
         for srcMod in load_order.get_ordered(count.keys()):
             log(u'  * %s: %d' % (srcMod.s, count[srcMod]))
@@ -456,7 +456,6 @@ class CoblExhaustion(_ACoblExhaustion,ListPatcher):
         self._pLog(log, count)
 
 class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
-    unloadedText = ""
 
     #--Config Phase -----------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -530,7 +529,7 @@ class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
 #------------------------------------------------------------------------------
 class _AMFactMarker(SpecialPatcher):
     """Mark factions that player can acquire while morphing."""
-    name = _(u'Morph Factions')
+    patcher_name = _(u'Morph Factions')
     patcher_text = u'\n\n'.join(
         [_(u"Mark factions that player can acquire while morphing."),
          _(u"Requires Cobl 1.28 and Wrye Morph or similar.")])
@@ -540,7 +539,7 @@ class _AMFactMarker(SpecialPatcher):
     autoKey = {u'MFact'}
 
     def _pLog(self, log, changed):
-        log.setHeader(u'= ' + self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         self._srcMods(log)
         log(u'\n=== ' + _(u'Morphable Factions'))
         for mod in load_order.get_ordered(changed):
@@ -645,7 +644,6 @@ class MFactMarker(_AMFactMarker,ListPatcher):
         self._pLog(log, changed)
 
 class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
-    unloadedText = u""
 
     #--Config Phase -----------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -810,7 +808,7 @@ class SEWorldEnforcer(_ASEWorldEnforcer,Patcher):
                 record.conditions.insert(0,condition)
                 keep(record.fid)
                 patched.append(record.eid)
-        log.setHeader('= '+self.__class__.name)
+        log.setHeader('= ' + self._patcher_name)
         log(u'==='+_(u'Quests Patched') + u': %d' % (len(patched),))
 
 class CBash_SEWorldEnforcer(_ASEWorldEnforcer,CBash_Patcher):
@@ -860,7 +858,7 @@ class CBash_SEWorldEnforcer(_ASEWorldEnforcer,CBash_Patcher):
         """Will write to log."""
         if not self.isActive: return
         #--Log
-        log.setHeader(u'= ' +self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         log(u'\n=== '+_(u'Quests Patched'))
         for mod, eids in self.mod_eids.iteritems():
             log(u'* %s: %d' % (mod.s, len(eids)))

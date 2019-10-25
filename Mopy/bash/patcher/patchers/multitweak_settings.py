@@ -198,8 +198,6 @@ class CBash_GmstTweak(DynamicNamedTweak, CBash_MultiTweakItem):
 #------------------------------------------------------------------------------
 class _AGmstTweaker(AMultiTweaker):
     """Tweaks miscellaneous gmsts in miscellaneous ways."""
-    name = _(u'Tweak Settings')
-    text = _(u"Tweak game settings.")
     tweaks = []
 
 class GmstTweaker(MultiTweaker, _AGmstTweaker):
@@ -227,7 +225,7 @@ class GmstTweaker(MultiTweaker, _AGmstTweaker):
         """Edits patch file as desired. Will write to log."""
         if not self.isActive: return
         keep = self.patchFile.getKeeper()
-        log.setHeader(u'= '+self.__class__.name)
+        log.setHeader(u'= '+self._patcher_name)
         for tweak in self.enabledTweaks:
             tweak.buildPatch(self.patchFile,keep,log)
 

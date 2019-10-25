@@ -896,9 +896,6 @@ class _ANamesTweaker(AMultiTweaker):
     """Tweaks record full names in various ways."""
     scanOrder = 32
     editOrder = 32
-    name = _(u'Tweak Names')
-    text = _(u"Tweak object names in various ways such as lore friendliness or"
-             u" show type/quality.")
     _namesTweaksBody = ((_(u"Armor"),
                          _(u"Rename armor to sort by type."),
                          'ARMO',

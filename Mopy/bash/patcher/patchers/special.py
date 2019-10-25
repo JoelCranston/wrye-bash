@@ -37,14 +37,6 @@ class _AListsMerger(SpecialPatcher, AListPatcher):
     """Merged leveled lists mod file."""
     scanOrder = 45
     editOrder = 45
-    name = _(u'Leveled Lists')
-    text = (_(
-        u"Merges changes to leveled lists from ACTIVE/MERGED MODS ONLY.") +
-            u'\n\n' + _(
-        u'Advanced users may override Relev/Delev tags for any mod (active '
-        u'or inactive) using the list below.'))
-    tip = _(u"Merges changes to leveled lists from all active mods.")
-    autoKey = {u'Delev', u'Relev'}
     iiMode = True
 
     def _overhaul_compat(self, mods, _skip_id):
@@ -174,7 +166,7 @@ class ListsMerger(_AListsMerger, ListPatcher):
         """Adds merged lists to patchfile."""
         keep = self.patchFile.getKeeper()
         #--Relevs/Delevs List
-        log.setHeader(u'= '+self.__class__.name,True)
+        log.setHeader(u'= ' + self._patcher_name, True)
         log.setHeader(u'=== '+_(u'Delevelers/Relevelers'))
         for leveler in (self.levelers or []):
             log(u'* '+self.getItemLabel(leveler))
@@ -451,7 +443,7 @@ class CBash_ListsMerger(_AListsMerger, CBash_ListPatcher):
         """Will write to log."""
         #--Log
         mod_count = self.mod_count
-        log.setHeader(u'= ' +self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         log(u'* '+_(u'Modified LVL') + u': %d' % (sum(mod_count.values()),))
         for srcMod in load_order.get_ordered(mod_count.keys()):
             log(u'  * %s: %d' % (srcMod.s,mod_count[srcMod]))
@@ -462,13 +454,6 @@ class FidListsMerger(_AListsMerger,ListPatcher):
     """Merged FormID lists mod file."""
     scanOrder = 46
     editOrder = 46
-    name = _(u'FormID Lists')
-    text = (_(u'Merges changes to formid lists from ACTIVE/MERGED MODS ONLY.') +
-            u"\n\n" +
-            _(u'Advanced users may override Deflst tags for any mod (active or inactive) using the list below.'))
-    tip = _(u"Merges changes to formid lists from all active mods.")
-    autoKey = {u'Deflst'}
-    iiMode = True
     _read_write_records = ('FLST',)
 
     #--Patch Phase ------------------------------------------------------------
@@ -542,7 +527,7 @@ class FidListsMerger(_AListsMerger,ListPatcher):
         """Adds merged lists to patchfile."""
         keep = self.patchFile.getKeeper()
         #--Deflsts List
-        log.setHeader(u'= '+self.__class__.name,True)
+        log.setHeader(u'= ' + self._patcher_name, True)
         log.setHeader(u'=== '+_(u'Deflsters'))
         for leveler in (self.levelers or []):
             log(u'* '+self.getItemLabel(leveler))
@@ -565,9 +550,6 @@ class _AContentsChecker(SpecialPatcher):
     correct content types."""
     scanOrder = 50
     editOrder = 50
-    name = _(u'Contents Checker')
-    text = _(u'Checks contents of leveled lists, inventories and containers '
-             u'for correct types.')
     contType_entryTypes = bush.game.cc_valid_types
     contTypes = set(contType_entryTypes)
     entryTypes = set(chain.from_iterable(contType_entryTypes.itervalues()))
@@ -620,7 +602,7 @@ class ContentsChecker(_AContentsChecker,Patcher):
         keep = self.patchFile.getKeeper()
         fid_to_type = self.fid_to_type
         id_eid = self.id_eid
-        log.setHeader(u'= ' + self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         # Execute each pass - one pass is needed for every distinct record
         # class layout, e.g. leveled list classes generally share the same
         # layout (LVLI.entries[i].listId, LVLN.entries[i].listId, etc.)
@@ -756,7 +738,7 @@ class CBash_ContentsChecker(_AContentsChecker,CBash_Patcher):
         if not self.isActive: return
         #--Log
         mod_type_id_badEntries = self.mod_type_id_badEntries
-        log.setHeader(u'= ' +self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         for mod, type_id_badEntries in mod_type_id_badEntries.iteritems():
             log(u'\n=== %s' % mod.s)
             for type,id_badEntries in type_id_badEntries.iteritems():

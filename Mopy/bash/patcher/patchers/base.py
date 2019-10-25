@@ -39,8 +39,6 @@ from ...brec import MreRecord
 class ListPatcher(AListPatcher,Patcher): pass
 
 class CBash_ListPatcher(AListPatcher,CBash_Patcher):
-    unloadedText = u'\n\n'+_(u'Any non-active, non-merged mods in the'
-                             u' following list will be IGNORED.')
 
     def initPatchFile(self, patchFile):
         super(CBash_ListPatcher, self).initPatchFile(patchFile)
@@ -114,7 +112,7 @@ class MultiTweaker(AMultiTweaker,Patcher):
     def buildPatch(self,log,progress):
         """Applies individual tweaks."""
         if not self.isActive: return
-        log.setHeader(u'= '+self.__class__.name,True)
+        log.setHeader(u'= ' + self._patcher_name, True)
         for tweak in self.enabledTweaks:
             tweak.buildPatch(log,progress,self.patchFile)
 
@@ -136,7 +134,7 @@ class CBash_MultiTweaker(AMultiTweaker,CBash_Patcher):
     def buildPatchLog(self,log):
         """Will write to log."""
         if not self.isActive: return
-        log.setHeader(u'= '+self.__class__.name,True)
+        log.setHeader(u'= ' + self._patcher_name, True)
         for tweak in self.enabledTweaks:
             tweak.buildPatchLog(log)
 
@@ -147,8 +145,7 @@ class CBash_AliasesPatcher(AAliasesPatcher,CBash_Patcher): pass
 
 class PatchMerger(APatchMerger, ListPatcher): pass
 
-class CBash_PatchMerger(APatchMerger, CBash_ListPatcher):
-    unloadedText = "" # Cbash only
+class CBash_PatchMerger(APatchMerger, CBash_ListPatcher): pass
 
 class UpdateReferences(AUpdateReferences,ListPatcher):
 
@@ -335,7 +332,7 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
             if keepWorld:
                 keep(worldBlock.world.fid)
 
-        log.setHeader(u'= '+self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         self._srcMods(log)
         log(u'\n=== '+_(u'Records Patched'))
         for srcMod in load_order.get_ordered(count.keys()):
@@ -405,7 +402,7 @@ class CBash_UpdateReferences(AUpdateReferences, CBash_ListPatcher):
         #--Log
         mod_count_old_new = self.mod_count_old_new
 
-        log.setHeader(u'= ' +self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         self._srcMods(log)
         log(u'\n')
         for mod in load_order.get_ordered(mod_count_old_new.keys()):
@@ -457,7 +454,7 @@ class ImportPatcher(AImportPatcher, ListPatcher):
             x.classType for x in self.srcClasses) if self.isActive else ()
 
     def _patchLog(self,log,type_count):
-        log.setHeader(u'= ' + self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         self._srcMods(log)
         self._plog(log,type_count)
 
@@ -515,7 +512,7 @@ class CBash_ImportPatcher(AImportPatcher, CBash_ListPatcher, SpecialPatcher):
         """Will write to log."""
         if not self.isActive: return
         #--Log
-        log.setHeader(u'= ' +self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         self._clog(log)
 
     def _clog(self,log):

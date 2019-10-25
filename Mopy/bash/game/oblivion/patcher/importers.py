@@ -30,9 +30,8 @@ __all__ = ['RoadImporter', 'CBash_RoadImporter']
 
 class _ARoadImporter(AImportPatcher):
     """Imports roads."""
-    name = _(u'Import Roads')
+    patcher_name = _(u'Import Roads')
     patcher_text = _(u"Import roads from source mods.")
-    tip = patcher_text
     autoKey = {u'Roads'}
 
 class RoadImporter(ImportPatcher, _ARoadImporter):
@@ -152,7 +151,7 @@ class CBash_RoadImporter(CBash_ImportPatcher, _ARoadImporter):
                 copyRoad = curRoad #Copy the current road over (its formID is acceptable)
             else:
                 #Ignore the record.
-                self.patchFile.patcher_mod_skipcount[self.name][
+                self.patchFile.patcher_mod_skipcount[self.patcher_name][
                     modFile.GName] += 1
                 return
 

@@ -83,13 +83,13 @@ class PatchDialog(DialogWindow):
         self.patchInfo = patchInfo
         self._gui_patchers = [copy.deepcopy(p) for p in (
             CBash_gui_patchers if doCBash else PBash_gui_patchers)]
-        self._gui_patchers.sort(key=lambda a: a.__class__.name)
-        self._gui_patchers.sort(key=lambda a: groupOrder[a.__class__.group])
+        self._gui_patchers.sort(key=lambda a: a.__class__.patcher_name)
+        self._gui_patchers.sort(key=lambda a: groupOrder[a.patcher_type.group])
         for patcher in self._gui_patchers:
             patcher.getConfig(patchConfigs) #--Will set patcher.isEnabled
             patcher.SetIsFirstLoad(isFirstLoad)
         self.currentPatcher = None
-        patcherNames = [patcher.getName() for patcher in self._gui_patchers]
+        patcherNames = [patcher.patcher_name for patcher in self._gui_patchers]
         #--GUI elements
         self.gExecute = OkButton(self, label=_(u'Build Patch'))
         self.gExecute.on_clicked.subscribe(self.PatchExecute)
@@ -485,10 +485,8 @@ class PatchDialog(DialogWindow):
 
     def _set_tip_text(self, mouseItem):
         if 0 <= mouseItem < len(self._gui_patchers):
-            patcherClass = self._gui_patchers[mouseItem].__class__
-            tip = patcherClass.tip or re.sub(u'' r'\..*', u'.',
-                            patcherClass.text.split(u'\n')[0], flags=re.U)
-            self.gTipText.label_text = tip
+            gui_patcher = self._gui_patchers[mouseItem]
+            self.gTipText.label_text = gui_patcher.patcher_tip
         else:
             self.gTipText.label_text = self.defaultTipText
 

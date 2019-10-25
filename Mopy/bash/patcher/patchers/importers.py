@@ -242,20 +242,13 @@ class _RecTypeModLogging(CBash_ImportPatcher):
         attr_value = record.ConflictDetails(self.class_attrs[record._Type])
         if not attr_value: return
         if not ValidateDict(attr_value, self.patchFile):
-            self.patchFile.patcher_mod_skipcount[self.name][
+            self.patchFile.patcher_mod_skipcount[self._patcher_name][
                 modFile.GName] += 1
             return
         self.fid_attr_value[record.fid].update(attr_value)
 
 # Patchers: 20 ----------------------------------------------------------------
-class _ACellImporter(AImportPatcher):
-    """Merges changes to cells (climate, lighting, and water.)"""
-    text = _(u"Import cells (climate, lighting, and water) from source mods.")
-    tip = text
-    name = _(u'Import Cells')
-
-class CellImporter(_ACellImporter, ImportPatcher):
-    autoKey = bush.game.cellAutoKeys
+class CellImporter(ImportPatcher):
     logMsg = u'\n=== ' + _(u'Cells/Worlds Patched')
 
     #--Patch Phase ------------------------------------------------------------
@@ -469,9 +462,7 @@ class CellImporter(_ACellImporter, ImportPatcher):
         for srcMod in load_order.get_ordered(count.keys()):
             log(u'* %s: %d' % (srcMod.s,count[srcMod]))
 
-class CBash_CellImporter(_ACellImporter,CBash_ImportPatcher):
-    autoKey = {u'C.Climate', u'C.Light', u'C.Water', u'C.Owner', u'C.Name',
-               u'C.RecordFlags', u'C.Music'}  #,u'C.Maps'
+class CBash_CellImporter(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Cells/Worlds Patched') + u': %d'
 
     #--Config Phase -----------------------------------------------------------
@@ -503,7 +494,7 @@ class CBash_CellImporter(_ACellImporter,CBash_ImportPatcher):
         for bashKey in bashTags & self.autoKey:
             attr_value = record.ConflictDetails(self.tag_attrs[bashKey])
             if not ValidateDict(attr_value, self.patchFile):
-                self.patchFile.patcher_mod_skipcount[self.name][
+                self.patchFile.patcher_mod_skipcount[self._patcher_name][
                     modFile.GName] += 1
                 continue
             self.fid_attr_value[record.fid].update(attr_value)
@@ -528,11 +519,6 @@ class CBash_CellImporter(_ACellImporter,CBash_ImportPatcher):
 #------------------------------------------------------------------------------
 class DestructiblePatcher(_SimpleImporter):
     """Merges changes to destructible records for Fallout3/FalloutNV."""
-    name = _(u'Import Destructible')
-    text = _(u'Preserves changes to destructible records.\n\nWill have to use '
-             u'if a mod that allows you to destroy part of the environment is '
-             u'installed and active.')
-    autoKey = {u'Destructible'}
     # All destructibles may contain FIDs, so let longTypes be set automatically
     rec_attrs = {x: ('destructible',) for x in bush.game.destructible_types}
 
@@ -565,14 +551,7 @@ class DestructiblePatcher(_SimpleImporter):
             type_count[top_mod_rec] += 1
 
 #------------------------------------------------------------------------------
-class _AGraphicsPatcher(AImportPatcher):
-    """Merges changes to graphics (models and icons)."""
-    name = _(u'Import Graphics')
-    text = _(u"Import graphics (models, icons, etc.) from source mods.")
-    tip = text
-    autoKey = {u'Graphics'}
-
-class GraphicsPatcher(_SimpleImporter, _AGraphicsPatcher):
+class GraphicsPatcher(_SimpleImporter):
     rec_attrs = bush.game.graphicsTypes
     long_types = bush.game.graphicsLongsTypes
 
@@ -615,8 +594,8 @@ class GraphicsPatcher(_SimpleImporter, _AGraphicsPatcher):
                         0] not in self.patchFile.loadSet):
                         # Ignore the record. Another option would be
                         # to just ignore the attr_fidvalue result
-                        self.patchFile.patcher_mod_skipcount[self.name][
-                            srcMod] += 1
+                        self.patchFile.patcher_mod_skipcount[
+                            self._patcher_name][srcMod] += 1
                         break
                 else:
                     temp_id_data[fid] = dict(
@@ -653,7 +632,7 @@ class GraphicsPatcher(_SimpleImporter, _AGraphicsPatcher):
             keep(fid)
             type_count[top_mod_rec] += 1
 
-class CBash_GraphicsPatcher(_RecTypeModLogging, _AGraphicsPatcher):
+class CBash_GraphicsPatcher(_RecTypeModLogging):
 
     #--Patch Phase ------------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -712,16 +691,10 @@ class CBash_GraphicsPatcher(_RecTypeModLogging, _AGraphicsPatcher):
                     record._RecordID = override._RecordID
 
 #------------------------------------------------------------------------------
-class _AActorImporter(AImportPatcher):
-    """Merges changes to actors."""
-    name = _(u'Import Actors')
-    text = _(u'Import various actor attributes from source mods.')
-    tip = text
-    autoKey = bush.game.actor_importer_auto_key
-
-class ActorImporter(_SimpleImporter, _AActorImporter):
+class ActorImporter(_SimpleImporter):
     # note peculiar mapping of record type to dictionaries[tag, attributes]
     rec_attrs = bush.game.actor_importer_attrs
+    autoKey = bush.game.actor_importer_auto_key
 
     #--Patch Phase ------------------------------------------------------------
     def initData(self,progress):
@@ -821,7 +794,8 @@ class ActorImporter(_SimpleImporter, _AActorImporter):
             keep(fid)
             type_count[top_mod_rec] += 1
 
-class CBash_ActorImporter(_RecTypeModLogging, _AActorImporter):
+class CBash_ActorImporter(_RecTypeModLogging):
+    autoKey = bush.game.actor_importer_auto_key
 
     #--Config Phase -----------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -879,7 +853,7 @@ class CBash_ActorImporter(_RecTypeModLogging, _AActorImporter):
                 attr_value = record.ConflictDetails(attrs)
                 if not attr_value: continue
                 if not ValidateDict(attr_value, self.patchFile):
-                    self.patchFile.patcher_mod_skipcount[self.name][
+                    self.patchFile.patcher_mod_skipcount[self._patcher_name][
                         modFile.GName] += 1
                     continue
                 self.fid_attr_value[record.fid].update(attr_value)
@@ -901,17 +875,10 @@ class CBash_ActorImporter(_RecTypeModLogging, _AActorImporter):
                     record._RecordID = override._RecordID
 
 #------------------------------------------------------------------------------
-class _AKFFZPatcher(AImportPatcher):
-    """Merges changes to actor animation lists."""
-    name = _(u'Import Actors: Animations')
-    text = _(u'Import actor animations from source mods.')
-    tip = text
-    autoKey = {u'Actors.Anims'}
-
-class KFFZPatcher(_SimpleImporter, _AKFFZPatcher):
+class KFFZPatcher(_SimpleImporter):
     rec_attrs = {x: ('animations',) for x in bush.game.actor_types}
 
-class CBash_KFFZPatcher(CBash_ImportPatcher, _AKFFZPatcher):
+class CBash_KFFZPatcher(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Imported Animations') + u': %d'
 
     #--Config Phase -----------------------------------------------------------
@@ -944,14 +911,7 @@ class CBash_KFFZPatcher(CBash_ImportPatcher, _AKFFZPatcher):
                 record._RecordID = override._RecordID
 
 #------------------------------------------------------------------------------
-class _ANPCAIPackagePatcher(AImportPatcher):
-    """Merges changes to the AI Packages of Actors."""
-    name = _(u'Import Actors: AI Packages')
-    text = _(u'Import actor AI Package links from source mods.')
-    tip = text
-    autoKey = {u'Actors.AIPackages', u'Actors.AIPackagesForceAdd'}
-
-class NPCAIPackagePatcher(ImportPatcher, _ANPCAIPackagePatcher):
+class NPCAIPackagePatcher(ImportPatcher):
     logMsg = u'\n=== ' + _(u'AI Package Lists Changed') + u': %d'
 
     #--Patch Phase ------------------------------------------------------------
@@ -1122,7 +1082,7 @@ class NPCAIPackagePatcher(ImportPatcher, _ANPCAIPackagePatcher):
 
     def _plog(self, log, mod_count): self._plog1(log, mod_count)
 
-class CBash_NPCAIPackagePatcher(CBash_ImportPatcher, _ANPCAIPackagePatcher):
+class CBash_NPCAIPackagePatcher(CBash_ImportPatcher):
     scanRequiresChecked = False
     logMsg = u'* ' + _(u'AI Package Lists Changed') + u': %d'
 
@@ -1141,7 +1101,8 @@ class CBash_NPCAIPackagePatcher(CBash_ImportPatcher, _ANPCAIPackagePatcher):
         """Records information needed to apply the patch."""
         aiPackages = record.aiPackages
         if not ValidateList(aiPackages, self.patchFile):
-            self.patchFile.patcher_mod_skipcount[self.name][modFile.GName] += 1
+            self.patchFile.patcher_mod_skipcount[self._patcher_name][
+                modFile.GName] += 1
             return
 
         recordId = record.fid
@@ -1203,17 +1164,10 @@ class CBash_NPCAIPackagePatcher(CBash_ImportPatcher, _ANPCAIPackagePatcher):
                     record._RecordID = override._RecordID
 
 #------------------------------------------------------------------------------
-class _ADeathItemPatcher(AImportPatcher):
-    """Merges changes to actor death items."""
-    name = _(u'Import Actors: Death Items')
-    text = _(u'Import actor death items from source mods.')
-    tip = text
-    autoKey = {u'Actors.DeathItem'}
-
-class DeathItemPatcher(_SimpleImporter, _ADeathItemPatcher):
+class DeathItemPatcher(_SimpleImporter):
     rec_attrs = {x: ('deathItem',) for x in bush.game.actor_types}
 
-class CBash_DeathItemPatcher(CBash_ImportPatcher, _ADeathItemPatcher):
+class CBash_DeathItemPatcher(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Imported Death Items') + u': %d'
 
     #--Config Phase -----------------------------------------------------------
@@ -1235,7 +1189,7 @@ class CBash_DeathItemPatcher(CBash_ImportPatcher, _ADeathItemPatcher):
             else:
                 # Ignore the record. Another option would be to just ignore
                 # the invalid formIDs
-                self.patchFile.patcher_mod_skipcount[self.name][
+                self.patchFile.patcher_mod_skipcount[self._patcher_name][
                     modFile.GName] += 1
 
     def apply(self,modFile,record,bashTags):
@@ -1256,13 +1210,7 @@ class CBash_DeathItemPatcher(CBash_ImportPatcher, _ADeathItemPatcher):
         super(CBash_DeathItemPatcher, self)._clog(log)
 
 #------------------------------------------------------------------------------
-class _AImportFactions(AImportPatcher):
-    """Import factions to creatures and NPCs."""
-    name = _(u'Import Factions')
-    text = _(u"Import factions from source mods/files.")
-    autoKey = {u'Factions'}
-
-class ImportFactions(_SimpleImporter, _AImportFactions):
+class ImportFactions(_SimpleImporter):
     logMsg = u'\n=== ' + _(u'Refactioned Actors')
     srcsHeader = u'=== ' + _(u'Source Mods/Files')
 
@@ -1342,7 +1290,7 @@ class ImportFactions(_SimpleImporter, _AImportFactions):
     def buildPatch(self, log, progress, types=None):
         super(ImportFactions, self).buildPatch(log, progress, self.activeTypes)
 
-class CBash_ImportFactions(_RecTypeModLogging, _AImportFactions):
+class CBash_ImportFactions(_RecTypeModLogging):
     listSrcs = False
     logModRecs = u'* ' + _(u'Refactioned %(type)s Records: %(count)d')
 
@@ -1431,13 +1379,7 @@ class CBash_ImportFactions(_RecTypeModLogging, _AImportFactions):
                 record._RecordID = override._RecordID
 
 #------------------------------------------------------------------------------
-class _AImportRelations(AImportPatcher):
-    """Import faction relations to factions."""
-    name = _(u'Import Relations')
-    text = _(u"Import relations from source mods/files.")
-    autoKey = {u'Relations'}
-
-class ImportRelations(_SimpleImporter, _AImportRelations):
+class ImportRelations(_SimpleImporter):
     logMsg = u'\n=== ' + _(u'Modified Factions') + u': %d'
     srcsHeader = u'=== ' + _(u'Source Mods/Files')
 
@@ -1522,7 +1464,7 @@ class ImportRelations(_SimpleImporter, _AImportRelations):
     def _plog(self,log,type_count):
         log(self.__class__.logMsg % type_count['FACT'])
 
-class CBash_ImportRelations(CBash_ImportPatcher, _AImportRelations):
+class CBash_ImportRelations(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Re-Relationed Records') + u': %d'
 
     #--Config Phase -----------------------------------------------------------
@@ -1582,17 +1524,10 @@ class CBash_ImportRelations(CBash_ImportPatcher, _AImportRelations):
                 record._RecordID = override._RecordID
 
 #------------------------------------------------------------------------------
-class _AImportScripts(AImportPatcher):
-    """Imports attached scripts on objects."""
-    name = _(u'Import Scripts')
-    text = _(u'Import scripts on various objects (e.g. containers, weapons, '
-             u'etc.) from source mods.')
-    autoKey = {u'Scripts'}
-
-class ImportScripts(_SimpleImporter, _AImportScripts):
+class ImportScripts(_SimpleImporter):
     rec_attrs = {x: ('script',) for x in bush.game.scripts_types}
 
-class CBash_ImportScripts(_RecTypeModLogging, _AImportScripts):
+class CBash_ImportScripts(_RecTypeModLogging):
 
     #--Config Phase -----------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -1624,7 +1559,7 @@ class CBash_ImportScripts(_RecTypeModLogging, _AImportScripts):
             else:
                 # Ignore the record. Another option would be to just ignore
                 # the invalid formIDs
-                self.patchFile.patcher_mod_skipcount[self.name][
+                self.patchFile.patcher_mod_skipcount[self._patcher_name][
                     modFile.GName] += 1
 
     def apply(self,modFile,record,bashTags):
@@ -1641,15 +1576,10 @@ class CBash_ImportScripts(_RecTypeModLogging, _AImportScripts):
                 record._RecordID = override._RecordID
 
 #------------------------------------------------------------------------------
-class _AImportInventory(AImportPatcher):
-    """Merge changes to actor inventories."""
-    name = _(u'Import Inventory')
-    text = _(u"Merges changes to NPC, creature and container inventories.")
-    autoKey = {u'Invent', u'InventOnly'}
-    iiMode = True
 
-class ImportInventory(ImportPatcher, _AImportInventory):
+class ImportInventory(ImportPatcher):
     logMsg = u'\n=== ' + _(u'Inventories Changed') + u': %d'
+    iiMode = True
 
     #--Patch Phase ------------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -1769,7 +1699,8 @@ class ImportInventory(ImportPatcher, _AImportInventory):
 
     def _plog(self, log, mod_count): self._plog1(log, mod_count)
 
-class CBash_ImportInventory(_RecTypeModLogging, _AImportInventory):
+class CBash_ImportInventory(_RecTypeModLogging):
+    iiMode = True
     listSrcs=False
     logModRecs = u'%(type)s ' + _(u'Inventories Changed') + u': %(count)d'
 
@@ -1857,14 +1788,7 @@ class CBash_ImportInventory(_RecTypeModLogging, _AImportInventory):
                 record._RecordID = override._RecordID
 
 #------------------------------------------------------------------------------
-class _AImportActorsSpells(AImportPatcher):
-    """Merges changes to the spells lists of Actors."""
-    name = _(u'Import Actors: Spells')
-    text = _(u'Merges changes to actor spell / effect lists.')
-    tip = text
-    autoKey = {u'Actors.Spells', u'Actors.SpellsForceAdd'}
-
-class ImportActorsSpells(ImportPatcher, _AImportActorsSpells):
+class ImportActorsSpells(ImportPatcher):
     logMsg = u'\n=== ' + _(u'Spell Lists Changed') + u': %d'
 
     #--Patch Phase ------------------------------------------------------------
@@ -2031,7 +1955,7 @@ class ImportActorsSpells(ImportPatcher, _AImportActorsSpells):
 
     def _plog(self, log, mod_count): self._plog1(log, mod_count)
 
-class CBash_ImportActorsSpells(CBash_ImportPatcher, _AImportActorsSpells):
+class CBash_ImportActorsSpells(CBash_ImportPatcher):
     logMsg = u'* '+_(u'Imported Spell Lists') + u': %d'
 
     #--Config Phase -----------------------------------------------------------
@@ -2094,9 +2018,6 @@ class CBash_ImportActorsSpells(CBash_ImportPatcher, _AImportActorsSpells):
 #------------------------------------------------------------------------------
 class _ANamesPatcher(AImportPatcher):
     """Import names from source mods/files."""
-    name = _(u'Import Names')
-    text = _(u"Import names from source mods/files.")
-    autoKey = {u'Names'}
     logMsg =  u'\n=== ' + _(u'Renamed Items')
     srcsHeader = u'=== ' + _(u'Source Mods/Files')
 
@@ -2245,17 +2166,12 @@ class CBash_NamesPatcher(_ANamesPatcher, _RecTypeModLogging):
 #------------------------------------------------------------------------------
 class _ANpcFacePatcher(AImportPatcher):
     """NPC Faces patcher, for use with TNR or similar mods."""
-    name = _(u'Import NPC Faces')
-    text = _(u"Import NPC face/eyes/hair from source mods. For use with TNR"
-             u" and similar mods.")
     autoRe = re.compile(u'^TNR .*.esp$', re.I | re.U)
-    autoKey = {u'NpcFaces', u'NpcFacesForceFullImport', u'Npc.HairOnly',
-               u'Npc.EyesOnly'}
 
     def _ignore_record(self, faceMod):
         # Ignore the record. Another option would be to just ignore the
         # attr_fidvalue result
-        self.patchFile.patcher_mod_skipcount[self.name][faceMod] += 1
+        self.patchFile.patcher_mod_skipcount[self._patcher_name][faceMod] += 1
 
 class NpcFacePatcher(_ANpcFacePatcher,ImportPatcher):
     logMsg = u'\n=== '+_(u'Faces Patched') + u': %d'
@@ -2456,24 +2372,13 @@ class CBash_NpcFacePatcher(_ANpcFacePatcher,CBash_ImportPatcher):
         super(CBash_NpcFacePatcher, self)._clog(log)
 
 #------------------------------------------------------------------------------
-class _ASoundPatcher(AImportPatcher):
+class SoundPatcher(_SimpleImporter):
     """Imports sounds from source mods into patch."""
-    name = _(u'Import Sounds')
-    autoKey = {u'Sound'}
-
-class SoundPatcher(_SimpleImporter, _ASoundPatcher):
-    """Imports sounds from source mods into patch."""
-    text = _(u"Import sounds (from Magic Effects, Containers, Activators,"
-             u" Lights, Weathers and Doors) from source mods.")
-    tip = text
     rec_attrs = bush.game.soundsTypes
     long_types = bush.game.soundsLongsTypes
 
-class CBash_SoundPatcher(_RecTypeModLogging, _ASoundPatcher):
+class CBash_SoundPatcher(_RecTypeModLogging):
     """Imports sounds from source mods into patch."""
-    text = _(u"Import sounds (from Activators, Containers, Creatures, Doors,"
-             u" Lights, Magic Effects and Weathers) from source mods.")
-    tip = text
 
     #--Patch Phase ------------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -2516,9 +2421,6 @@ class _AStatsPatcher(AImportPatcher):
     """Import stats from mod file."""
     scanOrder = 28
     editOrder = 28 #--Run ahead of bow patcher
-    name = _(u'Import Stats')
-    text = _(u"Import stats from any pickupable items from source mods/files.")
-    autoKey = {u'Stats'}
     logMsg = u'\n=== ' + _(u'Imported Stats')
     srcsHeader = u'=== ' + _(u'Source Mods/Files')
 
@@ -2649,10 +2551,6 @@ class _ASpellsPatcher(AImportPatcher):
     """Import spell changes from mod files."""
     scanOrder = 29
     editOrder = 29 #--Run ahead of bow patcher
-    name = _(u'Import Spell Stats')
-    text = _(u'Import stats from any spells / actor effects from source '
-             u'mods/files.')
-    autoKey = {u'Spells', u'SpellStats'}
 
 class SpellsPatcher(ImportPatcher, _ASpellsPatcher):
     logMsg = u'\n=== ' + _(u'Modified SPEL Stats')
@@ -2756,7 +2654,7 @@ class CBash_SpellsPatcher(CBash_ImportPatcher, _ASpellsPatcher):
                 self.id_stats.setdefault(record.fid,{}).update(conflicts)
             else:
                 #Ignore the record. Another option would be to just ignore the invalid formIDs
-                self.patchFile.patcher_mod_skipcount[self.name][
+                self.patchFile.patcher_mod_skipcount[self._patcher_name][
                     modFile.GName] += 1
 
     def apply(self,modFile,record,bashTags):
@@ -2786,11 +2684,7 @@ class WeaponModsPatcher(_SimpleImporter):
     """Merge changes to weapon modifications for FalloutNV."""
     scanOrder = 27
     editOrder = 27
-    name = _(u"Import Weapon Modifications")
-    text = _(u"Merges changes to weapon modifications.")
-    tip = text
     autoRe = re.compile(u'^UNDEFINED$', re.I)
-    autoKey = {u'WeaponMods'}
     rec_attrs = {'WEAP': ('modelWithMods', 'firstPersonModelWithMods',
         'weaponMods', 'soundMod1Shoot3Ds', 'soundMod1Shoot2D', 'effectMod1',
         'effectMod2', 'effectMod3', 'valueAMod1', 'valueAMod2', 'valueAMod3',
@@ -2908,25 +2802,15 @@ class WeaponModsPatcher(_SimpleImporter):
 
 #------------------------------------------------------------------------------
 class KeywordsImporter(_SimpleImporter):
-    name = _(u'Import Keywords')
-    text = _(u'Import keyword changes from source mods.')
-    autoKey = {u'Keywords'}
     rec_attrs = {x: ('keywords',) for x in bush.game.keywords_types}
     # Keywords are all fids, so default to long_types == rec_attrs
 
 #------------------------------------------------------------------------------
 class TextImporter(_SimpleImporter):
-    name = _(u'Import Text')
-    text = _(u'Import various types of long-form text like book texts, effect '
-             u'descriptions, etc. from source mods.')
-    autoKey = {u'Text'}
     rec_attrs = bush.game.text_types
     long_types = bush.game.text_long_types
 
 #------------------------------------------------------------------------------
 class ObjectBoundsImporter(_SimpleImporter):
-    name = _(u'Import Object Bounds')
-    text = _(u'Import object bounds for various actors, items and objects.')
-    autoKey = {u'ObjectBounds'}
     rec_attrs = {x: ('bounds',) for x in bush.game.object_bounds_types}
     long_types = () # OBND never has fids

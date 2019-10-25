@@ -43,26 +43,21 @@ class _Abstract_Patcher(object):
     scanOrder = 10
     editOrder = 10
     group = u'UNDEFINED'
-    name = u'UNDEFINED'
     text = u"UNDEFINED."
-    tip = None
     iiMode = False
 
     def getName(self):
-        """Returns patcher name."""
-        return self.__class__.name
+        """Return patcher name passed in by the gui, needed for logs."""
+        return self._patcher_name
 
     #--Config Phase -----------------------------------------------------------
-    def __init__(self):
+    def __init__(self, patcher_name, patchFile):
         """Initialization of common values to defaults."""
-        self.patchFile = None
-        self.scanOrder = self.__class__.scanOrder
-        self.editOrder = self.__class__.editOrder
         self.isActive = True
+        self.patchFile = patchFile
+        self._patcher_name = patcher_name
         #--Gui stuff
         self.isEnabled = False #--Patcher is enabled.
-        self.gConfigPanel = None
-        # super(Abstract_Patcher, self).__init__()#UNNEEDED (ALWAYS BEFORE obj)
 
     #--Patch Phase ------------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -100,16 +95,9 @@ class CBash_Patcher(_Abstract_Patcher):
     """Abstract base class for patcher elements performing a CBash patch - must
     be just before Abstract_Patcher in MRO.""" ##: "performing" ? how ?
     # would it make any sense to make getTypes into classmethod ?
-    unloadedText = u""
-    allowUnloaded = True
+    allowUnloaded = True # if True patcher needs a srcs attribute
     scanRequiresChecked = False # if True patcher needs a srcs attribute
     applyRequiresChecked = False # if True patcher needs a srcs attribute
-
-    #--Config Phase -----------------------------------------------------------
-    def __init__(self):
-        super(CBash_Patcher, self).__init__()
-        if not self.allowUnloaded:
-            self.text += self.unloadedText
 
     #--Patch Phase ------------------------------------------------------------
     def getTypes(self):
@@ -135,8 +123,6 @@ class AListPatcher(_Abstract_Patcher):
     """Subclass for patchers that have GUI lists of objects.
 
     :type _patches_set: set[bolt.Path]"""
-    #--Get/Save Config
-    autoKey = None
     # log header to be used if the ListPatcher has mods/files source files
     srcsHeader = u'=== '+ _(u'Source Mods')
     _patches_set = None
@@ -184,9 +170,6 @@ class AAliasesPatcher(_Abstract_Patcher):
     scanOrder = 10
     editOrder = 10
     group = _(u'General')
-    name = _(u"Alias Mod Names")
-    text = _(u"Specify mod aliases for reading CSV source files.")
-    tip = None
 
     #--Patch Phase ------------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -294,9 +277,6 @@ class APatchMerger(AListPatcher):
     scanOrder = 10
     editOrder = 10
     group = _(u'General')
-    name = _(u'Merge Patches')
-    text = _(u"Merge patch mods into Bashed Patch.")
-    autoKey = {u'Merge'}
 
     #--Patch Phase ------------------------------------------------------------
     def initPatchFile(self, patchFile):
@@ -314,6 +294,3 @@ class AUpdateReferences(AListPatcher):
     scanOrder = 15
     editOrder = 15
     group = _(u'General')
-    name = _(u'Replace Form IDs')
-    text = _(u"Imports Form Id replacers from csv files into the Bashed Patch.")
-    autoKey = {u'Formids'}

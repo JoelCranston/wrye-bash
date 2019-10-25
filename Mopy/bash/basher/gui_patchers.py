@@ -42,6 +42,20 @@ class _PatcherPanel(object):
     # CONFIG DEFAULTS
     default_isEnabled = False # is the patcher enabled on a new bashed patch ?
     patcher_type = type
+    _patcher_txt = u'UNDEFINED'
+    patcher_name = u'UNDEFINED'
+
+    def __init__(self): # WIP- investigate why we instantiate gui patchers once
+        self.gConfigPanel = None
+
+    @property
+    def patcher_tip(self):
+        return re.sub(u'' r'\..*', u'.', self._patcher_txt.split(u'\n')[0],
+                      flags=re.U)
+
+    @property
+    def patcher_text(self):
+        return self.__class__._patcher_txt
 
     def SetIsFirstLoad(self,isFirstLoad):
         self.is_first_load = isFirstLoad
@@ -69,7 +83,7 @@ class _PatcherPanel(object):
         self.gConfigPanel = PanelWin(parent, no_border=False)
         self.main_layout = VLayout(
             item_expand=True, item_weight=1, spacing=4, items=[
-                (Label(self.gConfigPanel, text_wrap(self.text, 70)),
+                (Label(self.gConfigPanel, text_wrap(self._patcher_txt, 70)),
                  LayoutOptions(weight=0))])
         self.main_layout.apply_to(self.gConfigPanel)
         config_layout.add(self.gConfigPanel)
@@ -110,7 +124,7 @@ class _PatcherPanel(object):
 
     def log_config(self, config, clip, log):
         className = self.__class__.__name__
-        humanName = self.__class__.name
+        humanName = self.__class__.patcher_name
         # Patcher in the config?
         if not className in config: return
         # Patcher active?
@@ -149,6 +163,11 @@ class _PatcherPanel(object):
 class _AliasesPatcherPanel(_PatcherPanel):
     # CONFIG DEFAULTS
     default_aliases = {}
+    patcher_name = _(u'Alias Mod Names')
+    _patcher_txt = _(u'Specify mod aliases for reading CSV source files.')
+
+    @property
+    def patcher_tip(self): return u''
 
     def GetConfigPanel(self, parent, config_layout, gTipText):
         """Show config."""
@@ -219,6 +238,19 @@ class _ListPatcherPanel(_PatcherPanel):
     default_configItems   = []
     default_configChecks  = {}
     default_configChoices = {}
+    # Only for CBash patchers
+    unloadedText = u'\n\n' + _(u'Any non-active, non-merged mods in the'
+                               u' following list will be IGNORED.')
+
+    @property
+    def patcher_text(self):
+        pt = self.__class__._patcher_txt
+        try:
+            if not self.patcher_type.allowUnloaded:
+                pt += self.unloadedText
+        except AttributeError:
+            pass
+        return pt
 
     def GetConfigPanel(self, parent, config_layout, gTipText):
         """Show config."""
@@ -476,7 +508,7 @@ class _ChoiceMenuMixin(object):
 #------------------------------------------------------------------------------
 class _TweakPatcherPanel(_ChoiceMenuMixin, _PatcherPanel):
     """Patcher panel with list of checkable, configurable tweaks."""
-    tweak_label = _(u"Tweaks")
+    tweak_label = _(u'Tweaks')
 
     def GetConfigPanel(self, parent, config_layout, gTipText):
         """Show config."""
@@ -907,167 +939,400 @@ class CBash_AliasesPatcher(_AliasesPatcherPanel):
         # mods - but with the least processing required. ##: NOT HERE !
         return config
 
-class PatchMerger(_MergerPanel): patcher_type = base.PatchMerger
-class CBash_PatchMerger(_MergerPanel): patcher_type = base.CBash_PatchMerger
+class _APatchMerger(_MergerPanel):
+    """Merges specified patches into Bashed Patch."""
+    patcher_name = _(u'Merge Patches')
+    _patcher_txt = _(u'Merge patch mods into Bashed Patch.')
+    autoKey = {u'Merge'}
+
+class PatchMerger(_APatchMerger): patcher_type = base.PatchMerger
+class CBash_PatchMerger(_APatchMerger): patcher_type = base.CBash_PatchMerger
 
 # Patchers 20 -----------------------------------------------------------------
-class GraphicsPatcher(_ImporterPatcherPanel):
+class _AGraphicsPatcher(_ImporterPatcherPanel):
+    """Merges changes to graphics (models and icons)."""
+    patcher_name = _(u'Import Graphics')
+    _patcher_txt = _(u'Import graphics (models, icons, etc.) from source '
+                     u'mods.')
+    autoKey = {u'Graphics'}
+
+class GraphicsPatcher(_AGraphicsPatcher):
     patcher_type = importers.GraphicsPatcher
-class CBash_GraphicsPatcher(_ImporterPatcherPanel):
+class CBash_GraphicsPatcher(_AGraphicsPatcher):
     patcher_type = importers.CBash_GraphicsPatcher
 
-class KFFZPatcher(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _AKFFZPatcher(_ImporterPatcherPanel):
+    """Merges changes to actor animation lists."""
+    patcher_name = _(u'Import Actors: Animations')
+    _patcher_txt = _(u'Import actor animations from source mods.')
+    autoKey = {u'Actors.Anims'}
+
+class KFFZPatcher(_AKFFZPatcher):
     patcher_type = importers.KFFZPatcher
-class CBash_KFFZPatcher(_ImporterPatcherPanel):
+class CBash_KFFZPatcher(_AKFFZPatcher):
     patcher_type = importers.CBash_KFFZPatcher
 
-class NPCAIPackagePatcher(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _ANPCAIPackagePatcher(_ImporterPatcherPanel):
+    """Merges changes to the AI Packages of Actors."""
+    patcher_name = _(u'Import Actors: AI Packages')
+    _patcher_txt = _(u'Import actor AI Package links from source mods.')
+    autoKey = {u'Actors.AIPackages', u'Actors.AIPackagesForceAdd'}
+
+class NPCAIPackagePatcher(_ANPCAIPackagePatcher):
     patcher_type = importers.NPCAIPackagePatcher
-class CBash_NPCAIPackagePatcher(_ImporterPatcherPanel):
+class CBash_NPCAIPackagePatcher(_ANPCAIPackagePatcher):
     patcher_type = importers.CBash_NPCAIPackagePatcher
 
-class ActorImporter(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _AActorImporter(_ImporterPatcherPanel):
+    """Merges changes to actors."""
+    patcher_name = _(u'Import Actors')
+    _patcher_txt = _(u'Import various actor attributes from source mods.')
+    autoKey = bush.game.actor_importer_auto_key
+
+class ActorImporter(_AActorImporter):
     patcher_type = importers.ActorImporter
-class CBash_ActorImporter(_ImporterPatcherPanel):
+class CBash_ActorImporter(_AActorImporter):
     patcher_type = importers.CBash_ActorImporter
 
-class DeathItemPatcher(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _ADeathItemPatcher(_ImporterPatcherPanel):
+    """Merges changes to actor death items."""
+    patcher_name = _(u'Import Actors: Death Items')
+    _patcher_txt = _(u'Import actor death items from source mods.')
+    autoKey = {u'Actors.DeathItem'}
+
+class DeathItemPatcher(_ADeathItemPatcher):
     patcher_type = importers.DeathItemPatcher
-class CBash_DeathItemPatcher(_ImporterPatcherPanel):
+class CBash_DeathItemPatcher(_ADeathItemPatcher):
     patcher_type = importers.CBash_DeathItemPatcher
 
-class CellImporter(_ImporterPatcherPanel):
-    patcher_type = importers.CellImporter
-class CBash_CellImporter(_ImporterPatcherPanel):
-    patcher_type = importers.CBash_CellImporter
+# -----------------------------------------------------------------------------
+class _ACellImporter(_ImporterPatcherPanel):
+    """Merges changes to cells (climate, lighting, and water.)"""
+    _patcher_txt = _(u'Import cells (climate, lighting, and water) from '
+                     u'source mods.')
+    patcher_name = _(u'Import Cells')
 
-class ImportFactions(_ImporterPatcherPanel):
+class CellImporter(_ACellImporter):
+    patcher_type = importers.CellImporter
+    autoKey = bush.game.cellAutoKeys
+    patcher_type.autoKey = autoKey ##: autoKey hack - needed in Pbash??
+class CBash_CellImporter(_ACellImporter):
+    autoKey = {u'C.Climate', u'C.Light', u'C.Water', u'C.Owner', u'C.Name',
+               u'C.RecordFlags', u'C.Music'}  #,u'C.Maps'
+    patcher_type = importers.CBash_CellImporter
+    patcher_type.autoKey = autoKey ##: autoKey hack
+
+# -----------------------------------------------------------------------------
+class _AImportFactions(_ImporterPatcherPanel):
+    """Import factions to creatures and NPCs."""
+    patcher_name = _(u'Import Factions')
+    _patcher_txt = _(u'Import factions from source mods/files.')
+    autoKey = {u'Factions'}
+
+class ImportFactions(_AImportFactions):
     patcher_type = importers.ImportFactions
-class CBash_ImportFactions(_ImporterPatcherPanel):
+class CBash_ImportFactions(_AImportFactions):
     patcher_type = importers.CBash_ImportFactions
 
-class ImportRelations(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _AImportRelations(_ImporterPatcherPanel):
+    """Import faction relations to factions."""
+    patcher_name = _(u'Import Relations')
+    _patcher_txt = _(u'Import relations from source mods/files.')
+    autoKey = {u'Relations'}
+
+class ImportRelations(_AImportRelations):
     patcher_type = importers.ImportRelations
-class CBash_ImportRelations(_ImporterPatcherPanel):
+class CBash_ImportRelations(_AImportRelations):
     patcher_type = importers.CBash_ImportRelations
 
-class ImportInventory(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _AImportInventory(_ImporterPatcherPanel):
+    """Merge changes to actor inventories."""
+    patcher_name = _(u'Import Inventory')
+    _patcher_txt = _(u'Merges changes to NPC, creature and container '
+                     u'inventories.')
+    autoKey = {u'Invent', u'InventOnly'}
+
+class ImportInventory(_AImportInventory):
     patcher_type = importers.ImportInventory
-class CBash_ImportInventory(_ImporterPatcherPanel):
+class CBash_ImportInventory(_AImportInventory):
     patcher_type = importers.CBash_ImportInventory
 
-class ImportActorsSpells(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _AImportActorsSpells(_ImporterPatcherPanel):
+    """Merges changes to the spells lists of Actors."""
+    patcher_name = _(u'Import Actors: Spells')
+    _patcher_txt = _(u'Merges changes to actor spell / effect lists.')
+    autoKey = {u'Actors.Spells', u'Actors.SpellsForceAdd'}
+
+class ImportActorsSpells(_AImportActorsSpells):
     patcher_type = importers.ImportActorsSpells
-class CBash_ImportActorsSpells(_ImporterPatcherPanel):
+class CBash_ImportActorsSpells(_AImportActorsSpells):
     patcher_type = importers.CBash_ImportActorsSpells
 
-class NamesPatcher(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _ANamesPatcher(_ImporterPatcherPanel):
+    """Import names from source mods/files."""
+    patcher_name = _(u'Import Names')
+    _patcher_txt = _(u'Import names from source mods/files.')
+    autoKey = {u'Names'}
+
+class NamesPatcher(_ANamesPatcher):
     patcher_type = importers.NamesPatcher
-class CBash_NamesPatcher(_ImporterPatcherPanel):
+class CBash_NamesPatcher(_ANamesPatcher):
     patcher_type = importers.CBash_NamesPatcher
 
-class NpcFacePatcher(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _ANpcFacePatcher(_ImporterPatcherPanel):
+    """NPC Faces patcher, for use with TNR or similar mods."""
+    patcher_name = _(u'Import NPC Faces')
+    _patcher_txt = _(u'Import NPC face/eyes/hair from source mods. For use '
+                     u'with TNR and similar mods.')
+    autoKey = {u'NpcFaces', u'NpcFacesForceFullImport', u'Npc.HairOnly',
+               u'Npc.EyesOnly'}
+
+class NpcFacePatcher(_ANpcFacePatcher):
     patcher_type = importers.NpcFacePatcher
-class CBash_NpcFacePatcher(_ImporterPatcherPanel):
+class CBash_NpcFacePatcher(_ANpcFacePatcher):
     patcher_type = importers.CBash_NpcFacePatcher
 
-class SoundPatcher(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _ASoundPatcher(_ImporterPatcherPanel):
+    """Imports sounds from source mods into patch."""
+    patcher_name = _(u'Import Sounds')
+    autoKey = {u'Sound'}
+
+class SoundPatcher(_ASoundPatcher):
+    _patcher_txt = _(u'Import sounds (from Magic Effects, Containers, '
+                     u'Activators, Lights, Weathers and Doors) from source '
+                     u'mods.')
     patcher_type = importers.SoundPatcher
-class CBash_SoundPatcher(_ImporterPatcherPanel):
+class CBash_SoundPatcher(_ASoundPatcher):
+    _patcher_txt = _(u'Import sounds (from Activators, Containers, Creatures, '
+                     u'Doors, Lights, Magic Effects and Weathers) from source '
+                     u'mods.')
     patcher_type = importers.CBash_SoundPatcher
 
-class StatsPatcher(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _AStatsPatcher(_ImporterPatcherPanel):
+    """Import stats from mod file."""
+    patcher_name = _(u'Import Stats')
+    _patcher_txt = _(u'Import stats from any pickupable items from source '
+                     u'mods/files.')
+    autoKey = {u'Stats'}
+
+class StatsPatcher(_AStatsPatcher):
     patcher_type = importers.StatsPatcher
-class CBash_StatsPatcher(_ImporterPatcherPanel):
+class CBash_StatsPatcher(_AStatsPatcher):
     patcher_type = importers.CBash_StatsPatcher
 
-class ImportScripts(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _AImportScripts(_ImporterPatcherPanel):
+    """Imports attached scripts on objects."""
+    patcher_name = _(u'Import Scripts')
+    _patcher_txt = _(u'Import scripts on various objects (e.g. containers, '
+                     u'weapons, etc.) from source mods.')
+    autoKey = {u'Scripts'}
+
+class ImportScripts(_AImportScripts):
     patcher_type = importers.ImportScripts
-class CBash_ImportScripts(_ImporterPatcherPanel):
+class CBash_ImportScripts(_AImportScripts):
     patcher_type = importers.CBash_ImportScripts
 
-class SpellsPatcher(_ImporterPatcherPanel):
+# -----------------------------------------------------------------------------
+class _ASpellsPatcher(_ImporterPatcherPanel):
+    """Import spell changes from mod files."""
+    patcher_name = _(u'Import Spell Stats')
+    _patcher_txt = _(u'Import stats from any spells / actor effects from '
+                     u'source mods/files.')
+    autoKey = {u'Spells', u'SpellStats'}
+
+class SpellsPatcher(_ASpellsPatcher):
     patcher_type = importers.SpellsPatcher
-class CBash_SpellsPatcher(_ImporterPatcherPanel):
+class CBash_SpellsPatcher(_ASpellsPatcher):
     patcher_type = importers.CBash_SpellsPatcher
 
+# Non CBash Importers----------------------------------------------------------
 class DestructiblePatcher(_ImporterPatcherPanel):
+    patcher_name = _(u'Import Destructible')
+    _patcher_txt = _(u'Preserves changes to destructible records.\n\nWill '
+                     u'have to use if a mod that allows you to destroy part '
+                     u'of the environment is installed and active.')
+    autoKey = {u'Destructible'}
     patcher_type = importers.DestructiblePatcher
 
 class WeaponModsPatcher(_ImporterPatcherPanel):
+    patcher_name = _(u'Import Weapon Modifications')
+    _patcher_txt = _(u'Merges changes to weapon modifications.')
+    autoKey = {u'WeaponMods'}
     patcher_type = importers.WeaponModsPatcher
 
 class KeywordsImporter(_ImporterPatcherPanel):
+    patcher_name = _(u'Import Keywords')
+    _patcher_txt = _(u'Import keyword changes from source mods.')
+    autoKey = {u'Keywords'}
     patcher_type = importers.KeywordsImporter
 
 class TextImporter(_ImporterPatcherPanel):
+    patcher_name = _(u'Import Text')
+    _patcher_txt = _(u'Import various types of long-form text like book '
+                     u'texts, effect descriptions, etc. from source mods.')
+    autoKey = {u'Text'}
     patcher_type = importers.TextImporter
 
 class ObjectBoundsImporter(_ImporterPatcherPanel):
+    patcher_name = _(u'Import Object Bounds')
+    _patcher_txt = _(u'Import object bounds for various actors, items and '
+                     u'objects.')
+    autoKey = {u'ObjectBounds'}
     patcher_type = importers.ObjectBoundsImporter
 
 # Patchers 30 -----------------------------------------------------------------
 class AssortedTweaker(_TweakPatcherPanel):
+    patcher_name = _(u'Tweak Assorted')
+    _patcher_txt = _(u'Tweak various records in miscellaneous ways.')
     patcher_type = multitweak_assorted.AssortedTweaker
     default_isEnabled = True
 class CBash_AssortedTweaker(_TweakPatcherPanel):
+    patcher_name = _(u'Tweak Assorted')
+    _patcher_txt = _(u'Tweak various records in miscellaneous ways.')
     patcher_type = multitweak_assorted.CBash_AssortedTweaker
     default_isEnabled = True
 
 class ClothesTweaker(_TweakPatcherPanel):
+    patcher_name = _(u'Tweak Clothes')
+    _patcher_txt = _(u'Tweak clothing weight and blocking.')
     patcher_type = multitweak_clothes.ClothesTweaker
 class CBash_ClothesTweaker(_TweakPatcherPanel):
+    patcher_name = _(u'Tweak Clothes')
+    _patcher_txt = _(u'Tweak clothing weight and blocking.')
     patcher_type = multitweak_clothes.CBash_ClothesTweaker
 
 class GmstTweaker(_GmstTweakerPanel):
+    patcher_name = _(u'Tweak Settings')
+    _patcher_txt = _(u'Tweak game settings.')
     patcher_type = multitweak_settings.GmstTweaker
 class CBash_GmstTweaker(_GmstTweakerPanel):
+    patcher_name = _(u'Tweak Settings')
+    _patcher_txt = _(u'Tweak game settings.')
     patcher_type = multitweak_settings.CBash_GmstTweaker
 
-class NamesTweaker(_TweakPatcherPanel):
+class _ANamesTweaker(_TweakPatcherPanel):
+    patcher_name = _(u'Tweak Names')
+    _patcher_txt = _(u'Tweak object names in various ways such as lore '
+                     u'friendliness or show type/quality.')
+
+class NamesTweaker(_ANamesTweaker):
     patcher_type = multitweak_names.NamesTweaker
-class CBash_NamesTweaker(_TweakPatcherPanel):
+class CBash_NamesTweaker(_ANamesTweaker):
     patcher_type = multitweak_names.CBash_NamesTweaker
 
 class TweakActors(_TweakPatcherPanel):
+    patcher_name = _(u'Tweak Actors')
+    _patcher_txt = _(u'Tweak NPC and Creatures records in specified ways.')
     patcher_type = multitweak_actors.TweakActors
 class CBash_TweakActors(_TweakPatcherPanel):
+    patcher_name = _(u'Tweak Actors')
+    _patcher_txt = _(u'Tweak NPC and Creatures records in specified ways.')
     patcher_type = multitweak_actors.CBash_TweakActors
 
 # Patchers 40 -----------------------------------------------------------------
-class UpdateReferences(_ListPatcherPanel):
+class _AUpdateReferences(_ListPatcherPanel):
+    """Imports Form Id replacers into the Bashed Patch."""
+    patcher_name = _(u'Replace Form IDs')
+    _patcher_txt = _(u'Imports Form Id replacers from csv files into the '
+                     u'Bashed Patch.')
+    autoKey = {u'Formids'}
+
+class UpdateReferences(_AUpdateReferences):
     patcher_type = base.UpdateReferences
     canAutoItemCheck = False #--GUI: Whether new items are checked by default.
-class CBash_UpdateReferences(_ListPatcherPanel):
+class CBash_UpdateReferences(_AUpdateReferences):
     patcher_type = base.CBash_UpdateReferences
     canAutoItemCheck = False #--GUI: Whether new items are checked by default.
 
-class RacePatcher(_DoublePatcherPanel):
+class _ARacePatcher(_DoublePatcherPanel):
+    """Merged leveled lists mod file."""
+    patcher_name = _(u'Race Records')
+    _patcher_txt = u'\n\n'.join([
+        _(u'Merge race eyes, hair, body, voice from ACTIVE AND/OR MERGED '
+          u'mods.  Any non-active, non-merged mods in the following list '
+          u'will be IGNORED.'),
+        _(u'Even if none of the below mods are checked, this will sort '
+          u'hairs and eyes and attempt to remove googly eyes from all '
+          u'active mods.  It will also randomly assign hairs and eyes to '
+          u'npcs that are otherwise missing them.')]
+    )
+    autoKey = {u'R.Head', u'R.Ears', u'Eyes',
+               u'Voice-F', u'R.ChangeSpells', u'R.Teeth', u'Voice-M',
+               u'R.Attributes-M', u'R.Attributes-F', u'Body-F', u'Body-M',
+               u'R.Mouth', u'R.Description', u'R.AddSpells', u'Body-Size-F',
+               u'R.Relations', u'Body-Size-M', u'R.Skills', u'Hair'}
+
+    @property
+    def patcher_tip(self):
+        return _(u'Merge race eyes, hair, body, voice from mods.')
+
+class RacePatcher(_ARacePatcher):
     patcher_type = races_multitweaks.RacePatcher
-class CBash_RacePatcher(_DoublePatcherPanel):
+class CBash_RacePatcher(_ARacePatcher):
     patcher_type = races_multitweaks.CBash_RacePatcher
 
-class ListsMerger(_ListsMergerPanel):
+class _AListsMerger(_ListsMergerPanel):
+    """Merged leveled lists mod file."""
+    patcher_name = _(u'Leveled Lists')
+    _patcher_txt = u'\n\n'.join([
+        _(u'Merges changes to leveled lists from ACTIVE/MERGED MODS ONLY.'),
+        _(u'Advanced users may override Relev/Delev tags for any mod (active '
+          u'or inactive) using the list below.')])
+    autoKey = {u'Delev', u'Relev'}
+
+    @property
+    def patcher_tip(self):
+        return _(u'Merges changes to leveled lists from all active mods.')
+
+class ListsMerger(_AListsMerger):
     patcher_type = special.ListsMerger
     show_empty_sublist_checkbox = True
-class CBash_ListsMerger(_ListsMergerPanel):
+class CBash_ListsMerger(_AListsMerger):
     patcher_type = special.CBash_ListsMerger
     show_empty_sublist_checkbox = True
 
-class FidListsMerger(_ListsMergerPanel):
+class FidListsMerger(_AListsMerger):
+    patcher_name = _(u'FormID Lists')
+    _patcher_txt = u'\n\n'.join([
+        _(u'Merges changes to formid lists from ACTIVE/MERGED MODS ONLY.') ,
+        _(u'Advanced users may override Deflst tags for any mod (active or '
+          u'inactive) using the list below.')])
+    autoKey = {u'Deflst'}
     patcher_type = special.FidListsMerger
-    listLabel = _(u"Override Deflst Tags")
+    listLabel = _(u'Override Deflst Tags')
     forceItemCheck = False #--Force configChecked to True for all items
     choiceMenu = (u'Auto', u'----', u'Deflst')
     # CONFIG DEFAULTS
     default_isEnabled = False
 
-class ContentsChecker(_PatcherPanel):
+    @property
+    def patcher_tip(self):
+        return _(u'Merges changes to formid lists from all active mods.')
+
+class _AContentsChecker(_PatcherPanel):
+    """Checks contents of leveled lists, inventories and containers for
+    correct content types."""
+    patcher_name = _(u'Contents Checker')
+    _patcher_txt = _(u'Checks contents of leveled lists, inventories and '
+                     u'containers for correct types.')
+    default_isEnabled = True
+
+class ContentsChecker(_AContentsChecker):
     patcher_type = special.ContentsChecker
-    default_isEnabled = True
-class CBash_ContentsChecker(_PatcherPanel):
+class CBash_ContentsChecker(_AContentsChecker):
     patcher_type = special.CBash_ContentsChecker
-    default_isEnabled = True
 
 #------------------------------------------------------------------------------
 # Game specific GUI Patchers --------------------------------------------------
@@ -1079,22 +1344,19 @@ from .patcher_dialog import PBash_gui_patchers, CBash_gui_patchers, \
 # Patchers with no options
 for patcher_name, p_info in bush.game.gameSpecificPatchers.items():
     globals()[patcher_name] = type(patcher_name, (_PatcherPanel,),
-                                   {'patcher_type': p_info.clazz,
-                                    'patcher_text': p_info.patcher_text})
+                                   p_info.cls_vars)
     if p_info.twin_patcher:
         otherPatcherDict[patcher_name] = p_info.twin_patcher
 # Simple list patchers
 for patcher_name, p_info in bush.game.gameSpecificListPatchers.items():
     globals()[patcher_name] = type(patcher_name, (_ListPatcherPanel,),
-                                   {'patcher_type': p_info.clazz,
-                                    'patcher_text': p_info.patcher_text})
+                                   p_info.cls_vars)
     if p_info.twin_patcher:
         otherPatcherDict[patcher_name] = p_info.twin_patcher
 # Import patchers
 for patcher_name, p_info in bush.game.game_specific_import_patchers.items():
     globals()[patcher_name] = type(patcher_name, (_ImporterPatcherPanel,),
-                                   {'patcher_type': p_info.clazz,
-                                    'patcher_text': p_info.patcher_text})
+                                   p_info.cls_vars)
     if p_info.twin_patcher:
         otherPatcherDict[patcher_name] = p_info.twin_patcher
 

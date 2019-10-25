@@ -619,25 +619,7 @@ def _find_vanilla_eyes():
         ret[new_key] = new_val
     return ret
 
-class _ARacePatcher(SpecialPatcher, AListPatcher):
-    """Merged leveled lists mod file."""
-    name = _(u'Race Records')
-    text = (_(u"Merge race eyes, hair, body, voice from ACTIVE AND/OR MERGED"
-              u" mods.  Any non-active, non-merged mods in the following list"
-              u" will be IGNORED.") + u'\n\n' +
-            _(u"Even if none of the below mods are checked, this will sort"
-              u" hairs and eyes and attempt to remove googly eyes from all"
-              u" active mods.  It will also randomly assign hairs and eyes to"
-              u" npcs that are otherwise missing them.")
-            )
-    tip = _(u"Merge race eyes, hair, body, voice from mods.")
-    autoKey = {u'R.Head', u'R.Ears', u'Eyes',
-               u'Voice-F', u'R.ChangeSpells', u'R.Teeth', u'Voice-M',
-               u'R.Attributes-M', u'R.Attributes-F', u'Body-F', u'Body-M',
-               u'R.Mouth', u'R.Description', u'R.AddSpells', u'Body-Size-F',
-               u'R.Relations', u'Body-Size-M', u'R.Skills', u'Hair'}
-
-class RacePatcher(_ARacePatcher, ListPatcher):
+class RacePatcher(SpecialPatcher, ListPatcher):
     races_data = {'EYES':[],'HAIR':[]}
     tweaks = sorted([
         RaceTweaker_BiggerOrcsAndNords(),
@@ -1078,7 +1060,7 @@ class RacePatcher(_ARacePatcher, ListPatcher):
                 mod_npcsFixed[srcMod].add(npc.fid)
 
         #--Done
-        log.setHeader(u'= '+self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         self._srcMods(log)
         log(u'\n=== '+_(u'Merged'))
         if not racesPatched:
@@ -1233,7 +1215,7 @@ class CBash_RacePatcher_Imports(SpecialPatcher):
             else:
                 attr_value = record.ConflictDetails(attrs)
                 if not ValidateDict(attr_value, self.patchFile):
-                    self.patchFile.patcher_mod_skipcount[self.name][
+                    self.patchFile.patcher_mod_skipcount[self._patcher_name][
                         modFile.GName] += 1
                     continue
             self.fid_attr_value[recordId].update(attr_value)
@@ -1382,7 +1364,7 @@ class CBash_RacePatcher_Eyes(SpecialPatcher):
                 self.id_meshes[recordId] = eyePaths
         else:
             if not recordId.ValidateFormID(self.patchFile):
-                self.patchFile.patcher_mod_skipcount[self.name][
+                self.patchFile.patcher_mod_skipcount[self._patcher_name][
                     modFile.GName] += 1
                 return
 
@@ -1643,7 +1625,7 @@ class CBash_RacePatcher_Eyes(SpecialPatcher):
                 npc.UnloadRecord()
             pstate += 1
 
-class CBash_RacePatcher(_ARacePatcher, CBash_ListPatcher):
+class CBash_RacePatcher(SpecialPatcher, CBash_ListPatcher):
     autoRe = re.compile(u'^UNDEFINED$', re.I | re.U)
     tweakers = [
         CBash_RacePatcher_Relations(),
@@ -1723,10 +1705,8 @@ class CBash_RacePatcher(_ARacePatcher, CBash_ListPatcher):
         if mod_npcsFixed:
             log(u'\n=== '+_(u'Eyes/Hair Assigned for NPCs'))
             for srcMod in sorted(mod_npcsFixed):
-                if srcMod.cext == u'.tmp':
-                    name = srcMod.sbody
-                else:
-                    name = srcMod.s
-                log(u'* %s: %d' % (name,len(mod_npcsFixed[srcMod])))
+                log(u'* %s: %d' % (
+                    (srcMod.sbody if srcMod.cext == u'.tmp' else srcMod.s),
+                    len(mod_npcsFixed[srcMod])))
         for tweak in self.enabledTweaks:
             tweak.buildPatchLog(log)

@@ -24,8 +24,7 @@
 from collections import namedtuple
 from .. import balt, bolt, bass
 
-PatcherInfo = namedtuple('PatcherInfo',
-                         ['clazz', 'twin_patcher', 'patcher_text'])
+PatcherInfo = namedtuple('PatcherInfo', ['clazz', 'twin_patcher', 'cls_vars'])
 
 def configIsCBash(patchConfigs): ##: belongs to basher but used also in bosh
     for key in patchConfigs:

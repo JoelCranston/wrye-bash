@@ -234,8 +234,6 @@ class _AClothesTweaker(AMultiTweaker):
                 (_(u'Custom'),0.0),),)
     scanOrder = 31
     editOrder = 31
-    name = _(u'Tweak Clothes')
-    text = _(u"Tweak clothing weight and blocking.")
 
 class ClothesTweaker(_AClothesTweaker,MultiTweaker):
     _read_write_records = ('CLOT',)
@@ -262,7 +260,7 @@ class ClothesTweaker(_AClothesTweaker,MultiTweaker):
         """Applies individual clothes tweaks."""
         if not self.isActive: return
         keep = self.patchFile.getKeeper()
-        log.setHeader(u'= '+self.__class__.name)
+        log.setHeader(u'= ' + self._patcher_name)
         for tweak in self.enabledTweaks:
             tweak.buildPatch(self.patchFile,keep,log)
 
