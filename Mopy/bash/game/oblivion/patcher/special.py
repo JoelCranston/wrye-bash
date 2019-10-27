@@ -72,6 +72,7 @@ class _AAlchemicalCatalogs(_ExSpecial):
     patcher_text = u'\n\n'.join(
         [_(u"Update COBL's catalogs of alchemical ingredients and effects."),
          _(u'Will only run if Cobl Main.esm is loaded.')])
+    _read_write_records = ('INGR',)
 
     @classmethod
     def gui_cls_vars(cls):
@@ -79,7 +80,6 @@ class _AAlchemicalCatalogs(_ExSpecial):
         return cls_vars.update({'default_isEnabled': True}) or cls_vars
 
 class AlchemicalCatalogs(_AAlchemicalCatalogs,Patcher):
-    _read_write_records = ('INGR',)
 
     def __init__(self, p_name, p_file):
         super(AlchemicalCatalogs, self).__init__(p_name, p_file)
@@ -199,10 +199,6 @@ class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
         self.SEFF = MGEFCode('SEFF')
         self.DebugPrintOnce = 0
 
-    def getTypes(self):
-        return ['INGR']
-
-    #--Patch Phase ------------------------------------------------------------
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
         if record.full:
@@ -382,6 +378,7 @@ class _ACoblExhaustion(_ExSpecialList):
         [_(u"Modify greater powers to use Cobl's Power Exhaustion feature."),
          _(u'Will only run if Cobl Main v1.66 (or higher) is active.')])
     autoKey = {u'Exhaust'}
+    _read_write_records = ('SPEL',)
 
     def __init__(self, p_name, p_file, p_sources):
         super(_ACoblExhaustion, self).__init__(p_name, p_file, p_sources)
@@ -413,7 +410,6 @@ class _ACoblExhaustion(_ExSpecialList):
                     pass #ValueError: Either we couldn't unpack or int() failed
 
 class CoblExhaustion(_ACoblExhaustion,ListPatcher):
-    _read_write_records = ('SPEL',)
 
     def initData(self,progress):
         """Get names from source files."""
@@ -488,9 +484,6 @@ class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
         self.id_exhaustion = {FormID(*k): v for k, v in
                               self.id_exhaustion.iteritems()}
 
-    def getTypes(self):
-        return ['SPEL']
-
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
         if record.IsPower:
@@ -527,6 +520,7 @@ class _AMFactMarker(_ExSpecialList):
          _(u"Requires Cobl 1.28 and Wrye Morph or similar.")])
     srcsHeader = u'=== ' + _(u'Source Mods/Files')
     autoKey = {u'MFact'}
+    _read_write_records = ('FACT',)
 
     def _pLog(self, log, changed):
         log.setHeader(u'= ' + self._patcher_name)
@@ -553,7 +547,6 @@ class _AMFactMarker(_ExSpecialList):
                 id_info[longid] = (morphName, rankName)
 
 class MFactMarker(_AMFactMarker,ListPatcher):
-    _read_write_records = ('FACT',)
 
     def __init__(self, p_name, p_file, p_sources):
         super(MFactMarker, self).__init__(p_name, p_file, p_sources)
@@ -657,10 +650,6 @@ class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
             progress.plus()
         self.id_info = {FormID(*k): v for k, v in self.id_info.iteritems()}
 
-    def getTypes(self):
-        return ['FACT']
-
-    #--Patch Phase ------------------------------------------------------------
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
         id_info = self.id_info
@@ -723,6 +712,7 @@ class _ASEWorldEnforcer(_ExSpecial):
     patcher_text = _(u"Suspends Cyrodiil quests while in Shivering Isles. "
                      u"I.e. re-instates GetPlayerInSEWorld tests as "
                      u"necessary.")
+    _read_write_records = ('QUST',)
 
     @classmethod
     def gui_cls_vars(cls):
@@ -731,7 +721,6 @@ class _ASEWorldEnforcer(_ExSpecial):
 
 _ob_path = GPath(u'Oblivion.esm')
 class SEWorldEnforcer(_ASEWorldEnforcer,Patcher):
-    _read_write_records = ('QUST',)
 
     def __init__(self, p_name, p_file):
         super(SEWorldEnforcer, self).__init__(p_name, p_file)
@@ -795,9 +784,6 @@ class CBash_SEWorldEnforcer(_ASEWorldEnforcer,CBash_Patcher):
         self.cyrodiilQuests = set()
         self.isActive = _ob_path in p_file.loadSet
         self.mod_eids = defaultdict(list)
-
-    def getTypes(self):
-        return ['QUST']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""

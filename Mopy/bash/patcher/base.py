@@ -42,6 +42,7 @@ class _Abstract_Patcher(object):
     editOrder = 10
     group = u'UNDEFINED'
     iiMode = False
+    _read_write_records = () # list of records this patcher patches FIXME naming and drop for type in getTypes/read/writeClasses
 
     def getName(self):
         """Return patcher name passed in by the gui, needed for logs."""
@@ -56,7 +57,6 @@ class _Abstract_Patcher(object):
 class Patcher(_Abstract_Patcher):
     """Abstract base class for patcher elements performing a PBash patch - must
     be just before Abstract_Patcher in MRO.""" ##: "performing" ? how ?
-    _read_write_records = ()
 
     def getReadClasses(self):
         """Returns load factory classes needed for reading."""
@@ -81,15 +81,13 @@ class Patcher(_Abstract_Patcher):
 class CBash_Patcher(_Abstract_Patcher):
     """Abstract base class for patcher elements performing a CBash patch - must
     be just before Abstract_Patcher in MRO.""" ##: "performing" ? how ?
-    # would it make any sense to make getTypes into classmethod ?
     allowUnloaded = True # if True patcher needs a srcs attribute
     scanRequiresChecked = False # if True patcher needs a srcs attribute
     applyRequiresChecked = False # if True patcher needs a srcs attribute
 
-    #--Patch Phase ------------------------------------------------------------
     def getTypes(self):
         """Returns the group types that this patcher checks"""
-        return []
+        return list(self.__class__._read_write_records) if self.isActive else []
 
     def initData(self,group_patchers,progress):
         """Compiles material, i.e. reads source text, esp's, etc. as

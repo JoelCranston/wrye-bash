@@ -611,29 +611,15 @@ class ATextReplacer(DynamicNamedTweak):
         self.logMsg = u'* '+_(u'Items Renamed') + u': %d'
 
 class TextReplacer(ATextReplacer,_AMultiTweakItem_Names):
-    #--Config Phase -----------------------------------------------------------
-    def __init__(self, reMatch, reReplace, label, tweak_tip, key, choices):
-        super(TextReplacer, self).__init__(reMatch, reReplace, label,
-                                           tweak_tip, key, choices)
-        self.activeTypes = ['ALCH','AMMO','APPA','ARMO','BOOK','BSGN',
-                            'CLAS','CLOT','CONT','CREA','DOOR',
-                            'ENCH','EYES','FACT','FLOR','FURN','GMST',
-                            'HAIR','INGR','KEYM','LIGH','LSCR','MGEF',
-                            'MISC','NPC_','QUST','RACE','SCPT','SGST',
-                            'SKIL','SLGM','SPEL','WEAP']
-
-    #--Patch Phase ------------------------------------------------------------
-    def getReadClasses(self):
-        """Returns load factory classes needed for reading."""
-        return tuple(self.activeTypes)
-
-    def getWriteClasses(self):
-        """Returns load factory classes needed for writing."""
-        return tuple(self.activeTypes)
+    tweak_read_classes = (
+        'ALCH', 'AMMO', 'APPA', 'ARMO', 'BOOK', 'BSGN', 'CLAS', 'CLOT', 'CONT',
+        'CREA', 'DOOR', 'ENCH', 'EYES', 'FACT', 'FLOR', 'FURN', 'GMST', 'HAIR',
+        'INGR', 'KEYM', 'LIGH', 'LSCR', 'MGEF', 'MISC', 'NPC_', 'QUST', 'RACE',
+        'SCPT', 'SGST', 'SKIL', 'SLGM', 'SPEL', 'WEAP')
 
     def scanModFile(self,modFile,progress,patchFile):
         mapper = modFile.getLongMapper()
-        for blockType in self.activeTypes:
+        for blockType in self.tweak_read_classes:
             if blockType not in modFile.tops: continue
             modBlock = getattr(modFile,blockType)
             patchBlock = getattr(patchFile,blockType)
@@ -648,7 +634,7 @@ class TextReplacer(ATextReplacer,_AMultiTweakItem_Names):
         keep = patchFile.getKeeper()
         reMatch = re.compile(self.reMatch)
         reReplace = self.reReplace
-        for type_ in self.activeTypes:
+        for type_ in self.tweak_read_classes:
             if type_ not in patchFile.tops: continue
             for record in patchFile.tops[type_].records:
                 changed = False
@@ -745,15 +731,12 @@ class TextReplacer(ATextReplacer,_AMultiTweakItem_Names):
         self._patchLog(log, count)
 
 class CBash_TextReplacer(ATextReplacer,CBash_MultiTweakItem):
-    #--Config Phase -----------------------------------------------------------
-    def getTypes(self):
-        ##: note it differs only in 'CELLS' from TextReplacer.activeTypes
-        return ['ALCH','AMMO','APPA','ARMO','BOOK','BSGN',
-                'CELLS','CLAS','CLOT','CONT','CREA','DOOR',
-                'ENCH','EYES','FACT','FLOR','FURN','GMST',
-                'HAIR','INGR','KEYM','LIGH','LSCR','MGEF',
-                'MISC','NPC_','QUST','RACE','SCPT','SGST',
-                'SKIL','SLGM','SPEL','WEAP']
+    tweak_read_classes = ('CELLS',
+        'ALCH', 'AMMO', 'APPA', 'ARMO', 'BOOK', 'BSGN', 'CLAS', 'CLOT', 'CONT',
+        'CREA', 'DOOR', 'ENCH', 'EYES', 'FACT', 'FLOR', 'FURN', 'GMST', 'HAIR',
+        'INGR', 'KEYM', 'LIGH', 'LSCR', 'MGEF', 'MISC', 'NPC_', 'QUST', 'RACE',
+        'SCPT', 'SGST', 'SKIL', 'SLGM', 'SPEL', 'WEAP')
+        ##: note it differs only in 'CELLS' from TextReplacer.tweak_read_classes
 
     def save_tweak_config(self, configs):
         """Save config to configs dictionary."""

@@ -1365,15 +1365,9 @@ class AssortedTweak_DefaultIcons(AAssortedTweak_DefaultIcons,MultiTweakItem):
         'ALCH', 'AMMO', 'APPA', 'ARMO', 'BOOK', 'BSGN', 'CLAS', 'CLOT', 'FACT',
         'INGR', 'KEYM', 'LIGH', 'MISC', 'QUST', 'SGST', 'SLGM', 'WEAP',)
 
-    #--Config Phase -----------------------------------------------------------
-    def __init__(self):
-        self.activeTypes = list(self.__class__.tweak_read_classes)
-        super(AssortedTweak_DefaultIcons,self).__init__()
-
-    #--Patch Phase ------------------------------------------------------------
     def scanModFile(self,modFile,progress,patchFile):
         mapper = modFile.getLongMapper()
-        for blockType in self.activeTypes:
+        for blockType in self.tweak_read_classes:
             if blockType not in modFile.tops: continue
             modBlock = getattr(modFile,blockType)
             patchBlock = getattr(patchFile,blockType)
@@ -1386,7 +1380,7 @@ class AssortedTweak_DefaultIcons(AAssortedTweak_DefaultIcons,MultiTweakItem):
     def buildPatch(self,log,progress,patchFile):
         count = Counter()
         keep = patchFile.getKeeper()
-        for type_ in self.activeTypes:
+        for type_ in self.tweak_read_classes:
             if type_ not in patchFile.tops: continue
             for record in patchFile.tops[type_].records:
                 if getattr(record, 'iconPath', None): continue

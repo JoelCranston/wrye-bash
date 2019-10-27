@@ -106,6 +106,7 @@ class RoadImporter(ImportPatcher, _ARoadImporter):
             log(u'* %s: %s' % modWorld)
 
 class CBash_RoadImporter(CBash_ImportPatcher, _ARoadImporter):
+    _read_write_records = ('ROADS',)
     logMsg = u'* ' + _(u'Roads Imported') + u': %d'
     #The regular patch routine doesn't allow merging of world records. The CBash patch routine does.
     #So, allowUnloaded isn't needed for this patcher to work. The same functionality could be gained by merging the tagged record.
@@ -117,10 +118,6 @@ class CBash_RoadImporter(CBash_ImportPatcher, _ARoadImporter):
         after this."""
         super(CBash_RoadImporter, self).__init__(p_name, p_file, p_sources)
         self.id_ROAD = {}
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['ROADS']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""

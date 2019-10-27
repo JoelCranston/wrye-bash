@@ -460,6 +460,7 @@ class CellImporter(ImportPatcher):
 
 class CBash_CellImporter(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Cells/Worlds Patched') + u': %d'
+    _read_write_records = ('CELLS',)
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_CellImporter, self).__init__(p_name, p_file, p_sources)
@@ -477,10 +478,6 @@ class CBash_CellImporter(CBash_ImportPatcher):
                         'directionalFade','fogClip'),
             u'C.RecordFlags': ('flags1',), # Yes seems funky but thats the way it is
             }
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CELLS']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -624,6 +621,11 @@ class GraphicsPatcher(_SimpleImporter):
             type_count[top_mod_rec] += 1
 
 class CBash_GraphicsPatcher(_RecTypeModLogging):
+    _read_write_records = (
+        'BSGN', 'LSCR', 'CLAS', 'LTEX', 'REGN', 'ACTI', 'DOOR', 'FLOR', 'FURN',
+        'GRAS', 'STAT', 'ALCH', 'AMMO', 'APPA', 'BOOK', 'INGR', 'KEYM', 'LIGH',
+        'MISC', 'SGST', 'SLGM', 'WEAP', 'TREE', 'ARMO', 'CLOT', 'CREA', 'MGEF',
+        'EFSH')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_GraphicsPatcher, self).__init__(p_name, p_file, p_sources)
@@ -655,13 +657,6 @@ class CBash_GraphicsPatcher(_RecTypeModLogging):
                                'key1Red','key1Green','key1Blue','key2Red','key2Green','key2Blue',
                                'key3Red','key3Green','key3Blue','key1A','key2A','key3A',
                                'key1Time','key2Time','key3Time')
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['BSGN','LSCR','CLAS','LTEX','REGN','ACTI','DOOR','FLOR',
-                'FURN','GRAS','STAT','ALCH','AMMO','APPA','BOOK','INGR',
-                'KEYM','LIGH','MISC','SGST','SLGM','WEAP','TREE','ARMO',
-                'CLOT','CREA','MGEF','EFSH']
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired."""
@@ -784,6 +779,7 @@ class ActorImporter(_SimpleImporter):
 
 class CBash_ActorImporter(_RecTypeModLogging):
     autoKey = bush.game.actor_importer_auto_key
+    _read_write_records = ('CREA', 'NPC_')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_ActorImporter, self).__init__(p_name, p_file, p_sources)
@@ -824,10 +820,6 @@ class CBash_ActorImporter(_RecTypeModLogging):
                 u'Actors.Skeleton': ('modPath','modb','modt_p',),
                 }
 
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CREA','NPC_']
-
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
         if modFile.GName == record.fid[0]: return
@@ -864,14 +856,11 @@ class KFFZPatcher(_SimpleImporter):
 
 class CBash_KFFZPatcher(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Imported Animations') + u': %d'
+    _read_write_records = ('CREA', 'NPC_')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_KFFZPatcher, self).__init__(p_name, p_file, p_sources)
         self.id_animations = defaultdict(list)
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CREA','NPC_']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -1066,16 +1055,13 @@ class NPCAIPackagePatcher(ImportPatcher):
 class CBash_NPCAIPackagePatcher(CBash_ImportPatcher):
     scanRequiresChecked = False
     logMsg = u'* ' + _(u'AI Package Lists Changed') + u': %d'
+    _read_write_records = ('CREA', 'NPC_')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_NPCAIPackagePatcher, self).__init__(p_name, p_file,
                                                         p_sources)
         self.previousPackages = {}
         self.mergedPackageList = {}
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CREA','NPC_']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -1149,14 +1135,11 @@ class DeathItemPatcher(_SimpleImporter):
 
 class CBash_DeathItemPatcher(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Imported Death Items') + u': %d'
+    _read_write_records = ('CREA', 'NPC_')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_DeathItemPatcher, self).__init__(p_name, p_file, p_sources)
         self.id_deathItem = {}
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CREA','NPC_']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -1270,6 +1253,7 @@ class ImportFactions(_SimpleImporter):
 class CBash_ImportFactions(_RecTypeModLogging):
     listSrcs = False
     logModRecs = u'* ' + _(u'Refactioned %(type)s Records: %(count)d')
+    _read_write_records = ('CREA', 'NPC_')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_ImportFactions, self).__init__(p_name, p_file, p_sources)
@@ -1287,10 +1271,6 @@ class CBash_ImportFactions(_RecTypeModLogging):
             if group not in ('CREA','NPC_'): continue
             for fid,factions in aFid_factions.iteritems():
                 csvId_factions[fid] = factions
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CREA','NPC_']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -1440,6 +1420,7 @@ class ImportRelations(_SimpleImporter):
 
 class CBash_ImportRelations(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Re-Relationed Records') + u': %d'
+    _read_write_records = ('FACT',)
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_ImportRelations, self).__init__(p_name, p_file, p_sources)
@@ -1452,10 +1433,6 @@ class CBash_ImportRelations(CBash_ImportPatcher):
         factionRelations = self._parse_texts(CBash_FactionRelations, progress)
         #--Finish
         self.csvFid_faction_mod.update(factionRelations.fid_faction_mod)
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['FACT']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -1500,16 +1477,13 @@ class ImportScripts(_SimpleImporter):
     rec_attrs = {x: ('script',) for x in bush.game.scripts_types}
 
 class CBash_ImportScripts(_RecTypeModLogging):
+    _read_write_records = ('ACTI', 'ALCH', 'APPA', 'ARMO', 'BOOK', 'CLOT',
+        'CONT', 'CREA', 'DOOR', 'FLOR', 'FURN', 'INGR', 'KEYM', 'LIGH', 'LVLC',
+        'MISC', 'NPC_', 'QUST', 'SGST', 'SLGM', 'WEAP')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_ImportScripts, self).__init__(p_name, p_file, p_sources)
         self.id_script = {}
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['ACTI','ALCH','APPA','ARMO','BOOK','CLOT','CONT','CREA',
-                'DOOR','FLOR','FURN','INGR','KEYM','LIGH','LVLC','MISC',
-                'NPC_','QUST','SGST','SLGM','WEAP']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -1676,13 +1650,10 @@ class ImportInventory(_AImportInventory, ImportPatcher):
     def _plog(self, log, mod_count): self._plog1(log, mod_count)
 
 class CBash_ImportInventory(_AImportInventory, _RecTypeModLogging):
+    _read_write_records = ('CREA', 'NPC_', 'CONT')
     listSrcs=False
     logModRecs = u'%(type)s ' + _(u'Inventories Changed') + u': %(count)d'
     allowUnloaded = False # FIXME CORRECT? comments seem to say so
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CREA','NPC_','CONT']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -1920,15 +1891,12 @@ class ImportActorsSpells(ImportPatcher):
 
 class CBash_ImportActorsSpells(CBash_ImportPatcher):
     logMsg = u'* '+_(u'Imported Spell Lists') + u': %d'
+    _read_write_records = ('CREA', 'NPC_')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_ImportActorsSpells, self).__init__(p_name, p_file,
                                                        p_sources)
         self.id_spells = {}
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CREA','NPC_']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -2076,6 +2044,11 @@ class NamesPatcher(_ANamesPatcher, ImportPatcher):
         self._patchLog(log,type_count)
 
 class CBash_NamesPatcher(_ANamesPatcher, _RecTypeModLogging):
+    _read_write_records = (
+        'CLAS', 'FACT', 'HAIR', 'EYES', 'RACE', 'MGEF', 'ENCH', 'SPEL', 'BSGN',
+        'ACTI', 'APPA', 'ARMO', 'BOOK', 'CLOT', 'CONT', 'DOOR', 'INGR', 'LIGH',
+        'MISC', 'FLOR', 'FURN', 'WEAP', 'AMMO', 'NPC_', 'CREA', 'SLGM', 'KEYM',
+        'ALCH', 'SGST', 'WRLD', 'CELLS', 'DIAL', 'QUST')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_NamesPatcher, self).__init__(p_name, p_file, p_sources)
@@ -2093,14 +2066,6 @@ class CBash_NamesPatcher(_ANamesPatcher, _RecTypeModLogging):
             for fid, (eid, name_) in fid_name.iteritems():
                 if name_ != u'NO NAME':
                     csvId_full[fid] = name_
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['CLAS','FACT','HAIR','EYES','RACE','MGEF','ENCH',
-                'SPEL','BSGN','ACTI','APPA','ARMO','BOOK','CLOT',
-                'CONT','DOOR','INGR','LIGH','MISC','FLOR','FURN',
-                'WEAP','AMMO','NPC_','CREA','SLGM','KEYM','ALCH',
-                'SGST','WRLD','CELLS','DIAL','QUST']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -2255,6 +2220,7 @@ class NpcFacePatcher(_ANpcFacePatcher,ImportPatcher):
 
 class CBash_NpcFacePatcher(_ANpcFacePatcher,CBash_ImportPatcher):
     logMsg = u'* '+_(u'Faces Patched') + u': %d'
+    _read_write_records = ('NPC_',)
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_NpcFacePatcher, self).__init__(p_name, p_file, p_sources)
@@ -2262,10 +2228,6 @@ class CBash_NpcFacePatcher(_ANpcFacePatcher,CBash_ImportPatcher):
         self.faceData = (
             'fggs_p', 'fgga_p', 'fgts_p', 'eye', 'hair', 'hairLength',
             'hairRed', 'hairBlue', 'hairGreen')
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['NPC_']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -2334,6 +2296,8 @@ class SoundPatcher(_SimpleImporter):
 
 class CBash_SoundPatcher(_RecTypeModLogging):
     """Imports sounds from source mods into patch."""
+    _read_write_records = (
+        'ACTI', 'CONT', 'CREA', 'DOOR', 'LIGH', 'MGEF', 'WTHR')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_SoundPatcher, self).__init__(p_name, p_file, p_sources)
@@ -2347,10 +2311,6 @@ class CBash_SoundPatcher(_RecTypeModLogging):
             'castingSound', 'boltSound', 'hitSound', 'areaSound')
         ##        class_attrs['REGN'] = ('sound','sounds_list')
         class_attrs['WTHR'] = ('sounds_list',)
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['ACTI','CONT','CREA','DOOR','LIGH','MGEF','WTHR']
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired."""
@@ -2572,6 +2532,7 @@ class SpellsPatcher(ImportPatcher, _ASpellsPatcher):
 
 class CBash_SpellsPatcher(CBash_ImportPatcher, _ASpellsPatcher):
     logMsg = u'* ' + _(u'Modified SPEL Stats') + u': %d'
+    _read_write_records = ('SPEL',)
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_SpellsPatcher, self).__init__(p_name, p_file, p_sources)
@@ -2586,10 +2547,6 @@ class CBash_SpellsPatcher(CBash_ImportPatcher, _ASpellsPatcher):
         self.spell_attrs = spellStats.attrs
         #--Finish
         self.csvId_stats.update(spellStats.fid_stats)
-
-    def getTypes(self):
-        """Returns the group types that this patcher checks"""
-        return ['SPEL']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
