@@ -24,6 +24,7 @@
 from __future__ import division
 import copy
 import re
+from collections import defaultdict
 from operator import itemgetter
 # Internal
 from .. import bass, bosh, bush, balt, load_order, bolt, exception
@@ -485,14 +486,18 @@ class _ListPatcherPanel(_PatcherPanel):
                 #     item, u', '.join(map(repr, self.configChecks))))
 
     def get_patcher_instance(self, patch_file):
+        patcher_sources = self._get_list_patcher_srcs(patch_file)
+        return self.patcher_type(self.patcher_name, patch_file,
+                                 patcher_sources)
+
+    def _get_list_patcher_srcs(self, patch_file):
         patcher_sources = [x for x in self.configItems if self.configChecks[x]]
         # that is for CBash List patchers - TODO(ut): how exactly used?
         if hasattr(self.patcher_type, 'allowUnloaded') and \
                 not self.patcher_type.allowUnloaded:
             patcher_sources = [s for s in patcher_sources if
                 s in patch_file.allSet or not bosh.ModInfos.rightFileType(s.s)]
-        return self.patcher_type(self.patcher_name, patch_file,
-                                 patcher_sources)
+        return patcher_sources
 
 class _ChoiceMenuMixin(object):
 
@@ -1298,6 +1303,13 @@ class _AListsMerger(_ListsMergerPanel):
     @property
     def patcher_tip(self):
         return _(u'Merges changes to leveled lists from all active mods.')
+
+    def get_patcher_instance(self, patch_file):
+        patcher_sources = self._get_list_patcher_srcs(patch_file)
+        return self.patcher_type(self.patcher_name, patch_file,
+                                 patcher_sources,
+                                 self.remove_empty_sublists,
+                                 defaultdict(tuple, self.configChoices))
 
 class ListsMerger(_AListsMerger):
     patcher_type = special.ListsMerger
