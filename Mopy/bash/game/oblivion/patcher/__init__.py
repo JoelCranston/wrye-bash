@@ -40,10 +40,8 @@ _spedial_patchers = (
     ("SEWorldEnforcer", SEWorldEnforcer, 'CBash_SEWorldEnforcer'),
     ("CBash_SEWorldEnforcer", CBash_SEWorldEnforcer, 'SEWorldEnforcer')
 )
-gameSpecificPatchers = {
-    pname: pi(ptype, twin, {'_patcher_txt': ptype.patcher_text,
-                            'patcher_name': ptype.patcher_name}) for
-    pname, ptype, twin in _spedial_patchers}
+gameSpecificPatchers = {pname: pi(ptype, twin, ptype.gui_cls_vars()) for
+                        pname, ptype, twin in _spedial_patchers}
 
 _list_pacthers =(
     ("CoblExhaustion", CoblExhaustion, 'CBash_CoblExhaustion'),
@@ -51,11 +49,8 @@ _list_pacthers =(
     ("MFactMarker", MFactMarker, 'CBash_MFactMarker'),
     ("CBash_MFactMarker", CBash_MFactMarker, 'MFactMarker')
 )
-gameSpecificListPatchers =  {
-    pname: pi(ptype, twin, {'_patcher_txt': ptype.patcher_text,
-                            'patcher_name': ptype.patcher_name,
-                            'autoKey': ptype.autoKey}) for
-    pname, ptype, twin in _list_pacthers}
+gameSpecificListPatchers = {pname: pi(ptype, twin, ptype.gui_cls_vars()) for
+                            pname, ptype, twin in _list_pacthers}
 
 _import_patchers = (
     ('RoadImporter', RoadImporter, 'CBash_RoadImporter'),

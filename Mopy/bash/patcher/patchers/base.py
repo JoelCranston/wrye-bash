@@ -40,28 +40,16 @@ class ListPatcher(AListPatcher,Patcher): pass
 
 class CBash_ListPatcher(AListPatcher,CBash_Patcher):
 
-    def initPatchFile(self, patchFile):
-        super(CBash_ListPatcher, self).initPatchFile(patchFile)
+    def __init__(self, p_name, p_file, p_sources):
+        super(CBash_ListPatcher, self).__init__(p_name, p_file, p_sources)
         # used in all subclasses except CBash_RacePatcher,
         # CBash_PatchMerger, CBash_UpdateReferences
         self.mod_count = Counter()
 
-    #--Patch Phase ------------------------------------------------------------
-    def getConfigChecked(self):
-        """Returns checked config items in list order."""
-        if self.allowUnloaded:
-            return [item for item in self.configItems if
-                    self.configChecks[item]]
-        else:
-            return [item for item in self.configItems if
-                    self.configChecks[item] and (
-                        item in self.patchFile.allSet or
-                        not bosh.ModInfos.rightFileType(item.s))]
-
 class MultiTweakItem(AMultiTweakItem):
     # Notice the differences from Patcher in scanModFile and buildPatch
     # TODO: scanModFile() have VERY similar code - use getReadClasses here ?
-    #--Patch Phase ------------------------------------------------------------
+
     def getReadClasses(self):
         """Returns load factory classes needed for reading."""
         return self.__class__.tweak_read_classes
@@ -117,19 +105,18 @@ class MultiTweaker(AMultiTweaker,Patcher):
             tweak.buildPatch(log,progress,self.patchFile)
 
 class CBash_MultiTweaker(AMultiTweaker,CBash_Patcher):
-    #--Config Phase -----------------------------------------------------------
+
+    def __init__(self, p_name, p_file):
+        super(CBash_MultiTweaker, self).__init__(p_name, p_file)
+        for tweak in self.tweaks:
+            tweak.patchFile = p_file
+
     def initData(self,group_patchers,progress):
         """Compiles material, i.e. reads source text, esp's, etc. as necessary."""
         if not self.isActive: return
         for tweak in self.enabledTweaks:
             for top_group_sig in tweak.getTypes():
                 group_patchers[top_group_sig].append(tweak)
-
-    #--Patch Phase ------------------------------------------------------------
-    def initPatchFile(self, patchFile):
-        super(CBash_MultiTweaker, self).initPatchFile(patchFile)
-        for tweak in self.tweaks:
-            tweak.patchFile = patchFile
 
     def buildPatchLog(self,log):
         """Will write to log."""
@@ -141,20 +128,19 @@ class CBash_MultiTweaker(AMultiTweaker,CBash_Patcher):
 # Patchers: 10 ----------------------------------------------------------------
 class AliasesPatcher(AAliasesPatcher,Patcher): pass
 
-class CBash_AliasesPatcher(AAliasesPatcher,CBash_Patcher): pass
+class CBash_AliasesPatcher(AAliasesPatcher,CBash_Patcher):
+    allowUnloaded = False # avoid the srcs check in CBash_Patcher.initData
 
 class PatchMerger(APatchMerger, ListPatcher): pass
 
 class CBash_PatchMerger(APatchMerger, CBash_ListPatcher): pass
 
 class UpdateReferences(AUpdateReferences,ListPatcher):
+    # TODO move this to a file it's imported after MreRecord.simpleTypes is set
 
-    #--Patch Phase ------------------------------------------------------------
-    def initPatchFile(self, patchFile):
-        super(UpdateReferences, self).initPatchFile(patchFile)
-        self.types = MreRecord.simpleTypes
-        self.classes = self.types.union(
-            {'CELL', 'WRLD', 'REFR', 'ACHR', 'ACRE'})
+    def __init__(self, p_name, p_file, p_sources):
+        super(UpdateReferences, self).__init__(p_name, p_file,
+                                               p_sources)
         self.old_new = {} #--Maps old fid to new fid
         self.old_eid = {} #--Maps old fid to old editor id
         self.new_eid = {} #--Maps new fid to new editor id
@@ -186,12 +172,12 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
             progress.plus()
 
     def getReadClasses(self):
-        """Returns load factory classes needed for reading."""
-        return tuple(self.classes) if self.isActive else ()
+        return tuple(
+            MreRecord.simpleTypes | ({'CELL', 'WRLD', 'REFR', 'ACHR', 'ACRE'}))
 
     def getWriteClasses(self):
-        """Returns load factory classes needed for writing."""
-        return tuple(self.classes) if self.isActive else ()
+        return tuple(
+            MreRecord.simpleTypes | ({'CELL', 'WRLD', 'REFR', 'ACHR', 'ACRE'}))
 
     def scanModFile(self,modFile,progress):
         """Scans specified mod file to extract info. May add record to patch mod,
@@ -201,7 +187,7 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
         patchCells = self.patchFile.CELL
         patchWorlds = self.patchFile.WRLD
         modFile.convertToLongFids(('CELL','WRLD','REFR','ACRE','ACHR'))
-##        for type in self.types:
+##        for type in MreRecord.simpleTypes:
 ##            for record in getattr(modFile,type).getActiveRecords():
 ##                record = record.getTypeCopy(mapper)
 ##                if record.fid in self.old_new:
@@ -287,7 +273,7 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
         def swapper(oldId):
             newId = old_new.get(oldId,None)
             return newId if newId else oldId
-##        for type in self.types:
+##        for type in MreRecord.simpleTypes:
 ##            for record in getattr(self.patchFile,type).getActiveRecords():
 ##                if record.fid in self.old_new:
 ##                    record.fid = swapper(record.fid)
@@ -342,10 +328,8 @@ from ...parsers import CBash_FidReplacer
 
 class CBash_UpdateReferences(AUpdateReferences, CBash_ListPatcher):
 
-    #--Config Phase -----------------------------------------------------------
-    def initPatchFile(self, patchFile):
-        super(CBash_UpdateReferences, self).initPatchFile(patchFile)
-        if not self.isActive: return
+    def __init__(self, p_name, p_file, p_sources):
+        super(CBash_UpdateReferences, self).__init__(p_name, p_file, p_sources)
         self.old_eid = {} #--Maps old fid to old editor id
         self.new_eid = {} #--Maps new fid to new editor id
         self.mod_count_old_new = {}
@@ -381,7 +365,6 @@ class CBash_UpdateReferences(AUpdateReferences, CBash_ListPatcher):
                 'ACRES','REFRS','DIAL','INFOS','QUST','IDLE',
                 'PACK','LSCR','LVSP','ANIO','WATR']
 
-    #--Patch Phase ------------------------------------------------------------
     def mod_apply(self, modFile):
         """Changes the mod in place without copying any records."""
         counts = modFile.UpdateReferences(self.old_new)
