@@ -787,6 +787,12 @@ class _DoublePatcherPanel(_TweakPatcherPanel, _ListPatcherPanel):
         clip.write(u'== ' + self.tweak_label + u'\n')
         _TweakPatcherPanel._log_config(self, conf, config, clip, log)
 
+    def get_patcher_instance(self, patch_file):
+        enabledTweaks = [t for t in self._all_tweaks if t.isEnabled]
+        patcher_sources = [x for x in self.configItems if self.configChecks[x]]
+        return self.patcher_type(self.patcher_name, patch_file,
+                                 patcher_sources, enabledTweaks)
+
 #------------------------------------------------------------------------------
 class _ImporterPatcherPanel(_ListPatcherPanel):
 
