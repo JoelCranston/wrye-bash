@@ -33,7 +33,7 @@ from ..base import AMultiTweakItem, AMultiTweaker, Patcher, CBash_Patcher, \
     AAliasesPatcher, AListPatcher, AImportPatcher, APatchMerger, \
     AUpdateReferences
 from ... import bosh, load_order, bush  # for bosh.modInfos
-from ...bolt import GPath, CsvReader
+from ...bolt import GPath, CsvReader, deprint
 from ...brec import MreRecord
 
 # Patchers 1 ------------------------------------------------------------------
@@ -185,9 +185,9 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
         progress.setFull(len(self.srcs))
         for srcFile in self.srcs:
             srcPath = GPath(srcFile)
-            if srcPath not in self.patches_set: continue
-            if getPatchesPath(srcFile).isfile():
-                self.readFromText(getPatchesPath(srcFile))
+            try: self.readFromText(getPatchesPath(srcFile))
+            except OSError: deprint(
+                u'%s is no longer in patches set' % srcPath, traceback=True)
             progress.plus()
 
     def getReadClasses(self):
@@ -360,9 +360,9 @@ class CBash_UpdateReferences(AUpdateReferences, CBash_ListPatcher):
         progress.setFull(len(self.srcs))
         for srcFile in self.srcs:
             if not bosh.ModInfos.rightFileType(srcFile):
-                if srcFile not in self.patches_set: continue
-                if getPatchesPath(srcFile).isfile():
-                    fidReplacer.readFromText(getPatchesPath(srcFile))
+                try: fidReplacer.readFromText(getPatchesPath(srcFile))
+                except OSError: deprint(
+                    u'%s is no longer in patches set' % srcFile, traceback=True)
             progress.plus()
         #--Finish
         self.old_new = fidReplacer.old_new
@@ -498,9 +498,11 @@ class ImportPatcher(AImportPatcher, ListPatcher):
                 srcInfo = bosh.modInfos[srcPath]
                 fullNames.readFromMod(srcInfo)
             else:
-                if srcPath not in self.patches_set: continue
                 try:
                     fullNames.readFromText(getPatchesPath(srcFile))
+                except OSError:
+                    deprint(u'%s is no longer in patches set' % srcPath,
+                        traceback=True)
                 except UnicodeError as e: # originally in NamesPatcher, keep ?
                     print(srcPath.stail, u'is not saved in UTF-8 format:', e)
             progress.plus()
@@ -539,7 +541,8 @@ class CBash_ImportPatcher(AImportPatcher, CBash_ListPatcher, SpecialPatcher):
         for srcFile in self.srcs:
             srcPath = GPath(srcFile)
             if not bosh.ModInfos.rightFileType(srcFile):
-                if srcPath not in self.patches_set: continue
-                actorFactions.readFromText(getPatchesPath(srcFile))
+                try: actorFactions.readFromText(getPatchesPath(srcFile))
+                except OSError: deprint(
+                    u'%s is no longer in patches set' % srcPath, traceback=True)
             progress.plus()
         return actorFactions

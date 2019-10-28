@@ -30,7 +30,6 @@ from this module outside of the patcher package."""
 # unhelpful) docs from overriding methods to save some (100s) lines. We must
 # also document which methods MUST be overridden by raising AbstractError. For
 # instance Patcher.buildPatch() apparently is NOT always overridden
-from . import getPatchesList
 from .. import load_order, bosh, bolt
 
 #------------------------------------------------------------------------------
@@ -113,7 +112,6 @@ class AListPatcher(_Abstract_Patcher):
     :type _patches_set: set[bolt.Path]"""
     # log header to be used if the ListPatcher has mods/files source files
     srcsHeader = u'=== '+ _(u'Source Mods')
-    _patches_set = None
 
     def __init__(self, p_name, p_file, p_sources):
         """In addition to super implementation this defines the self.srcs
@@ -121,14 +119,6 @@ class AListPatcher(_Abstract_Patcher):
         super(AListPatcher, self).__init__(p_name, p_file)
         self.srcs = p_sources
         self.isActive = bool(self.srcs)
-
-    @staticmethod
-    def list_patches_dir(): AListPatcher._patches_set = getPatchesList()
-
-    @property
-    def patches_set(self): # ONLY use in patchers config phase or initData
-        if self._patches_set is None: self.list_patches_dir()
-        return self._patches_set
 
     def _srcMods(self,log):
         """Logs the Source mods for this patcher."""

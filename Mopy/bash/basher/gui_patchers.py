@@ -33,7 +33,7 @@ from ..bolt import GPath
 from ..gui import Button, CheckBox, HBoxedLayout, Label, LayoutOptions, \
     Spacer, TextArea, TOP, VLayout, EventResult, PanelWin, ListBox, \
     CheckListBox
-from ..patcher import patch_files
+from ..patcher import patch_files, patches_set
 
 reCsvExt = re.compile(u'' r'\.csv$', re.I | re.U)
 
@@ -251,7 +251,6 @@ class _ListPatcherPanel(_PatcherPanel):
     # Only for CBash patchers
     unloadedText = u'\n\n' + _(u'Any non-active, non-merged mods in the'
                                u' following list will be IGNORED.')
-
     @property
     def patcher_text(self):
         pt = self.__class__._patcher_txt
@@ -428,7 +427,7 @@ class _ListPatcherPanel(_PatcherPanel):
         newConfigItems = []
         for srcPath in self.configItems:
             if (srcPath in bosh.modInfos or (reCsvExt.search(
-                srcPath.s) and srcPath in self.patches_set)):
+                srcPath.s) and srcPath in patches_set())):
                 newConfigItems.append(srcPath)
         self.configItems = newConfigItems
         if self.__class__.forceItemCheck:
@@ -461,7 +460,7 @@ class _ListPatcherPanel(_PatcherPanel):
         autoItems = self._get_auto_mods()
         reFile = re.compile(
             u'_(' + (u'|'.join(self.__class__.autoKey)) + r')\.csv$', re.U)
-        for fileName in sorted(self.patches_set):
+        for fileName in sorted(patches_set()):
             if reFile.search(fileName.s):
                 autoItems.append(fileName)
         return autoItems

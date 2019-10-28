@@ -24,14 +24,15 @@
 import os
 import re
 from collections import Counter, defaultdict
-from ....bolt import GPath, sio, SubProgress, CsvReader
+from ....bolt import GPath, sio, SubProgress, CsvReader, deprint
 from ....patcher import getPatchesPath
 from ....parsers import LoadFactory, ModFile
 from ....brec import MreRecord, RecordHeader, null4
 from .... import bush, load_order
 from ....cint import MGEFCode, FormID
 from ....exception import StateError
-from ....patcher.base import Patcher, CBash_Patcher, _Abstract_Patcher
+from ....patcher.base import Patcher, CBash_Patcher, _Abstract_Patcher, \
+    AListPatcher
 from ....patcher.patchers.base import ListPatcher, CBash_ListPatcher
 
 __all__ = ['AlchemicalCatalogs', 'CBash_AlchemicalCatalogs', 'CoblExhaustion',
@@ -355,7 +356,7 @@ class CBash_AlchemicalCatalogs(_AAlchemicalCatalogs,CBash_Patcher):
         log(u'* '+_(u'Effects Cataloged') + u': %d' % len(effect_ingred))
 
 #------------------------------------------------------------------------------
-class _ExSpecialList(_ExSpecial):
+class _ExSpecialList(_ExSpecial, AListPatcher):
 
     @classmethod
     def gui_cls_vars(cls):
@@ -376,14 +377,17 @@ class _DefaultDictLog(CBash_ListPatcher):
 class _ACoblExhaustion(_ExSpecialList):
     """Modifies most Greater power to work with Cobl's power exhaustion
     feature."""
-    # TODO: readFromText differ only in (PBash -> CBash):
-    # -         longid = (aliases.get(mod,mod),int(objectIndex[2:],16))
-    # +         longid = FormID(aliases.get(mod,mod),int(objectIndex[2:],16))
     patcher_name = _(u'Cobl Exhaustion')
     patcher_text = u'\n\n'.join(
         [_(u"Modify greater powers to use Cobl's Power Exhaustion feature."),
          _(u'Will only run if Cobl Main v1.66 (or higher) is active.')])
     autoKey = {u'Exhaust'}
+
+    def __init__(self, p_name, p_file, p_sources):
+        super(_ACoblExhaustion, self).__init__(p_name, p_file, p_sources)
+        self.isActive |= (_cobl_main in p_file.loadSet and
+            self.patchFile.p_file_minfos.getVersionFloat(_cobl_main) > 1.65)
+        self.id_exhaustion = {}
 
     def _pLog(self, log, count):
         log.setHeader(u'= ' + self._patcher_name)
@@ -391,39 +395,34 @@ class _ACoblExhaustion(_ExSpecialList):
         for srcMod in load_order.get_ordered(count.keys()):
             log(u'  * %s: %d' % (srcMod.s, count[srcMod]))
 
-class CoblExhaustion(_ACoblExhaustion,ListPatcher):
-    _read_write_records = ('SPEL',)
-
-    def __init__(self, p_name, p_file, p_sources):
-        super(CoblExhaustion, self).__init__(p_name, p_file, p_sources)
-        self.isActive = bool(self.srcs) and (_cobl_main in p_file.loadSet and
-            self.patchFile.p_file_minfos.getVersionFloat(_cobl_main) > 1.65)
-        self.id_exhaustion = {}
-
-    def readFromText(self,textPath):
+    def readFromText(self, textPath):
         """Imports type_id_name from specified text file."""
         aliases = self.patchFile.aliases
         id_exhaustion = self.id_exhaustion
         textPath = GPath(textPath)
         with CsvReader(textPath) as ins:
-            reNum = re.compile(u'' r'\d+', re.U)
             for fields in ins:
-                if len(fields) < 4 or fields[1][:2] != u'0x' or \
-                        not reNum.match(fields[3]):
-                    continue
-                mod,objectIndex,eid,time = fields[:4]
-                mod = GPath(mod)
-                longid = (aliases.get(mod,mod),int(objectIndex[2:],16))
-                id_exhaustion[longid] = int(time)
+                try:
+                    if fields[1][:2] != u'0x': # may raise IndexError
+                        continue
+                    mod, objectIndex, eid, time = fields[:4] # may raise VE
+                    mod = GPath(mod)
+                    longid = (aliases.get(mod, mod), int(objectIndex[2:], 16))
+                    id_exhaustion[longid] = int(time)
+                except (IndexError, ValueError):
+                    pass #ValueError: Either we couldn't unpack or int() failed
+
+class CoblExhaustion(_ACoblExhaustion,ListPatcher):
+    _read_write_records = ('SPEL',)
 
     def initData(self,progress):
         """Get names from source files."""
         if not self.isActive: return
         progress.setFull(len(self.srcs))
         for srcFile in self.srcs:
-            srcPath = GPath(srcFile)
-            if srcPath not in self.patches_set: continue
-            self.readFromText(getPatchesPath(srcFile))
+            try: self.readFromText(getPatchesPath(srcFile))
+            except OSError: deprint(
+                u'%s is no longer in patches set' % srcFile, traceback=True)
             progress.plus()
 
     def scanModFile(self,modFile,progress):
@@ -473,14 +472,8 @@ class CoblExhaustion(_ACoblExhaustion,ListPatcher):
         self._pLog(log, count)
 
 class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
-
-    def __init__(self, p_name, p_file, p_sources):
-        super(CBash_CoblExhaustion, self).__init__(p_name, p_file, p_sources)
-        self.isActive = (_cobl_main in p_file.loadSet and
-                         self.patchFile.p_file_minfos.getVersionFloat(_cobl_main) > 1.65)
-        self.id_exhaustion = {}
-        self.SEFF = MGEFCode('SEFF')
-        self.exhaustionId = FormID(_cobl_main, 0x05139B)
+    SEFF = MGEFCode('SEFF')
+    exhaustionId = FormID(_cobl_main, 0x05139B)
 
     def initData(self,group_patchers,progress):
         if not self.isActive: return
@@ -488,29 +481,15 @@ class CBash_CoblExhaustion(_ACoblExhaustion, _DefaultDictLog):
             group_patchers[top_group_sig].append(self)
         progress.setFull(len(self.srcs))
         for srcFile in self.srcs:
-            srcPath = GPath(srcFile)
-            if srcPath not in self.patches_set: continue
-            self.readFromText(getPatchesPath(srcFile))
+            try: self.readFromText(getPatchesPath(srcFile))
+            except OSError: deprint(
+                u'%s is no longer in patches set' % srcFile, traceback=True)
             progress.plus()
+        self.id_exhaustion = {FormID(*k): v for k, v in
+                              self.id_exhaustion.iteritems()}
 
     def getTypes(self):
         return ['SPEL']
-
-    def readFromText(self,textPath):
-        """Imports type_id_name from specified text file."""
-        aliases = self.patchFile.aliases
-        id_exhaustion = self.id_exhaustion
-        textPath = GPath(textPath)
-        with CsvReader(textPath) as ins:
-            reNum = re.compile(u'' r'\d+', re.U)
-            for fields in ins:
-                if len(fields) < 4 or fields[1][:2] != u'0x' or \
-                        not reNum.match(fields[3]):
-                    continue
-                mod,objectIndex,eid,time = fields[:4]
-                mod = GPath(mod)
-                longid = FormID(aliases.get(mod,mod),int(objectIndex[2:],16))
-                id_exhaustion[longid] = int(time)
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
@@ -556,6 +535,23 @@ class _AMFactMarker(_ExSpecialList):
         for mod in load_order.get_ordered(changed):
             log(u'* %s: %d' % (mod.s, changed[mod]))
 
+    def readFromText(self, textPath):
+        """Imports id_info from specified text file."""
+        aliases = self.patchFile.aliases
+        id_info = self.id_info
+        with CsvReader(textPath) as ins:
+            for fields in ins:
+                if len(fields) < 6 or fields[1][:2] != u'0x':
+                    continue
+                mod, objectIndex = fields[:2]
+                mod = GPath(mod)
+                longid = (aliases.get(mod, mod), int(objectIndex, 0))
+                morphName = fields[4].strip()
+                rankName = fields[5].strip()
+                if not morphName: continue
+                if not rankName: rankName = _(u'Member')
+                id_info[longid] = (morphName, rankName)
+
 class MFactMarker(_AMFactMarker,ListPatcher):
     _read_write_records = ('FACT',)
 
@@ -568,23 +564,11 @@ class MFactMarker(_AMFactMarker,ListPatcher):
     def initData(self,progress):
         """Get names from source files."""
         if not self.isActive: return
-        aliases = self.patchFile.aliases
-        id_info = self.id_info
         for srcFile in self.srcs:
-            textPath = getPatchesPath(srcFile)
-            if not textPath.exists(): continue
-            with CsvReader(textPath) as ins:
-                for fields in ins:
-                    if len(fields) < 6 or fields[1][:2] != u'0x':
-                        continue
-                    mod,objectIndex = fields[:2]
-                    mod = GPath(mod)
-                    longid = (aliases.get(mod,mod),int(objectIndex,0))
-                    morphName = fields[4].strip()
-                    rankName = fields[5].strip()
-                    if not morphName: continue
-                    if not rankName: rankName = _(u'Member')
-                    id_info[longid] = (morphName,rankName)
+            try: self.readFromText(getPatchesPath(srcFile))
+            except OSError: deprint(
+                u'%s is no longer in patches set' % srcFile, traceback=True)
+            progress.plus()
 
     def scanModFile(self, modFile, progress):
         """Scan modFile."""
@@ -667,32 +651,14 @@ class CBash_MFactMarker(_AMFactMarker, _DefaultDictLog):
             group_patchers[top_group_sig].append(self)
         progress.setFull(len(self.srcs))
         for srcFile in self.srcs:
-            srcPath = GPath(srcFile)
-            if srcPath not in self.patches_set: continue
-            self.readFromText(getPatchesPath(srcFile))
+            try: self.readFromText(getPatchesPath(srcFile))
+            except OSError: deprint(
+                u'%s is no longer in patches set' % srcFile, traceback=True)
             progress.plus()
+        self.id_info = {FormID(*k): v for k, v in self.id_info.iteritems()}
 
     def getTypes(self):
         return ['FACT']
-
-    def readFromText(self,textPath):
-        """Imports id_info from specified text file."""
-        aliases = self.patchFile.aliases
-        id_info = self.id_info
-        textPath = GPath(textPath)
-        if not textPath.exists(): return
-        with CsvReader(textPath) as ins:
-            for fields in ins:
-                if len(fields) < 6 or fields[1][:2] != u'0x':
-                    continue
-                mod,objectIndex = fields[:2]
-                mod = GPath(mod)
-                longid = FormID(aliases.get(mod,mod),int(objectIndex,0))
-                morphName = fields[4].strip()
-                rankName = fields[5].strip()
-                if not morphName: continue
-                if not rankName: rankName = _(u'Member')
-                id_info[longid] = (morphName,rankName)
 
     #--Patch Phase ------------------------------------------------------------
     def apply(self,modFile,record,bashTags):

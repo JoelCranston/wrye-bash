@@ -38,8 +38,7 @@ from ..exception import BoltError, CancelError, FileEditError, \
 from ..gui import CancelButton, DeselectAllButton, HLayout, Label, \
     LayoutOptions, OkButton, OpenButton, RevertButton, RevertToSavedButton, \
     SaveAsButton, SelectAllButton, Stretch, VLayout, DialogWindow, CheckListBox
-from ..patcher import configIsCBash, exportConfig
-from ..patcher.base import AListPatcher
+from ..patcher import configIsCBash, exportConfig, list_patches_dir
 from ..patcher.patch_files import PatchFile, CBash_PatchFile
 
 # Final lists of gui patcher classes instances, initialized in
@@ -68,7 +67,7 @@ class PatchDialog(DialogWindow):
             icon_bundle=Resources.bashMonkey, sizes_dict=balt.sizes, size=size)
         self.set_min_size(400, 300)
         #--Data
-        AListPatcher.list_patches_dir()
+        list_patches_dir() # refresh cached dir
         groupOrder = dict([(group,index) for index,group in
             enumerate((_(u'General'),_(u'Importers'),_(u'Tweakers'),_(u'Special')))])
         patchConfigs = bosh.modInfos.table.getItem(patchInfo.name,'bash.patch.configs',{})
