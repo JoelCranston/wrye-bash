@@ -48,10 +48,9 @@ executing_patch = None # type: bolt.Path
 class _PFile(object):
     """Base class of patch files - factoring out common code __WIP__. Wraps an
     executing bashed Patch."""
-    def __init__(self, patchers, patch_path):
+    def __init__(self, patch_path):
         """:type patch_path: bolt.Path"""
         #--New attrs
-        self._patcher_instances = patchers
         self.patchName = patch_path # the bashed Patch
         # Aliases from one mod name to another. Used by text file patchers.
         self.aliases = {}
@@ -76,8 +75,9 @@ class _PFile(object):
         self.loadSet = frozenset(self.loadMods)
         self.set_mergeable_mods([])
         self.p_file_minfos = bosh.modInfos
-        for patcher in self._patcher_instances:
-            patcher.initPatchFile(self)
+
+    def set_patcher_instances(self, patchers_):
+        self._patcher_instances = patchers_
 
     def set_mergeable_mods(self, mergeMods):
         """Add to mod lists and sets the mergeable mods."""
@@ -170,14 +170,14 @@ class PatchFile(_PFile, ModFile):
     """Defines and executes patcher configuration."""
 
     #--Instance
-    def __init__(self,modInfo,patchers):
+    def __init__(self, modInfo):
         """Initialization."""
         ModFile.__init__(self,modInfo,None)
         self.tes4.author = u'BASHED PATCH'
         self.tes4.masters = [bosh.modInfos.masterName]
         self.longFids = True
         self.keepIds = set()
-        _PFile.__init__(self, patchers, modInfo.name)
+        _PFile.__init__(self, modInfo.name)
 
     def getKeeper(self):
         """Returns a function to add fids to self.keepIds."""
@@ -362,7 +362,7 @@ class CBash_PatchFile(_PFile, ObModFile):
     """Defines and executes patcher configuration."""
 
     #--Instance
-    def __init__(self, patch_name, patchers):
+    def __init__(self, patch_name):
         """Initialization."""
         self.group_patchers = defaultdict(list)
         self.indexMGEFs = False
@@ -375,7 +375,7 @@ class CBash_PatchFile(_PFile, ObModFile):
                               'imperial', 'khajiit', 'nord', 'orc', 'redguard',
                               'wood elf']
         self.races_data = {'EYES': [], 'HAIR': []}
-        _PFile.__init__(self, patchers, patch_name)
+        _PFile.__init__(self, patch_name)
 
     def init_patchers_data(self, progress):
         """Gives each patcher a chance to get its source data."""

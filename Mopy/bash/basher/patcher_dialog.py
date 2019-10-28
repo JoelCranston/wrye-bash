@@ -183,9 +183,12 @@ class PatchDialog(DialogWindow):
             self._saveConfig(patch_name)
             #--Do it
             log = bolt.LogFile(StringIO.StringIO())
-            patchers = [p for p in self._gui_patchers if p.isEnabled]
-            patchFile = CBash_PatchFile(patch_name, patchers) if self.doCBash \
-                   else PatchFile(self.patchInfo, patchers)
+            patchFile = CBash_PatchFile(patch_name) if self.doCBash else \
+                PatchFile(self.patchInfo)
+            patchers = [p.get_patcher_instance(patchFile) for p in
+                        self._gui_patchers if p.isEnabled]
+            patchers = [p for p in patchers if p.isActive]
+            patchFile.set_patcher_instances(patchers) # FIXME check what happens if empty
             patchFile.init_patchers_data(SubProgress(progress, 0, 0.1)) #try to speed this up!
             if self.doCBash:
                 #try to speed this up!
