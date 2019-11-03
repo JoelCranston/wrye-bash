@@ -628,7 +628,6 @@ class RacePatcher(AMultiTweaker, ListPatcher):
     scanOrder = 40
     editOrder = 40
     _read_write_records = ('RACE', 'EYES', 'HAIR', 'NPC_',)
-    races_data = {'EYES':[],'HAIR':[]}
     _tweak_classes = [RaceTweaker_BiggerOrcsAndNords,
         RaceTweaker_MergeSimilarRaceHairs, RaceTweaker_MergeSimilarRaceEyes,
         RaceTweaker_PlayableEyes, RaceTweaker_PlayableHairs,
@@ -1090,6 +1089,7 @@ class _CBashOnlyRacePatchers(SpecialPatcher, AListPatcher):
     allowUnloaded = True
     scanRequiresChecked = True
     applyRequiresChecked = False
+    _read_write_records = ('RACE',)
 
     def initData(self,group_patchers,progress):
         if not self.isActive: return
@@ -1106,9 +1106,6 @@ class CBash_RacePatcher_Relations(_CBashOnlyRacePatchers):
         self.racesPatched = set()
         self.fid_faction_mod = {}
 
-    def getTypes(self):
-        return ['RACE']
-    #--Patch Phase ------------------------------------------------------------
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
         if bashTags & self.autoKey:
@@ -1180,9 +1177,6 @@ class CBash_RacePatcher_Imports(_CBashOnlyRacePatchers):
         self.racesPatched = set()
         self.fid_attr_value = defaultdict(dict)
 
-    def getTypes(self):
-        return ['RACE']
-    #--Patch Phase ------------------------------------------------------------
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
         recordId = record.fid
@@ -1230,10 +1224,6 @@ class CBash_RacePatcher_Spells(_CBashOnlyRacePatchers):
         self.racesPatched = set()
         self.id_spells = {}
 
-    def getTypes(self):
-        return ['RACE']
-
-    #--Patch Phase ------------------------------------------------------------
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
         tags = bashTags & self.autoKey
@@ -1276,6 +1266,7 @@ class CBash_RacePatcher_Eyes(_CBashOnlyRacePatchers):
     dremoraRace = FormID(GPath(u'Oblivion.esm'),0x038010)
     reX117 = re.compile(u'^117[a-z]',re.I|re.U)
     scanRequiresChecked = False
+    _read_write_records = ('EYES', 'HAIR', 'RACE')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_RacePatcher_Eyes, self).__init__(p_name, p_file, p_sources)
@@ -1295,9 +1286,6 @@ class CBash_RacePatcher_Eyes(_CBashOnlyRacePatchers):
         self.eye_meshes = {}
         self.finishedOnce = False
         self.vanilla_eyes = _find_vanilla_eyes()
-
-    def getTypes(self):
-        return ['EYES','HAIR','RACE']
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
