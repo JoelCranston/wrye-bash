@@ -759,7 +759,7 @@ class ModCleaner(object):
                             if header.groupType != 0:
                                 pass
                             elif header.label not in ('CELL','WRLD'):
-                                copy(rec_size-header.__class__.rec_header_size)
+                                copy(rec_size - RecordHeader.rec_header_size)
                         else:
                             if doUDR and header.flags1 & 0x20 and rec_type in {
                                 'ACRE',               #--Oblivion only
@@ -767,7 +767,7 @@ class ModCleaner(object):
                                 'NAVM','PGRE','PHZD', #--Skyrim only
                                 }:
                                 header.flags1 = (header.flags1 & ~0x20) | 0x1000
-                                out.seek(-header.__class__.rec_header_size,1)
+                                out.seek(-RecordHeader.rec_header_size, 1)
                                 out.write(header.pack())
                                 changed = True
                             if doFog and rec_type == 'CELL':
@@ -839,12 +839,12 @@ class NvidiaFogFixer(object):
                     header = ins.unpackRecHeader()
                     type,size = header.recType,header.size
                     #(type,size,str0,fid,uint2) = ins.unpackRecHeader()
-                    copyPrev(header.__class__.rec_header_size)
+                    copyPrev(RecordHeader.rec_header_size)
                     if type == 'GRUP':
                         if header.groupType != 0: #--Ignore sub-groups
                             pass
                         elif header.label not in ('CELL','WRLD'):
-                            copy(size-header.__class__.rec_header_size)
+                            copy(size - RecordHeader.rec_header_size)
                     #--Handle cells
                     elif type == 'CELL':
                         nextRecord = ins.tell() + size
@@ -902,13 +902,13 @@ class ModDetails(object):
                     # FIXME(ut): monkey patch for fallout QUST GRUP
                     if bush.game.fsName in (u'Fallout4', u'Fallout4VR') and \
                             header.groupType == 10:
-                        ins.seek(rec_siz - header.__class__.rec_header_size, 1)
+                        ins.seek(rec_siz - RecordHeader.rec_header_size, 1)
                         continue
                     label = header.label
                     progress(1.0*ins.tell()/modInfo.size,_(u"Scanning: ")+label)
                     records = group_records.setdefault(label,[])
                     if label in ('CELL', 'WRLD', 'DIAL'): # skip these groups
-                        ins.seek(rec_siz - header.__class__.rec_header_size, 1)
+                        ins.seek(rec_siz - RecordHeader.rec_header_size, 1)
                 elif recType != 'GRUP':
                     eid = u''
                     nextRecord = ins.tell() + rec_siz

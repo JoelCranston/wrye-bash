@@ -269,17 +269,17 @@ class OblivionGameInfo(GameInfo):
         cls.readClasses = (MreMgef, MreScpt,)
         cls.writeClasses = (MreMgef,)
         # Setting RecordHeader class variables - Oblivion is special
-        __rec_type = brec.RecordHeader
-        __rec_type.rec_header_size = 20
-        __rec_type.rec_pack_format = ['=4s', 'I', 'I', 'I', 'I']
-        __rec_type.rec_pack_format_str = ''.join(__rec_type.rec_pack_format)
-        __rec_type.pack_formats = {0: '=4sI4s2I'}
-        __rec_type.pack_formats.update(
+        rec_header = brec.RecordHeader
+        rec_header.rec_header_size = 20
+        rec_header.rec_pack_format = ['=4s', 'I', 'I', 'I', 'I']
+        rec_header.rec_pack_format_str = ''.join(rec_header.rec_pack_format)
+        rec_header.pack_formats = {0: '=4sI4s2I'}
+        rec_header.pack_formats.update(
             {x: '=4s4I' for x in {1, 6, 7, 8, 9, 10}})
-        __rec_type.pack_formats.update({x: '=4sIi2I' for x in {2, 3}})
-        __rec_type.pack_formats.update({x: '=4sIhh2I' for x in {4, 5}})
+        rec_header.pack_formats.update({x: '=4sIi2I' for x in {2, 3}})
+        rec_header.pack_formats.update({x: '=4sIhh2I' for x in {4, 5}})
         # Similar to other games
-        __rec_type.topTypes = [
+        rec_header.topTypes = [
             'GMST', 'GLOB', 'CLAS', 'FACT', 'HAIR', 'EYES', 'RACE', 'SOUN',
             'SKIL', 'MGEF', 'SCPT', 'LTEX', 'ENCH', 'SPEL', 'BSGN', 'ACTI',
             'APPA', 'ARMO', 'BOOK', 'CLOT', 'CONT', 'DOOR', 'INGR', 'LIGH',
@@ -287,8 +287,8 @@ class OblivionGameInfo(GameInfo):
             'NPC_', 'CREA', 'LVLC', 'SLGM', 'KEYM', 'ALCH', 'SBSP', 'SGST',
             'LVLI', 'WTHR', 'CLMT', 'REGN', 'CELL', 'WRLD', 'DIAL', 'QUST',
             'IDLE', 'PACK', 'CSTY', 'LSCR', 'LVSP', 'ANIO', 'WATR', 'EFSH']
-        __rec_type.recordTypes = set(
-            __rec_type.topTypes + ['GRUP', 'TES4', 'ROAD', 'REFR', 'ACHR',
+        rec_header.recordTypes = set(
+            rec_header.topTypes + ['GRUP', 'TES4', 'ROAD', 'REFR', 'ACHR',
                                    'ACRE', 'PGRD', 'LAND', 'INFO'])
         brec.MreRecord.type_class = dict((x.classType,x) for x in (
             MreAchr, MreAcre, MreActi, MreAlch, MreAmmo, MreAnio, MreAppa,

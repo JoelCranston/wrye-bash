@@ -547,9 +547,10 @@ class GameInfo(object):
     def init(cls):
         # Setting RecordHeader class variables --------------------------------
         # Top types in order of the main ESM
-        brec.RecordHeader.topTypes = []
-        brec.RecordHeader.recordTypes = set(
-            brec.RecordHeader.topTypes + ['GRUP', 'TES4'])
+        rec_header = brec.RecordHeader
+        rec_header.topTypes = []
+        rec_header.recordTypes = set(
+            rec_header.topTypes + ['GRUP', 'TES4'])
         # Record Types
         brec.MreRecord.type_class = dict((x.classType,x) for x in  (
                 ))

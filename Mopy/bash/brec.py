@@ -214,7 +214,7 @@ class RecordHeader(object):
 
 #------------------------------------------------------------------------------
 class ModReader(object):
-    """Wrapper around a TES4 file in read mode.
+    """Wrapper around a plugin file in read mode.
     Will throw a ModReaderror if read operation fails to return correct size.
     """
 
@@ -345,7 +345,7 @@ class ModReader(object):
 
 #------------------------------------------------------------------------------
 class ModWriter(object):
-    """Wrapper around a TES4 output stream.  Adds utility functions."""
+    """Wrapper around a plugin file output stream.  Adds utility functions."""
     def __init__(self,out):
         self.out = out
 

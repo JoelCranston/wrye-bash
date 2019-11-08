@@ -166,7 +166,8 @@ class FalloutNVGameInfo(Fallout3GameInfo):
                 MreTxst, MreVtyp, MreWatr, MreWeap, MreWthr, MreGmst,
             )
         # Setting RecordHeader class variables --------------------------------
-        brec.RecordHeader.topTypes = [
+        rec_header = brec.RecordHeader
+        rec_header.topTypes = [
             'GMST', 'TXST', 'MICN', 'GLOB', 'CLAS', 'FACT', 'HDPT', 'HAIR',
             'EYES', 'RACE', 'SOUN', 'ASPC', 'MGEF', 'SCPT', 'LTEX', 'ENCH',
             'SPEL', 'ACTI', 'TACT', 'TERM', 'ARMO', 'BOOK', 'CONT', 'DOOR',
@@ -180,11 +181,10 @@ class FalloutNVGameInfo(Fallout3GameInfo):
             'LGTM', 'MUSC', 'IMOD', 'REPU', 'RCPE', 'RCCT', 'CHIP', 'CSNO',
             'LSCT', 'MSET', 'ALOC', 'CHAL', 'AMEF', 'CCRD', 'CMNY', 'CDCK',
             'DEHY', 'HUNG', 'SLPD', 'CELL', 'WRLD', ]
-        brec.RecordHeader.recordTypes = set(
-            brec.RecordHeader.topTypes + ['GRUP', 'TES4', 'ACHR', 'ACRE',
-                                          'INFO', 'LAND', 'NAVM', 'PGRE',
-                                          'PMIS', 'REFR'])
-        brec.RecordHeader.plugin_form_version = 15
+        rec_header.recordTypes = set(
+            rec_header.topTypes + ['GRUP', 'TES4', 'ACHR', 'ACRE', 'INFO',
+                                   'LAND', 'NAVM', 'PGRE', 'PMIS', 'REFR'])
+        rec_header.plugin_form_version = 15
         brec.MreRecord.type_class = dict(
             (x.classType, x) for x in (cls.mergeClasses +  # Not Mergeable
                 (MreAchr, MreAcre, MreCell, MreDial, MreInfo, MreNavi,

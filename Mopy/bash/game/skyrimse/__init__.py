@@ -137,7 +137,8 @@ class SkyrimSEGameInfo(SkyrimGameInfo):
             MrePack,
         )
         # Setting RecordHeader class variables --------------------------------
-        brec.RecordHeader.topTypes = [
+        rec_header = brec.RecordHeader
+        rec_header.topTypes = [
             'GMST', 'KYWD', 'LCRT', 'AACT', 'TXST', 'GLOB', 'CLAS', 'FACT',
             'HDPT', 'HAIR', 'EYES', 'RACE', 'SOUN', 'ASPC', 'MGEF', 'SCPT',
             'LTEX', 'ENCH', 'SPEL', 'SCRL', 'ACTI', 'TACT', 'ARMO', 'BOOK',
@@ -154,11 +155,10 @@ class SkyrimSEGameInfo(SkyrimGameInfo):
             'SCEN', 'ASTP', 'OTFT', 'ARTO', 'MATO', 'MOVT', 'SNDR', 'DUAL',
             'SNCT', 'SOPM', 'COLL', 'CLFM', 'REVB', 'LENS', 'VOLI']
         #-> this needs updating for Skyrim
-        brec.RecordHeader.recordTypes = set(
-            brec.RecordHeader.topTypes + ['GRUP', 'TES4', 'REFR', 'ACHR',
-                                          'ACRE', 'LAND', 'INFO', 'NAVM',
-                                          'PHZD', 'PGRE'])
-        brec.RecordHeader.plugin_form_version = 44
+        rec_header.recordTypes = set(
+            rec_header.topTypes + ['GRUP', 'TES4', 'REFR', 'ACHR', 'ACRE',
+                                   'LAND', 'INFO', 'NAVM', 'PHZD', 'PGRE'])
+        rec_header.plugin_form_version = 44
         brec.MreRecord.type_class = dict((x.classType,x) for x in (
             MreAchr, MreDial, MreInfo, MreAact, MreActi, MreAddn, MreAlch,
             MreAmmo, MreAnio, MreAppa, MreArma, MreArmo, MreArto, MreAspc,

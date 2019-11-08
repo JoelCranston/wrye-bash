@@ -164,7 +164,8 @@ class Fallout4GameInfo(GameInfo):
             MreGmst, MreLvli, MreLvln
         )
         # Setting RecordHeader class variables --------------------------------
-        brec.RecordHeader.topTypes = [
+        rec_header = brec.RecordHeader
+        rec_header.topTypes = [
             'GMST', 'KYWD', 'LCRT', 'AACT', 'TRNS', 'CMPO', 'TXST', 'GLOB',
             'DMGT', 'CLAS', 'FACT', 'HDPT', 'RACE', 'SOUN', 'ASPC', 'MGEF',
             'LTEX', 'ENCH', 'SPEL', 'ACTI', 'TACT', 'ARMO', 'BOOK', 'CONT',
@@ -182,10 +183,10 @@ class Fallout4GameInfo(GameInfo):
             'RFGP', 'AMDL', 'LAYR', 'COBJ', 'OMOD', 'MSWP', 'ZOOM', 'INNR',
             'KSSM', 'AECH', 'SCCO', 'AORU', 'SCSN', 'STAG', 'NOCM', 'LENS',
             'GDRY', 'OVIS']
-        brec.RecordHeader.recordTypes = (set(brec.RecordHeader.topTypes) |
+        rec_header.recordTypes = (set(rec_header.topTypes) |
             {'GRUP', 'TES4', 'REFR', 'ACHR', 'PMIS', 'PARW', 'PGRE', 'PBEA',
              'PFLA', 'PCON', 'PBAR', 'PHZD', 'LAND', 'NAVM', 'DIAL', 'INFO'})
-        brec.RecordHeader.plugin_form_version = 131
+        rec_header.plugin_form_version = 131
         brec.MreRecord.type_class = dict((x.classType,x) for x in (
             #--Always present
             MreTes4,
