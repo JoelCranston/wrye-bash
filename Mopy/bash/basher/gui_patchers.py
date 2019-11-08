@@ -491,11 +491,6 @@ class _ListPatcherPanel(_PatcherPanel):
 
     def _get_list_patcher_srcs(self, patch_file):
         patcher_sources = [x for x in self.configItems if self.configChecks[x]]
-        # that is for CBash List patchers - TODO(ut): how exactly used?
-        if hasattr(self.patcher_type, 'allowUnloaded') and \
-                not self.patcher_type.allowUnloaded:
-            patcher_sources = [s for s in patcher_sources if
-                s in patch_file.allSet or not bosh.ModInfos.rightFileType(s.s)]
         return patcher_sources
 
 class _ChoiceMenuMixin(object):

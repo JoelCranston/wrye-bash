@@ -42,6 +42,9 @@ class ListPatcher(AListPatcher,Patcher): pass
 class CBash_ListPatcher(AListPatcher,CBash_Patcher):
 
     def __init__(self, p_name, p_file, p_sources):
+        if not self.allowUnloaded:
+            p_sources = [s for s in p_sources if
+                s in p_file.allSet or not bosh.ModInfos.rightFileType(s.s)]
         super(CBash_ListPatcher, self).__init__(p_name, p_file, p_sources)
         # used in all subclasses except CBash_RacePatcher,
         # CBash_PatchMerger, CBash_UpdateReferences
