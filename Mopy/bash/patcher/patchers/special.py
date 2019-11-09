@@ -132,7 +132,7 @@ class ListsMerger(_AListsMerger, ListPatcher):
         _skip_id = lambda x: (GPath(u'Oblivion.esm'), x)
         self._overhaul_compat(self.srcs, _skip_id)
 
-    def scanModFile(self, modFile, progress):
+    def scanModFile(self, modFile, progress): # if not self active???
         """Add lists from modFile."""
         #--Begin regular scan
         modName = modFile.fileInfo.name
@@ -478,7 +478,7 @@ class FidListsMerger(_AListsMerger,ListPatcher):
     editOrder = 46
     _read_write_records = ('FLST',)
 
-    def scanModFile(self, modFile, progress):
+    def scanModFile(self, modFile, progress):# if not self active???
         """Add lists from modFile."""
         #--Begin regular scan
         modName = modFile.fileInfo.name

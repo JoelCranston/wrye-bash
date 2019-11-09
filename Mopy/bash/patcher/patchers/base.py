@@ -153,7 +153,7 @@ class AliasesPatcher(AAliasesPatcher,Patcher): pass
 class CBash_AliasesPatcher(AAliasesPatcher,CBash_Patcher):
     allowUnloaded = False # avoid the srcs check in CBash_Patcher.initData
 
-class PatchMerger(APatchMerger, ListPatcher): pass
+class PatchMerger(APatchMerger, ListPatcher): pass # no scanModFile
 
 class CBash_PatchMerger(APatchMerger, CBash_ListPatcher): pass
 
@@ -378,7 +378,7 @@ class CBash_UpdateReferences(AUpdateReferences, CBash_ListPatcher):
         self.old_eid.update(fidReplacer.old_eid)
         self.new_eid.update(fidReplacer.new_eid)
         self.isActive = bool(self.old_new)
-        if not self.isActive: return
+        if not self.isActive: return # FIXME this initData resets isActive !!
         # resets isActive !!
         for top_group_sig in self.getTypes():
             self.patchFile.group_patchers[top_group_sig].append(self)

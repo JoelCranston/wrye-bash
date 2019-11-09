@@ -2179,7 +2179,7 @@ class NpcFacePatcher(_ANpcFacePatcher,ImportPatcher):
         """Returns load factory classes needed for writing."""
         return ('NPC_',) if self.isActive else ()
 
-    def scanModFile(self, modFile, progress): # scanModFile3: mapper unused !
+    def scanModFile(self, modFile, progress): # scanModFile3: mapper unused ! # if not self active???
         """Add lists from modFile."""
         modName = modFile.fileInfo.name
         if not self.isActive or modName in self.srcs or 'NPC_' not in modFile.tops:

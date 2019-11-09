@@ -47,7 +47,7 @@ class RoadImporter(ImportPatcher, _ARoadImporter):
         loadFactory = LoadFactory(False,MreRecord.type_class['CELL'],
                                         MreRecord.type_class['WRLD'],
                                         MreRecord.type_class['ROAD'])
-        progress.setFull(len(self.srcs))
+        # progress.setFull(len(self.srcs))
         for srcMod in self.srcs:
             if srcMod not in self.patchFile.p_file_minfos: continue
             srcInfo = self.patchFile.p_file_minfos[srcMod]
