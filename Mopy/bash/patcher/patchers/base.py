@@ -114,7 +114,6 @@ class MultiTweaker(AMultiTweaker,Patcher):
         return chain.from_iterable(classTuples)
 
     def scanModFile(self,modFile,progress):
-        if not self.isActive: return
         for tweak in self.enabled_tweaks:
             tweak.scanModFile(modFile,progress,self.patchFile)
 
@@ -205,7 +204,6 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
     def scanModFile(self,modFile,progress):
         """Scans specified mod file to extract info. May add record to patch mod,
         but won't alter it."""
-        if not self.isActive: return
         mapper = modFile.getLongMapper()
         patchCells = self.patchFile.CELL
         patchWorlds = self.patchFile.WRLD
