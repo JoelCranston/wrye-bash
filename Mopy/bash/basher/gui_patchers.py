@@ -493,6 +493,7 @@ class _ListPatcherPanel(_PatcherPanel):
         patcher_sources = [x for x in self.configItems if self.configChecks[x]]
         return patcher_sources
 
+#------------------------------------------------------------------------------
 class _ChoiceMenuMixin(object):
 
     def _bind_mouse_events(self, right_click_list):
@@ -522,7 +523,6 @@ class _ChoiceMenuMixin(object):
 
     def ShowChoiceMenu(self, lb_selection_dex): raise exception.AbstractError
 
-#------------------------------------------------------------------------------
 class _TweakPatcherPanel(_ChoiceMenuMixin, _PatcherPanel):
     """Patcher panel with list of checkable, configurable tweaks."""
     tweak_label = _(u'Tweaks')

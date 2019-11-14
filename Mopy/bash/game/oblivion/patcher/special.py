@@ -549,7 +549,7 @@ class MFactMarker(_AMFactMarker,ListPatcher):
     def __init__(self, p_name, p_file, p_sources):
         super(MFactMarker, self).__init__(p_name, p_file, p_sources)
         self.id_info = {} #--Morphable factions keyed by fid
-        self.isActive = bool(self.srcs) and _cobl_main in p_file.loadSet
+        self.isActive &= _cobl_main in p_file.loadSet
         self.mFactLong = (_cobl_main, 0x33FB)
 
     def initData(self,progress):

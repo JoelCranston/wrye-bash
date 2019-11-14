@@ -459,23 +459,23 @@ class CellImporter(ImportPatcher):
 class CBash_CellImporter(CBash_ImportPatcher):
     logMsg = u'* ' + _(u'Cells/Worlds Patched') + u': %d'
     _read_write_records = ('CELLS',)
+    tag_attrs = {
+        u'C.Climate': ('climate', 'IsBehaveLikeExterior'),
+        u'C.Music': ('musicType',),
+        u'C.Name': ('full',),
+        u'C.Owner': ('owner', 'rank', 'globalVariable', 'IsPublicPlace'),
+        u'C.Water': ('water', 'waterHeight', 'IsHasWater'),
+        u'C.Light': (
+            'ambientRed', 'ambientGreen', 'ambientBlue', 'directionalRed',
+            'directionalGreen', 'directionalBlue', 'fogRed', 'fogGreen',
+            'fogBlue', 'fogNear', 'fogFar', 'directionalXY', 'directionalZ',
+            'directionalFade', 'fogClip'),
+        u'C.RecordFlags': ('flags1',) # Yes seems funky but thats the way it is
+    }
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_CellImporter, self).__init__(p_name, p_file, p_sources)
         self.fid_attr_value = defaultdict(dict)
-        self.tag_attrs = {
-            u'C.Climate': ('climate','IsBehaveLikeExterior'),
-            u'C.Music': ('musicType',),
-            u'C.Name': ('full',),
-            u'C.Owner': ('owner','rank','globalVariable','IsPublicPlace'),
-            u'C.Water': ('water','waterHeight','IsHasWater'),
-            u'C.Light': ('ambientRed','ambientGreen','ambientBlue',
-                        'directionalRed','directionalGreen','directionalBlue',
-                        'fogRed','fogGreen','fogBlue',
-                        'fogNear','fogFar','directionalXY','directionalZ',
-                        'directionalFade','fogClip'),
-            u'C.RecordFlags': ('flags1',), # Yes seems funky but thats the way it is
-            }
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -778,45 +778,52 @@ class ActorImporter(_SimpleImporter):
 class CBash_ActorImporter(_RecTypeModLogging):
     autoKey = bush.game.actor_importer_auto_key
     _read_write_records = ('CREA', 'NPC_')
-
-    def __init__(self, p_name, p_file, p_sources):
-        super(CBash_ActorImporter, self).__init__(p_name, p_file, p_sources)
-        class_tag_attrs = self.class_tag_attrs = {}
-        class_tag_attrs['NPC_'] = {
-                u'Actors.AIData': ('aggression','confidence','energyLevel','responsibility','services','trainSkill','trainLevel'),
-                u'Actors.Stats': ('armorer','athletics','blade','block','blunt','h2h','heavyArmor','alchemy',
-                                 'alteration','conjuration','destruction','illusion','mysticism','restoration',
-                                 'acrobatics','lightArmor','marksman','mercantile','security','sneak','speechcraft',
-                                 'health',
-                                 'strength','intelligence','willpower','agility','speed','endurance','personality','luck',),
-                u'Actors.ACBS': (('baseSpell','fatigue','level','calcMin','calcMax','IsPCLevelOffset','IsAutoCalc',),
-                                'barterGold','IsFemale','IsEssential','IsRespawn','IsNoLowLevel','IsNoRumors',
-                                'IsSummonable','IsNoPersuasion','IsCanCorpseCheck',
-                                ),
-                u'NPC.Class': ('iclass',),
-                u'NPC.Race': ('race',),
-                u'Actors.CombatStyle': ('combatStyle',),
-                u'Creatures.Blood': (),
-                u'Creatures.Type': (),
-                u'Actors.Skeleton': ('modPath','modb','modt_p'),
-                }
-        class_tag_attrs['CREA'] = {
-                u'Actors.AIData': ('aggression','confidence','energyLevel','responsibility','services','trainSkill','trainLevel'),
-                u'Actors.Stats': ('combat','magic','stealth','soulType','health','attackDamage','strength','intelligence','willpower',
-                                 'agility','speed','endurance','personality','luck'),
-                u'Actors.ACBS': (('baseSpell','fatigue','level','calcMin','calcMax','IsPCLevelOffset',),
-                                'barterGold','IsBiped','IsEssential','IsWeaponAndShield','IsRespawn',
-                                'IsSwims','IsFlies','IsWalks','IsNoLowLevel','IsNoBloodSpray','IsNoBloodDecal',
-                                'IsNoHead','IsNoRightArm','IsNoLeftArm','IsNoCombatInWater','IsNoShadow',
-                                'IsNoCorpseCheck',
-                                ),
-                u'NPC.Class': (),
-                u'NPC.Race': (),
-                u'Actors.CombatStyle': ('combatStyle',),
-                u'Creatures.Blood': ('bloodSprayPath','bloodDecalPath'),
-                u'Creatures.Type': ('creatureType',),
-                u'Actors.Skeleton': ('modPath','modb','modt_p',),
-                }
+    class_tag_attrs = {
+      'NPC_': {
+        u'Actors.AIData': ('aggression', 'confidence', 'energyLevel',
+            'responsibility', 'services', 'trainSkill', 'trainLevel'),
+        u'Actors.Stats': ('armorer', 'athletics', 'blade', 'block', 'blunt',
+            'h2h', 'heavyArmor', 'alchemy', 'alteration', 'conjuration',
+            'destruction', 'illusion', 'mysticism', 'restoration',
+            'acrobatics', 'lightArmor', 'marksman', 'mercantile', 'security',
+            'sneak', 'speechcraft', 'health', 'strength', 'intelligence',
+            'willpower', 'agility', 'speed', 'endurance', 'personality',
+            'luck',),
+        u'Actors.ACBS': (('baseSpell', 'fatigue', 'level', 'calcMin',
+                          'calcMax', 'IsPCLevelOffset', 'IsAutoCalc',),
+            'barterGold', 'IsFemale', 'IsEssential', 'IsRespawn',
+            'IsNoLowLevel', 'IsNoRumors', 'IsSummonable', 'IsNoPersuasion',
+            'IsCanCorpseCheck',),
+        u'NPC.Class': ('iclass',),
+        u'NPC.Race': ('race',),
+        u'Actors.CombatStyle': ('combatStyle',),
+        u'Creatures.Blood': (),
+        u'Creatures.Type': (),
+        u'Actors.Skeleton': ('modPath', 'modb', 'modt_p'),
+      },
+      'CREA': {
+        u'Actors.AIData': (
+            'aggression', 'confidence', 'energyLevel', 'responsibility',
+            'services', 'trainSkill', 'trainLevel'),
+            u'Actors.Stats': (
+            'combat', 'magic', 'stealth', 'soulType', 'health', 'attackDamage',
+            'strength', 'intelligence', 'willpower', 'agility', 'speed',
+            'endurance', 'personality', 'luck'),
+            u'Actors.ACBS': (('baseSpell', 'fatigue', 'level', 'calcMin',
+                              'calcMax', 'IsPCLevelOffset',),
+            'barterGold', 'IsBiped', 'IsEssential', 'IsWeaponAndShield',
+            'IsRespawn', 'IsSwims', 'IsFlies', 'IsWalks', 'IsNoLowLevel',
+            'IsNoBloodSpray', 'IsNoBloodDecal', 'IsNoHead', 'IsNoRightArm',
+            'IsNoLeftArm', 'IsNoCombatInWater', 'IsNoShadow',
+            'IsNoCorpseCheck',),
+        u'NPC.Class': (),
+        u'NPC.Race': (),
+        u'Actors.CombatStyle': ('combatStyle',),
+        u'Creatures.Blood': ('bloodSprayPath', 'bloodDecalPath'),
+        u'Creatures.Type': ('creatureType',),
+        u'Actors.Skeleton': ('modPath', 'modb', 'modt_p',),
+      }
+    }
 
     def scan(self,modFile,record,bashTags):
         """Records information needed to apply the patch."""
@@ -1535,7 +1542,6 @@ class ImportInventory(_AImportInventory, ImportPatcher):
         p_sources = [x for x in p_sources if
                      x in bosh.modInfos and x in p_file.allSet]
         super(ImportInventory, self).__init__(p_name, p_file, p_sources)
-        self.isActive = bool(self.srcs)
         self.masters = set(chain.from_iterable(
             bosh.modInfos[srcMod].get_masters() for srcMod in self.srcs))
         self._masters_and_srcs = self.masters | set(self.srcs)
