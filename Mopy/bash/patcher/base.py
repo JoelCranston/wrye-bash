@@ -146,6 +146,17 @@ class AMultiTweaker(_Abstract_Patcher):
     scanOrder = 20
     editOrder = 20
 
+    def __init__(self, p_name, p_file, enabled_tweaks):
+        super(AMultiTweaker, self).__init__(p_name, p_file)
+        self.enabled_tweaks = enabled_tweaks
+        self.isActive = bool(enabled_tweaks)
+
+    @classmethod
+    def tweak_instances(cls):
+        return sorted([cls() for cls in cls._tweak_classes],
+                      key=lambda a: a.tweak_name.lower())
+
+
 class AAliasesPatcher(_Abstract_Patcher):
     """Specify mod aliases for patch files."""
     scanOrder = 10

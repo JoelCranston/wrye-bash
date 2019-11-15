@@ -32,7 +32,6 @@ from collections import Counter
 from ...bolt import GPath, deprint
 from ...brec import MreRecord
 from ... import load_order
-from ... import bush # from ....bush import game ? # should be set by now !
 from ...cint import MGEFCode
 from ...patcher.base import AMultiTweakItem, DynamicNamedTweak
 from ...patcher.patchers.base import MultiTweakItem, CBash_MultiTweakItem
@@ -1913,8 +1912,9 @@ class AssortedTweaker(MultiTweaker):
     scanOrder = 32
     editOrder = 32
 
-    if bush.game.fsName == u'Oblivion':
-        tweaks = sorted([
+    @classmethod
+    def tweak_instances(cls):
+        return sorted([
             AssortedTweak_ArmorShows(_(u"Armor Shows Amulets"),
                 _(u"Prevents armor from hiding amulets."),
                 u'armorShowsAmulets',
@@ -1957,30 +1957,14 @@ class AssortedTweaker(MultiTweaker):
             AssortedTweak_TextlessLSCRs(),
             ],key=lambda a: a.tweak_name.lower())
 
-    #--Patch Phase ------------------------------------------------------------
-    def getReadClasses(self):
-        """Returns load factory classes needed for reading."""
-        if not self.isActive: return tuple()
-        classNames = [tweak.getReadClasses() for tweak in self.enabledTweaks]
-        return sum(classNames,tuple())
-
-    def getWriteClasses(self):
-        """Returns load factory classes needed for writing."""
-        if not self.isActive: return tuple()
-        classTuples = [tweak.getWriteClasses() for tweak in self.enabledTweaks]
-        return sum(classTuples,tuple())
-
-    def scanModFile(self,modFile,progress):
-        if not self.isActive: return
-        for tweak in self.enabledTweaks:
-            tweak.scanModFile(modFile,progress,self.patchFile)
-
 class CBash_AssortedTweaker(CBash_MultiTweaker):
     """Tweaks assorted stuff. Sub-tweaks behave like patchers themselves."""
     scanOrder = 32
     editOrder = 32
 
-    tweaks = sorted([
+    @classmethod
+    def tweak_instances(cls):
+        return sorted([
         CBash_AssortedTweak_ArmorShows(_(u"Armor Shows Amulets"),
             _(u"Prevents armor from hiding amulets."),
             u'armorShowsAmulets',

@@ -935,46 +935,43 @@ class _ANamesTweaker(AMultiTweaker):
                     (u'Proper English Text: Staffs -> Staves', u'Staves'),),)
 
 class NamesTweaker(_ANamesTweaker,MultiTweaker):
-    tweaks = sorted(
-        [NamesTweak_Body(*x) for x in _ANamesTweaker._namesTweaksBody] + [
-            TextReplacer(*x) for x in _ANamesTweaker._txtReplacer] + [
-            NamesTweak_Potions(), NamesTweak_Scrolls(), NamesTweak_Spells(),
-            NamesTweak_Weapons()], key=lambda a: a.tweak_name.lower())
-    tweaks.insert(0, NamesTweak_BodyTags())
 
-    def getWriteClasses(self):
-        """Returns load factory classes needed for writing."""
-        if not self.isActive: return tuple()
-        classTuples = [tweak.getWriteClasses() for tweak in self.enabledTweaks]
-        return sum(classTuples,tuple())
-
-    def scanModFile(self,modFile,progress):
-        if not self.isActive: return
-        for tweak in self.enabledTweaks:
-            tweak.scanModFile(modFile,progress,self.patchFile)
+    @classmethod
+    def tweak_instances(cls):
+        instances = sorted(
+            [NamesTweak_Body(*x) for x in cls._namesTweaksBody] + [
+                TextReplacer(*x) for x in cls._txtReplacer] + [
+                NamesTweak_Potions(), NamesTweak_Scrolls(),
+                NamesTweak_Spells(), NamesTweak_Weapons()],
+            key=lambda a: a.tweak_name.lower())
+        instances.insert(0, NamesTweak_BodyTags())
+        return instances
 
 class CBash_NamesTweaker(_ANamesTweaker,CBash_MultiTweaker):
-    tweaks = sorted(
-        [CBash_NamesTweak_Body(*x) for x in _ANamesTweaker._namesTweaksBody] +
-        [CBash_TextReplacer(*x) for x in _ANamesTweaker._txtReplacer] + [
-            CBash_NamesTweak_Potions(), CBash_NamesTweak_Scrolls(),
-            CBash_NamesTweak_Spells(), CBash_NamesTweak_Weapons()],
-        key=lambda a: a.tweak_name.lower())
-    tweaks.insert(0,CBash_NamesTweak_BodyTags())
 
-    #--Config Phase -----------------------------------------------------------
-    def initPatchFile(self, patchFile):
-        self.patchFile = patchFile
-        for tweak in self.tweaks[1:]:
-            tweak.patchFile = patchFile
-        bodyTagPatcher = self.tweaks[0]
-        patchFile.bodyTags = \
-            bodyTagPatcher.choiceValues[bodyTagPatcher.chosen][0]
-        patchFile.indexMGEFs = True
+    @classmethod
+    def tweak_instances(cls):
+        instances = sorted(
+            [CBash_NamesTweak_Body(*x) for x in cls._namesTweaksBody] + [
+                CBash_TextReplacer(*x) for x in cls._txtReplacer] + [
+                CBash_NamesTweak_Potions(), CBash_NamesTweak_Scrolls(),
+                CBash_NamesTweak_Spells(), CBash_NamesTweak_Weapons()],
+            key=lambda a: a.tweak_name.lower())
+        instances.insert(0,CBash_NamesTweak_BodyTags())
+        return instances
+
+    def __init__(self, p_name, p_file, enabled_tweaks):
+        super(CBash_NamesTweaker, self).__init__(p_name, p_file,
+                                                 enabled_tweaks)
+        body_tags_tweak = enabled_tweaks[0] # FIXME test - was always enabled?
+        if isinstance(body_tags_tweak, CBash_NamesTweak_BodyTags):
+            p_file.bodyTags = \
+                body_tags_tweak.choiceValues[body_tags_tweak.chosen][0]
+        p_file.indexMGEFs = True # FIXME what is this? needed if body tags are set?
 
     def initData(self,group_patchers,progress):
         if not self.isActive: return
-        for tweak in self.enabledTweaks:
+        for tweak in self.enabled_tweaks:
             for top_group_sig in tweak.getTypes():
                 group_patchers[top_group_sig].append(tweak)
             tweak.format = tweak.choiceValues[tweak.chosen][0]

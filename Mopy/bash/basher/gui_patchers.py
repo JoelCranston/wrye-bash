@@ -720,7 +720,7 @@ class _TweakPatcherPanel(_ChoiceMenuMixin, _PatcherPanel):
     def getConfig(self, configs):
         """Get config from configs dictionary and/or set to default."""
         config = super(_TweakPatcherPanel, self).getConfig(configs)
-        self._all_tweaks = copy.deepcopy(self.__class__.tweaks)
+        self._all_tweaks = self.patcher_type.tweak_instances()
         for tweak in self._all_tweaks:
             tweak.init_tweak_config(config)
         return config
@@ -730,9 +730,6 @@ class _TweakPatcherPanel(_ChoiceMenuMixin, _PatcherPanel):
         config = super(_TweakPatcherPanel, self).saveConfig(configs)
         for tweak in self._all_tweaks:
             tweak.save_tweak_config(config)
-        self.enabledTweaks = [tweak for tweak in self._all_tweaks if
-                              tweak.isEnabled]
-        self.isActive = len(self.enabledTweaks) > 0 ##: NOT HERE !!!!
         return config
 
     def _log_config(self, conf, config, clip, log):
@@ -758,6 +755,10 @@ class _TweakPatcherPanel(_ChoiceMenuMixin, _PatcherPanel):
             except KeyError: pass # no such key don't spam the log
             except: bolt.deprint(_(u'Error importing Bashed patch '
                 u'configuration. Item %s skipped.') % tweakie, traceback=True)
+
+    def get_patcher_instance(self, patch_file):
+        enabledTweaks = [t for t in self._all_tweaks if t.isEnabled]
+        return self.patcher_type(self.patcher_name, patch_file, enabledTweaks)
 
 #------------------------------------------------------------------------------
 class _DoublePatcherPanel(_TweakPatcherPanel, _ListPatcherPanel):
@@ -915,26 +916,8 @@ class _MergerPanel(_ListPatcherPanel):
                 mod].getBashTags())]
 
 class _GmstTweakerPanel(_TweakPatcherPanel):
-
-    #--Config Phase -----------------------------------------------------------
     # CONFIG DEFAULTS
     default_isEnabled = True
-    def getConfig(self,configs):
-        """Get config from configs dictionary and/or set to default."""
-        config = super(_GmstTweakerPanel, self).getConfig(configs)
-        # Load game specific tweaks
-        tweaksAppend = self._all_tweaks.append # self.tweaks defined in super, empty
-        for cls,tweaks in self.__class__.class_tweaks:
-            for tweak in tweaks:
-                if isinstance(tweak,tuple):
-                    tweaksAppend(cls(*tweak))
-                elif isinstance(tweak,list):
-                    args = tweak[0]
-                    kwdargs = tweak[1]
-                    tweaksAppend(cls(*args,**kwdargs))
-        self._all_tweaks.sort(key=lambda a: a.tweak_name.lower())
-        for tweak in self._all_tweaks:
-            tweak.init_tweak_config(config)
 
 #------------------------------------------------------------------------------
 # GUI Patcher classes

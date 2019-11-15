@@ -70,8 +70,7 @@ class ClothesTweak(AClothesTweak,MultiTweakItem):
         if record.flags.notPlayable: return False #--Ignore non-playable items.
         return super(ClothesTweak,self).isMyType(record)
 
-class CBash_ClothesTweak(AClothesTweak,CBash_MultiTweakItem):
-    tweak_read_classes = 'CLOT',
+class CBash_ClothesTweak(AClothesTweak,CBash_MultiTweakItem): pass
 
 #------------------------------------------------------------------------------
 class ClothesTweak_MaxWeight(ClothesTweak):
@@ -238,10 +237,13 @@ class _AClothesTweaker(AMultiTweaker):
 class ClothesTweaker(_AClothesTweaker,MultiTweaker):
     _read_write_records = ('CLOT',)
 
-    tweaks = sorted(itertools.chain(
-        (ClothesTweak_Unblock(*x) for x in _AClothesTweaker._unblock),
-        (ClothesTweak_MaxWeight(*x) for x in _AClothesTweaker._max_weight)),
-        key=lambda a: a.tweak_name.lower())
+    @classmethod
+    def tweak_instances(cls):
+        return sorted(
+            itertools.chain(
+                (ClothesTweak_Unblock(*x) for x in cls._unblock),
+                (ClothesTweak_MaxWeight(*x) for x in cls._max_weight)),
+                      key=lambda a: a.tweak_name.lower())
 
     def scanModFile(self,modFile,progress):
         if not self.isActive or 'CLOT' not in modFile.tops: return
@@ -250,7 +252,7 @@ class ClothesTweaker(_AClothesTweaker,MultiTweaker):
         id_records = patchRecords.id_records
         for record in modFile.CLOT.getActiveRecords():
             if mapper(record.fid) in id_records: continue
-            for tweak in self.enabledTweaks:
+            for tweak in self.enabled_tweaks:
                 if tweak.isMyType(record):
                     record = record.getTypeCopy(mapper)
                     patchRecords.setRecord(record)
@@ -261,12 +263,14 @@ class ClothesTweaker(_AClothesTweaker,MultiTweaker):
         if not self.isActive: return
         keep = self.patchFile.getKeeper()
         log.setHeader(u'= ' + self._patcher_name)
-        for tweak in self.enabledTweaks:
+        for tweak in self.enabled_tweaks:
             tweak.buildPatch(self.patchFile,keep,log)
 
 class CBash_ClothesTweaker(_AClothesTweaker,CBash_MultiTweaker):
 
-    tweaks = sorted(itertools.chain(
-     (CBash_ClothesTweak_Unblock(*x) for x in _AClothesTweaker._unblock),
-     (CBash_ClothesTweak_MaxWeight(*x) for x in _AClothesTweaker._max_weight)),
-        key=lambda a: a.tweak_name.lower())
+    @classmethod
+    def tweak_instances(cls):
+        return sorted(itertools.chain(
+            (CBash_ClothesTweak_Unblock(*x) for x in cls._unblock),
+            (CBash_ClothesTweak_MaxWeight(*x) for x in cls._max_weight)),
+                      key=lambda a: a.tweak_name.lower())

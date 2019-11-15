@@ -25,6 +25,7 @@
 """This module contains base patcher classes."""
 from __future__ import print_function
 from collections import Counter
+from itertools import chain
 from operator import itemgetter
 # Internal
 from .. import getPatchesPath
@@ -97,24 +98,42 @@ class CBash_MultiTweakItem(AMultiTweakItem):
 
 class MultiTweaker(AMultiTweaker,Patcher):
 
+    def getReadClasses(self):
+        """Returns load factory classes needed for reading."""
+        if not self.isActive: return tuple()
+        classTuples = [tweak.getReadClasses() for tweak in self.enabled_tweaks]
+        return chain.from_iterable(classTuples)
+
+    def getWriteClasses(self):
+        """Returns load factory classes needed for writing."""
+        if not self.isActive: return tuple()
+        classTuples = [tweak.getWriteClasses() for tweak in self.enabled_tweaks]
+        return chain.from_iterable(classTuples)
+
+    def scanModFile(self,modFile,progress):
+        if not self.isActive: return
+        for tweak in self.enabled_tweaks:
+            tweak.scanModFile(modFile,progress,self.patchFile)
+
     def buildPatch(self,log,progress):
         """Applies individual tweaks."""
         if not self.isActive: return
         log.setHeader(u'= ' + self._patcher_name, True)
-        for tweak in self.enabledTweaks:
+        for tweak in self.enabled_tweaks:
             tweak.buildPatch(log,progress,self.patchFile)
 
 class CBash_MultiTweaker(AMultiTweaker,CBash_Patcher):
 
-    def __init__(self, p_name, p_file):
-        super(CBash_MultiTweaker, self).__init__(p_name, p_file)
-        for tweak in self.tweaks:
+    def __init__(self, p_name, p_file, enabled_tweaks):
+        super(CBash_MultiTweaker, self).__init__(p_name, p_file,
+                                                 enabled_tweaks)
+        for tweak in self.enabled_tweaks:
             tweak.patchFile = p_file
 
     def initData(self,group_patchers,progress):
         """Compiles material, i.e. reads source text, esp's, etc. as necessary."""
         if not self.isActive: return
-        for tweak in self.enabledTweaks:
+        for tweak in self.enabled_tweaks: ##: FIXME allowUnloaded (use or not base class method)
             for top_group_sig in tweak.getTypes():
                 group_patchers[top_group_sig].append(tweak)
 
@@ -122,7 +141,7 @@ class CBash_MultiTweaker(AMultiTweaker,CBash_Patcher):
         """Will write to log."""
         if not self.isActive: return
         log.setHeader(u'= ' + self._patcher_name, True)
-        for tweak in self.enabledTweaks:
+        for tweak in self.enabled_tweaks:
             tweak.buildPatchLog(log)
 
 # Patchers: 10 ----------------------------------------------------------------
@@ -351,7 +370,7 @@ class CBash_UpdateReferences(AUpdateReferences, CBash_ListPatcher):
         self.new_eid.update(fidReplacer.new_eid)
         self.isActive = bool(self.old_new)
         if not self.isActive: return
-
+        # resets isActive !!
         for top_group_sig in self.getTypes():
             group_patchers[top_group_sig].append(self)
 
