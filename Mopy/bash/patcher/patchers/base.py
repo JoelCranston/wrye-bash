@@ -417,7 +417,7 @@ class CBash_UpdateReferences(AUpdateReferences, CBash_ListPatcher):
         self.mod_count_old_new = {}
 
 # Patchers: 40 ----------------------------------------------------------------
-class SpecialPatcher(object):
+class SpecialPatcher(CBash_Patcher):
     """Provides scan_more method only used in CBash importers (17) and CBash
     race patchers (3/4 except CBash_RacePatcher_Eyes)."""
     group = _(u'Special')

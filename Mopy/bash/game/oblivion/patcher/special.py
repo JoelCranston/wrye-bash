@@ -31,7 +31,7 @@ from ....brec import MreRecord, RecordHeader, null4
 from .... import bush, load_order
 from ....cint import MGEFCode, FormID
 from ....exception import StateError
-from ....patcher.base import Patcher, CBash_Patcher, _Abstract_Patcher, \
+from ....patcher.base import Patcher, CBash_Patcher, Abstract_Patcher, \
     AListPatcher
 from ....patcher.patchers.base import ListPatcher, CBash_ListPatcher
 
@@ -53,7 +53,7 @@ def _PrintFormID(fid):
         fid = repr(fid)
     print fid.encode('utf-8')
 
-class _ExSpecial(_Abstract_Patcher):
+class _ExSpecial(Abstract_Patcher):
     """Those used to be subclasses of SpecialPatcher that did not make much
     sense as they did not use scan_more."""
     group = _(u'Special')

@@ -33,9 +33,9 @@ from this module outside of the patcher package."""
 from .. import load_order, bosh, bolt
 
 #------------------------------------------------------------------------------
-# _Abstract_Patcher and subclasses---------------------------------------------
+# Abstract_Patcher and subclasses ---------------------------------------------
 #------------------------------------------------------------------------------
-class _Abstract_Patcher(object):
+class Abstract_Patcher(object):
     """Abstract base class for patcher elements - must be the penultimate class
      in MRO (method resolution order), just before object"""
     scanOrder = 10
@@ -54,7 +54,7 @@ class _Abstract_Patcher(object):
         self.patchFile = p_file
         self._patcher_name = p_name
 
-class Patcher(_Abstract_Patcher):
+class Patcher(Abstract_Patcher):
     """Abstract base class for patcher elements performing a PBash patch - must
     be just before Abstract_Patcher in MRO.""" ##: "performing" ? how ?
 
@@ -78,7 +78,7 @@ class Patcher(_Abstract_Patcher):
     def buildPatch(self,log,progress):
         """Edits patch file as desired. Should write to log."""
 
-class CBash_Patcher(_Abstract_Patcher):
+class CBash_Patcher(Abstract_Patcher):
     """Abstract base class for patcher elements performing a CBash patch - must
     be just before Abstract_Patcher in MRO.""" ##: "performing" ? how ?
     allowUnloaded = True # if True patcher needs a srcs attribute
@@ -104,7 +104,7 @@ class CBash_Patcher(_Abstract_Patcher):
         """Write to log."""
         pass
 
-class AListPatcher(_Abstract_Patcher):
+class AListPatcher(Abstract_Patcher):
     """Subclass for patchers that have GUI lists of objects.
 
     :type _patches_set: set[bolt.Path]"""
@@ -127,7 +127,7 @@ class AListPatcher(_Abstract_Patcher):
             for srcFile in self.srcs:
                 log(u"* " +srcFile.s)
 
-class AMultiTweaker(_Abstract_Patcher):
+class AMultiTweaker(Abstract_Patcher):
     """Combines a number of sub-tweaks which can be individually enabled and
     configured through a choice menu."""
     group = _(u'Tweakers')
@@ -145,14 +145,14 @@ class AMultiTweaker(_Abstract_Patcher):
                       key=lambda a: a.tweak_name.lower())
 
 
-class AAliasesPatcher(_Abstract_Patcher):
+class AAliasesPatcher(Abstract_Patcher):
     """Specify mod aliases for patch files."""
     scanOrder = 10
     editOrder = 10
     group = _(u'General')
 
 #------------------------------------------------------------------------------
-# AMultiTweakItem(object)------------------------------------------------------
+# AMultiTweakItem(object) -----------------------------------------------------
 #------------------------------------------------------------------------------
 class AMultiTweakItem(object):
     """A tweak item, optionally with configuration choices."""
@@ -185,8 +185,6 @@ class AMultiTweakItem(object):
         for srcMod in load_order.get_ordered(count.keys()):
             log(u'  * %s: %d' % (srcMod.s, count[srcMod]))
 
-    #--Config Phase -----------------------------------------------------------
-    # Methods present in _Abstract_Patcher too
     def init_tweak_config(self, configs):
         """Get config from configs dictionary and/or set to default."""
         self.isEnabled,self.chosen = self.defaultEnabled,0
@@ -235,7 +233,7 @@ class DynamicNamedTweak(AMultiTweakItem):
         self.__class__.__name__, self.tweak_name)
 
 #------------------------------------------------------------------------------
-# AListPatcher subclasses------------------------------------------------------
+# AListPatcher subclasses -----------------------------------------------------
 #------------------------------------------------------------------------------
 class AImportPatcher(AListPatcher):
     """Subclass for patchers in group Importer."""

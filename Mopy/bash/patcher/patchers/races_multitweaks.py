@@ -1086,9 +1086,7 @@ class RacePatcher(AMultiTweaker, ListPatcher):
 #-------------------------- CBash only RacePatchers --------------------------#
 class _CBashOnlyRacePatchers(SpecialPatcher, AListPatcher):
     iiMode = False
-    allowUnloaded = True
     scanRequiresChecked = True
-    applyRequiresChecked = False
     _read_write_records = ('RACE',)
 
     def initData(self,group_patchers,progress):
