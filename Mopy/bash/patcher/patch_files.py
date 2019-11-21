@@ -180,10 +180,7 @@ class PatchFile(_PFile, ModFile):
 
     def getKeeper(self):
         """Returns a function to add fids to self.keepIds."""
-        def keep(fid):
-            self.keepIds.add(fid)
-            return fid
-        return keep
+        return self.keepIds.add
 
     def init_patchers_data(self, progress):
         """Gives each patcher a chance to get its source data."""
