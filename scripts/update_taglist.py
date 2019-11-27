@@ -46,89 +46,85 @@ import utils
 
 LOGGER = logging.getLogger(__name__)
 
-MASTERLIST_VERSION = "0.14"
+MASTERLIST_VERSION = u'0.14'
 
 SCRIPTS_PATH = os.path.dirname(os.path.abspath(__file__))
-LOGFILE = os.path.join(SCRIPTS_PATH, "taglist.log")
-MOPY_PATH = os.path.abspath(os.path.join(SCRIPTS_PATH, u"..", u"Mopy"))
+LOGFILE = os.path.join(SCRIPTS_PATH, u'taglist.log')
+MOPY_PATH = os.path.abspath(os.path.join(SCRIPTS_PATH, u'..', u'Mopy'))
 sys.path.append(MOPY_PATH)
-
 
 def setup_parser(parser):
     parser.add_argument(
-        "-l",
-        "--logfile",
+        u'-l',
+        u'--logfile',
         default=LOGFILE,
-        help="Where to store the log. [default: {}]".format(utils.relpath(LOGFILE)),
+        help=u'Where to store the log. '
+             u'[default: {}]'.format(utils.relpath(LOGFILE)),
     )
     parser.add_argument(
-        "-mv",
-        "--masterlist-version",
+        u'-mv',
+        u'--masterlist-version',
         default=MASTERLIST_VERSION,
-        help="Which loot masterlist version to "
-        "download [default: {}].".format(MASTERLIST_VERSION),
+        help=u'Which loot masterlist version to download '
+             u'[default: {}].'.format(MASTERLIST_VERSION),
     )
-
 
 def mock_game_install(master_file_name):
     game_path = tempfile.mkdtemp()
-    os.mkdir(os.path.join(game_path, u"Data"))
-    open(os.path.join(game_path, u"Data", master_file_name), "a").close()
+    os.mkdir(os.path.join(game_path, u'Data'))
+    open(os.path.join(game_path, u'Data', master_file_name), u'a').close()
     return game_path
 
-
 def download_masterlist(repository, version, dl_path):
-    url = "https://raw.githubusercontent.com/loot/{}/v{}/masterlist.yaml".format(
+    url = u'https://raw.githubusercontent.com/loot/{}/v{}/masterlist.yaml'.format(
         repository, version
     )
-    LOGGER.info("Downloading {} masterlist...".format(repository))
-    LOGGER.debug("Download url: {}".format(url))
-    LOGGER.debug("Downloading {} masterlist to {}".format(repository, dl_path))
+    LOGGER.info(u'Downloading {} masterlist...'.format(repository))
+    LOGGER.debug(u'Download url: {}'.format(url))
+    LOGGER.debug(u'Downloading {} masterlist to {}'.format(repository, dl_path))
     utils.download_file(url, dl_path)
-
 
 def main(args):
     utils.setup_log(LOGGER, verbosity=args.verbosity, logfile=args.logfile)
     LOGGER.debug(
-        u"Loaded the LOOT API v{} using wrapper version {}".format(
+        u'Loaded the LOOT API v{} using wrapper version {}'.format(
             loot_api.Version.string(), loot_api.WrapperVersion.string()
         )
     )
     game_data = [
-        (u"Oblivion", "Oblivion.esm", "oblivion", loot_api.GameType.tes4),
-        (u"Skyrim", "Skyrim.esm", "skyrim", loot_api.GameType.tes5),
-        (u"SkyrimSE", "Skyrim.esm", "skyrimse", loot_api.GameType.tes5se),
-        (u"Fallout3", "Fallout3.esm", "fallout3", loot_api.GameType.fo3),
-        (u"FalloutNV", "FalloutNV.esm", "falloutnv", loot_api.GameType.fonv),
-        (u"Fallout4", "Fallout4.esm", "fallout4", loot_api.GameType.fo4),
+        (u'Oblivion', u'Oblivion.esm', u'oblivion', loot_api.GameType.tes4),
+        (u'Skyrim', u'Skyrim.esm', u'skyrim', loot_api.GameType.tes5),
+        (u'SkyrimSE', u'Skyrim.esm', u'skyrimse', loot_api.GameType.tes5se),
+        (u'Fallout3', u'Fallout3.esm', u'fallout3', loot_api.GameType.fo3),
+        (u'FalloutNV', u'FalloutNV.esm', u'falloutnv', loot_api.GameType.fonv),
+        (u'Fallout4', u'Fallout4.esm', u'fallout4', loot_api.GameType.fo4),
     ]
     for game_name, master_name, repository, game_type in game_data:
         game_install_path = mock_game_install(master_name)
-        masterlist_path = os.path.join(game_install_path, u"masterlist.yaml")
-        game_dir = os.path.join(MOPY_PATH, u"Bash Patches", game_name)
-        taglist_path = os.path.join(game_dir, u"taglist.yaml")
+        masterlist_path = os.path.join(game_install_path, u'masterlist.yaml')
+        game_dir = os.path.join(MOPY_PATH, u'Bash Patches', game_name)
+        taglist_path = os.path.join(game_dir, u'taglist.yaml')
         if not os.path.exists(game_dir):
             LOGGER.error(
-                u"Skipping taglist for {} as its output "
-                u"directory does not exist".format(game_name)
+                u'Skipping taglist for {} as its output '
+                u'directory does not exist'.format(game_name)
             )
             continue
         download_masterlist(repository, args.masterlist_version, masterlist_path)
-        loot_api.initialise_locale("")
+        loot_api.initialise_locale(u'')
         loot_game = loot_api.create_game_handle(game_type, game_install_path)
         loot_db = loot_game.get_database()
         loot_db.load_lists(masterlist_path)
         loot_db.write_minimal_list(taglist_path, True)
-        LOGGER.info(u"{} masterlist converted.".format(game_name))
+        LOGGER.info(u'{} masterlist converted.'.format(game_name))
         shutil.rmtree(game_install_path)
 
-
-if __name__ == "__main__":
+if __name__ == u'__main__':
     argparser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     utils.setup_common_parser(argparser)
     setup_parser(argparser)
     parsed_args = argparser.parse_args()
-    open(parsed_args.logfile, "w").close()
+    open(parsed_args.logfile, u'w').close()
     main(parsed_args)
