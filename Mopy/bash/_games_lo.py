@@ -51,15 +51,15 @@ def _write_plugins_txt_(path, lord, active, _star):
 
 def __write_plugins(out, lord, active, _star):
     def asterisk(active_set=frozenset(active)):
-        return '*' if _star and (mod in active_set) else ''
+        return u'*' if _star and (mod in active_set) else u''
     for mod in (_star and lord) or active:
         # Ok, this seems to work for Oblivion, but not Skyrim
         # Skyrim seems to refuse to have any non-cp1252 named file in
         # plugins.txt.  Even activating through the SkyrimLauncher
         # doesn't work.
         try:
-            out.write(asterisk() + bolt.encode(mod.s, firstEncoding='cp1252'))
-            out.write('\r\n')
+            out.write(asterisk() + bolt.encode(mod.s, firstEncoding=u'cp1252'))
+            out.write(u'\r\n')
         except UnicodeEncodeError:
             bolt.deprint(mod.s + u' failed to properly encode and was not '
                                  u'included in plugins.txt')
@@ -84,10 +84,10 @@ def _parse_plugins_txt_(path, mod_infos, _star):
         for line in ins:
             # Oblivion/Skyrim saves the plugins.txt file in cp1252 format
             # It wont accept filenames in any other encoding
-            modname = _re_plugins_txt_comment.sub('', line).strip()
+            modname = _re_plugins_txt_comment.sub(u'', line).strip()
             if not modname: continue
             # use raw strings below
-            is_active_ = not _star or modname.startswith('*')
+            is_active_ = not _star or modname.startswith(u'*')
             if _star and is_active_: modname = modname[1:]
             try:
                 test = bolt.decode(modname, encoding=u'cp1252')
@@ -264,12 +264,12 @@ class Game(object):
     def set_load_order(self, lord, active, previous_lord=None,
                        previous_active=None, dry_run=False, fix_lo=None):
         assert lord is not None or active is not None, \
-            'load order or active must be not None'
+            u'load order or active must be not None'
         if lord is not None: self._fix_load_order(lord, fix_lo=fix_lo)
         if (previous_lord is None or previous_lord != lord) and active is None:
             # changing load order - must test if active plugins must change too
             assert previous_active is not None, \
-                'you must pass info on active when setting load order'
+                u'you must pass info on active when setting load order'
             if previous_lord is not None:
                 prev = set(previous_lord)
                 new = set(lord)
@@ -284,7 +284,7 @@ class Game(object):
             if test_active: active = list(previous_active)
         if active is not None:
             assert lord is not None or previous_lord is not None, \
-                'you need to pass a load order in to set active plugins'
+                u'you need to pass a load order in to set active plugins'
             # a load order is needed for all games to validate active against
             test = lord if lord is not None else previous_lord
             self._fix_active_plugins(active, test, on_disc=False,
@@ -292,7 +292,7 @@ class Game(object):
         lord = lord if lord is not None else previous_lord
         active = active if active is not None else previous_active
         assert lord is not None and active is not None, \
-            'returned load order and active must be not None'
+            u'returned load order and active must be not None'
         if not dry_run: # else just return the (possibly fixed) lists
             self._persist_if_changed(active, lord, previous_active,
                                      previous_lord)
@@ -305,7 +305,7 @@ class Game(object):
     def has_load_order_conflict(self, mod_name): return False
     def has_load_order_conflict_active(self, mod_name, active): return False
     # force installation last - only for timestamp games
-    def get_free_time(self, start_time, default_time='+1', end_time=None):
+    def get_free_time(self, start_time, default_time=u'+1', end_time=None):
         raise exception.AbstractError
 
     @classmethod
@@ -754,7 +754,7 @@ class TimestampGame(Game):
         return self.has_load_order_conflict(mod_name) and bool(
             (self._mtime_mods[mtime] - {mod_name}) & active)
 
-    def get_free_time(self, start_time, default_time='+1', end_time=None):
+    def get_free_time(self, start_time, default_time=u'+1', end_time=None):
         all_mtimes = set(x.mtime for x in self.mod_infos.itervalues())
         end_time = end_time or (start_time + 1000) # 1000 (seconds) is an arbitrary limit
         while start_time < end_time:
