@@ -1041,7 +1041,7 @@ class AsteriskGame(Game):
         if to_drop:
             # If we need to drop some mods, then make a backup first
             self._backup_load_order()
-            msg = (u'Removed ' + u' ,'.join(map(unicode, to_drop)) +
+            msg = (u'Removed ' + u' ,'.join(unicode(s) for s in to_drop) +
                    u' from %s')
         if not exists or to_drop:
             # In either case, write out the LO and deprint it
@@ -1110,7 +1110,7 @@ class AsteriskGame(Game):
         _ccc_path = bass.dirs['app'].join(cls._ccc_filename)
         try:
             with open(_ccc_path.s, 'r') as ins:
-                lines = map(bolt.GPath, map(str.strip, ins.readlines()))
+                lines = (bolt.GPath(line.strip()) for line in ins.readlines())
                 cls.must_be_active_if_present += tuple(lines)
         except (OSError, IOError) as e:
             if e.errno != errno.ENOENT:

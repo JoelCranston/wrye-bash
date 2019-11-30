@@ -308,7 +308,8 @@ class Installer(object):
 
     def __setstate(self,values):
         self.initDefault() # runs on __init__ called by __reduce__
-        map(self.__setattr__,self.persistent,values)
+        for attr, value in zip(self.persistent, values):
+            setattr(self, attr, value)
         rescan = False
         if not isinstance(self.extras_dict, dict):
             self.extras_dict = {}
@@ -2018,8 +2019,9 @@ class InstallersData(DataStore):
         if bass.settings['bash.installers.autoRefreshBethsoft']:
             bethFiles = set()
         else:
-            bethFiles = LowerDict.fromkeys(set(
-                map(CIstr, bush.game.bethDataFiles)) - self.overridden_skips)
+            bethFiles = LowerDict.fromkeys(
+                set(CIstr(s) for s in bush.game.bethDataFiles) - self.overridden_skips
+            )
         skipExts = Installer.skipExts
         relPos = len(bass.dirs['mods'].s) + 1
         for index, (asDir, __sDirs, sFiles) in enumerate(dirDirsFiles):
@@ -2826,7 +2828,7 @@ class InstallersData(DataStore):
         def installable(x): # type -> 0: unset/invalid; 1: simple; 2: complex
             return self[x].type in (1, 2) and isinstance(self[x],
                 (InstallerArchive, InstallerProject))
-        return filter(installable, installerKeys)
+        return [k for k in installerKeys if installable(k)]
 
     def filterPackages(self, installerKeys):
         """Remove markers from installerKeys.
@@ -2835,7 +2837,7 @@ class InstallersData(DataStore):
         """
         def _package(x):
             return isinstance(self[x], (InstallerArchive, InstallerProject))
-        return filter(_package, installerKeys)
+        return [k for k in installerKeys if _package(k)]
 
     def createFromData(self, projectPath, ci_files, progress):
         if not ci_files: return

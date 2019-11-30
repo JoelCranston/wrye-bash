@@ -1330,7 +1330,7 @@ _dump_ExpandLists = True
 def dump_record(record, expand=False):
     def printRecord(record):
         def fflags(y):
-            for x in range(32):
+            for x in xrange(32):
                 z = 1 << x
                 if y & z == z:
                     print(hex(z))
@@ -1358,7 +1358,7 @@ def dump_record(record, expand=False):
                 elif 'flag' in attr.lower() or 'service' in attr.lower():
                     print(hex(rec))
                     if _dump_ExpandLists == True:
-                        for x in range(32):
+                        for x in xrange(32):
                             z = pow(2, x)
                             if rec & z == z:
                                 print(" " * _dump_RecIndent, " Active" + " " * (msize - len("  Active")), "  :", hex(z))
@@ -1556,7 +1556,7 @@ class CBashUINT8ARRAY_GROUP(object):
         if(numRecords > 0):
             cRecords = POINTER(c_ubyte * numRecords)()
             _CGetField(instance._RecordID, self._FieldID + instance._FieldID, 0, 0, 0, 0, 0, 0, byref(cRecords))
-            return [cRecords.contents[x] for x in range(numRecords)]
+            return [cRecords.contents[x] for x in xrange(numRecords)]
         return []
 
     def __set__(self, instance, nValue):
@@ -1616,7 +1616,7 @@ class CBashLIST_GROUP(object):
 
     def __get__(self, instance, owner):
         FieldID = self._FieldID + instance._FieldID
-        return ExtractCopyList([self._Type(instance._RecordID, FieldID, x) for x in range(_CGetFieldAttribute(instance._RecordID, FieldID, 0, 0, 0, 0, 0, 0, 1))]) if self._AsList else [self._Type(instance._RecordID, FieldID, x) for x in range(_CGetFieldAttribute(instance._RecordID, FieldID, 0, 0, 0, 0, 0, 0, 1))]
+        return ExtractCopyList([self._Type(instance._RecordID, FieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, FieldID, 0, 0, 0, 0, 0, 0, 1))]) if self._AsList else [self._Type(instance._RecordID, FieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, FieldID, 0, 0, 0, 0, 0, 0, 1))]
 
     def __set__(self, instance, nElements):
         FieldID = self._FieldID + instance._FieldID
@@ -1626,7 +1626,7 @@ class CBashLIST_GROUP(object):
             if not isinstance(nElements[0], tuple): nElements = ExtractCopyList(nElements)
             ##Resizes the list
             _CSetField(instance._RecordID, FieldID, 0, 0, 0, 0, 0, 0, 0, c_long(length))
-            SetCopyList([self._Type(instance._RecordID, FieldID, x) for x in range(_CGetFieldAttribute(instance._RecordID, FieldID, 0, 0, 0, 0, 0, 0, 1))], nElements)
+            SetCopyList([self._Type(instance._RecordID, FieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, FieldID, 0, 0, 0, 0, 0, 0, 1))], nElements)
 
 # Top level Descriptors
 class CBashLIST(object):
@@ -1635,7 +1635,7 @@ class CBashLIST(object):
         self._FieldID, self._Type, self._AsList = FieldID, Type, AsList
 
     def __get__(self, instance, owner):
-        return ExtractCopyList([self._Type(instance._RecordID, self._FieldID, x) for x in range(_CGetFieldAttribute(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0, 1))]) if self._AsList else [self._Type(instance._RecordID, self._FieldID, x) for x in range(_CGetFieldAttribute(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0, 1))]
+        return ExtractCopyList([self._Type(instance._RecordID, self._FieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0, 1))]) if self._AsList else [self._Type(instance._RecordID, self._FieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0, 1))]
 
     def __set__(self, instance, nElements):
         if nElements is None or not len(nElements): _CDeleteField(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0)
@@ -1859,7 +1859,7 @@ class CBashMGEFCODE_ARRAY(object):
         if(numRecords > 0):
             cRecords = POINTER(c_ulong * numRecords)()
             _CGetField(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0, byref(cRecords))
-            return [MGEFCode(instance._RecordID, cast(POINTER(c_ulong)(c_ulong(cRecords.contents[x])), POINTER(c_char * 4)).contents.value if _CGetFieldAttribute(instance._RecordID, self._FieldID, x, 1, 0, 0, 0, 0, 2) == API_FIELDS.CHAR4 else cRecords.contents[x]) for x in range(numRecords)]
+            return [MGEFCode(instance._RecordID, cast(POINTER(c_ulong)(c_ulong(cRecords.contents[x])), POINTER(c_char * 4)).contents.value if _CGetFieldAttribute(instance._RecordID, self._FieldID, x, 1, 0, 0, 0, 0, 2) == API_FIELDS.CHAR4 else cRecords.contents[x]) for x in xrange(numRecords)]
         return []
 
     def __set__(self, instance, nValue):
@@ -1920,7 +1920,7 @@ class CBashSINT16ARRAY(object):
         if(numRecords > 0):
             cRecords = POINTER(c_short * numRecords)()
             _CGetField(instance._RecordID, self._FieldID, 0, 0, 0, 0, 0, 0, byref(cRecords))
-            return [cRecords.contents[x] for x in range(numRecords)]
+            return [cRecords.contents[x] for x in xrange(numRecords)]
         return []
 
     def __set__(self, instance, nValue):
@@ -2057,7 +2057,7 @@ class CBashLIST_LIST(object):
         self._ListFieldID, self._Type, self._AsList = ListFieldID, Type, AsList
 
     def __get__(self, instance, owner):
-        return ExtractCopyList([self._Type(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, 0, 0, 0, 0, 1))]) if self._AsList else [self._Type(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, x) for x in range(_CGetFieldAttribute(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, 0, 0, 0, 0, 1))]
+        return ExtractCopyList([self._Type(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, 0, 0, 0, 0, 1))]) if self._AsList else [self._Type(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, 0, 0, 0, 0, 1))]
 
     def __set__(self, instance, nElements):
         if nElements is None or not len(nElements): _CDeleteField(instance._RecordID, instance._FieldID, instance._ListIndex, self._ListFieldID, 0, 0, 0, 0)
@@ -2299,7 +2299,7 @@ class CBashLIST_LISTX2(object):
         self._ListX2FieldID, self._Type, self._AsList = ListX2FieldID, Type, AsList
 
     def __get__(self, instance, owner):
-        return ExtractCopyList([self._Type(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, 0, 0, 1))]) if self._AsList else [self._Type(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, x) for x in range(_CGetFieldAttribute(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, 0, 0, 1))]
+        return ExtractCopyList([self._Type(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, 0, 0, 1))]) if self._AsList else [self._Type(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, x) for x in xrange(_CGetFieldAttribute(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, 0, 0, 1))]
 
     def __set__(self, instance, nElements):
         if nElements is None or not len(nElements): _CDeleteField(instance._RecordID, instance._FieldID, instance._ListIndex, instance._ListFieldID, instance._ListX2Index, self._ListX2FieldID, 0, 0)
@@ -3056,7 +3056,7 @@ class FnvBaseRecord(object):
     def History(self):
         cRecordIDs = (c_record_p * 257)() #just allocate enough for the max number + size
         numRecords = _CGetRecordHistory(self._RecordID, byref(cRecordIDs))
-        return [self.__class__(cRecordIDs[x]) for x in range(numRecords)]
+        return [self.__class__(cRecordIDs[x]) for x in xrange(numRecords)]
 
     def IsWinning(self, GetExtendedConflicts=False):
         """Returns true if the record is the last to load.
@@ -3072,7 +3072,7 @@ class FnvBaseRecord(object):
         if(numRecords > 1):
             cRecordIDs = (c_record_p * numRecords)()
             numRecords = _CGetRecordConflicts(self._RecordID, byref(cRecordIDs), c_ulong(GetExtendedConflicts))
-            return [self.__class__(cRecordIDs[x]) for x in range(numRecords)]
+            return [self.__class__(cRecordIDs[x]) for x in xrange(numRecords)]
         return []
 
     def ConflictDetails(self, attrs=None):
@@ -4791,43 +4791,43 @@ class FnvLANDRecord(FnvBaseRecord):
     data_p = CBashUINT8ARRAY(7)
 
     def get_normals(self):
-        return [[self.Normal(self._RecordID, 8, x, 0, y) for y in range(0,33)] for x in range(0,33)]
+        return [[self.Normal(self._RecordID, 8, x, 0, y) for y in xrange(0,33)] for x in xrange(0,33)]
     def set_normals(self, nElements):
         if nElements is None or len(nElements) != 33: return
-        for oElement, nElement in zip(self.normals, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in range(0,33)]):
+        for oElement, nElement in zip(self.normals, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in xrange(0,33)]):
             SetCopyList(oElement, nElement)
     normals = property(get_normals, set_normals)
     def get_normals_list(self):
-        return [ExtractCopyList([self.Normal(self._RecordID, 8, x, 0, y) for y in range(0,33)]) for x in range(0,33)]
+        return [ExtractCopyList([self.Normal(self._RecordID, 8, x, 0, y) for y in xrange(0,33)]) for x in xrange(0,33)]
 
     normals_list = property(get_normals_list, set_normals)
 
     heightOffset = CBashFLOAT32(9)
 
     def get_heights(self):
-        return [[self.Height(self._RecordID, 10, x, 0, y) for y in range(0,33)] for x in range(0,33)]
+        return [[self.Height(self._RecordID, 10, x, 0, y) for y in xrange(0,33)] for x in xrange(0,33)]
     def set_heights(self, nElements):
         if nElements is None or len(nElements) != 33: return
-        for oElement, nElement in zip(self.heights, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in range(0,33)]):
+        for oElement, nElement in zip(self.heights, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in xrange(0,33)]):
             SetCopyList(oElement, nElement)
 
     heights = property(get_heights, set_heights)
     def get_heights_list(self):
-        return [ExtractCopyList([self.Height(self._RecordID, 10, x, 0, y) for y in range(0,33)]) for x in range(0,33)]
+        return [ExtractCopyList([self.Height(self._RecordID, 10, x, 0, y) for y in xrange(0,33)]) for x in xrange(0,33)]
     heights_list = property(get_heights_list, set_heights)
 
     unused1 = CBashUINT8ARRAY(11, 3)
 
     def get_colors(self):
-        return [[self.Color(self._RecordID, 12, x, 0, y) for y in range(0,33)] for x in range(0,33)]
+        return [[self.Color(self._RecordID, 12, x, 0, y) for y in xrange(0,33)] for x in xrange(0,33)]
     def set_colors(self, nElements):
         if nElements is None or len(nElements) != 33: return
-        for oElement, nElement in zip(self.colors, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in range(0,33)]):
+        for oElement, nElement in zip(self.colors, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in xrange(0,33)]):
             SetCopyList(oElement, nElement)
 
     colors = property(get_colors, set_colors)
     def get_colors_list(self):
-        return [ExtractCopyList([self.Color(self._RecordID, 12, x, 0, y) for y in range(0,33)]) for x in range(0,33)]
+        return [ExtractCopyList([self.Color(self._RecordID, 12, x, 0, y) for y in xrange(0,33)]) for x in xrange(0,33)]
     colors_list = property(get_colors_list, set_colors)
 
     def create_baseTexture(self):
@@ -4853,14 +4853,14 @@ class FnvLANDRecord(FnvBaseRecord):
 
     ##The Positions accessor is unique in that it duplicates the above accessors. It just presents the data in a more friendly format.
     def get_Positions(self):
-        return [[self.Position(self._RecordID, 16, row, 0, column) for column in range(0,33)] for row in range(0,33)]
+        return [[self.Position(self._RecordID, 16, row, 0, column) for column in xrange(0,33)] for row in xrange(0,33)]
     def set_Positions(self, nElements):
         if nElements is None or len(nElements) != 33: return
-        for oElement, nElement in zip(self.Positions, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in range(0,33)]):
+        for oElement, nElement in zip(self.Positions, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in xrange(0,33)]):
             SetCopyList(oElement, nElement)
     Positions = property(get_Positions, set_Positions)
     def get_Positions_list(self):
-        return [ExtractCopyList([self.Position(self._RecordID, 16, x, 0, y) for y in range(0,33)]) for x in range(0,33)]
+        return [ExtractCopyList([self.Position(self._RecordID, 16, x, 0, y) for y in xrange(0,33)]) for x in xrange(0,33)]
     Positions_list = property(get_Positions_list, set_Positions)
     copyattrs = FnvBaseRecord.baseattrs + ['data_p', 'normals_list', 'heights_list', 'heightOffset',
                                            'colors_list', 'baseTextures_list', 'alphaLayers_list',
@@ -10650,7 +10650,7 @@ class ObBaseRecord(object):
     def History(self):
         cRecordIDs = (c_record_p * 257)() #just allocate enough for the max number + size
         numRecords = _CGetRecordHistory(self._RecordID, cRecordIDs)
-        return [self.__class__(cRecordIDs[x]) for x in range(numRecords)]
+        return [self.__class__(cRecordIDs[x]) for x in xrange(numRecords)]
 
     def IsWinning(self, GetExtendedConflicts=False):
         """Returns true if the record is the last to load.
@@ -10666,7 +10666,7 @@ class ObBaseRecord(object):
         if(numRecords > 1):
             cRecordIDs = (c_record_p * numRecords)()
             numRecords = _CGetRecordConflicts(self._RecordID, cRecordIDs, c_ulong(GetExtendedConflicts))
-            return [self.__class__(cRecordIDs[x]) for x in range(numRecords)]
+            return [self.__class__(cRecordIDs[x]) for x in xrange(numRecords)]
         return []
 
     def ConflictDetails(self, attrs=None):
@@ -11216,40 +11216,40 @@ class ObLANDRecord(ObBaseRecord):
         return [[self.Normal(self._RecordID, 6, x, 0, y) for y in xrange(0,33)] for x in xrange(0,33)]
     def set_normals(self, nElements):
         if nElements is None or len(nElements) != 33: return
-        for oElement, nElement in zip(self.normals, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in range(0,33)]):
+        for oElement, nElement in zip(self.normals, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in xrange(0,33)]):
             SetCopyList(oElement, nElement)
     normals = property(get_normals, set_normals)
     def get_normals_list(self):
-        return [ExtractCopyList([self.Normal(self._RecordID, 6, x, 0, y) for y in range(0,33)]) for x in range(0,33)]
+        return [ExtractCopyList([self.Normal(self._RecordID, 6, x, 0, y) for y in xrange(0,33)]) for x in xrange(0,33)]
 
     normals_list = property(get_normals_list, set_normals)
 
     heightOffset = CBashFLOAT32(7)
 
     def get_heights(self):
-        return [[self.Height(self._RecordID, 8, x, 0, y) for y in range(0,33)] for x in range(0,33)]
+        return [[self.Height(self._RecordID, 8, x, 0, y) for y in xrange(0,33)] for x in xrange(0,33)]
     def set_heights(self, nElements):
         if nElements is None or len(nElements) != 33: return
-        for oElement, nElement in zip(self.heights, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in range(0,33)]):
+        for oElement, nElement in zip(self.heights, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in xrange(0,33)]):
             SetCopyList(oElement, nElement)
 
     heights = property(get_heights, set_heights)
     def get_heights_list(self):
-        return [ExtractCopyList([self.Height(self._RecordID, 8, x, 0, y) for y in range(0,33)]) for x in range(0,33)]
+        return [ExtractCopyList([self.Height(self._RecordID, 8, x, 0, y) for y in xrange(0,33)]) for x in xrange(0,33)]
     heights_list = property(get_heights_list, set_heights)
 
     unused1 = CBashUINT8ARRAY(9, 3)
 
     def get_colors(self):
-        return [[self.Color(self._RecordID, 10, x, 0, y) for y in range(0,33)] for x in range(0,33)]
+        return [[self.Color(self._RecordID, 10, x, 0, y) for y in xrange(0,33)] for x in xrange(0,33)]
     def set_colors(self, nElements):
         if nElements is None or len(nElements) != 33: return
-        for oElement, nElement in zip(self.colors, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in range(0,33)]):
+        for oElement, nElement in zip(self.colors, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in xrange(0,33)]):
             SetCopyList(oElement, nElement)
 
     colors = property(get_colors, set_colors)
     def get_colors_list(self):
-        return [ExtractCopyList([self.Color(self._RecordID, 10, x, 0, y) for y in range(0,33)]) for x in range(0,33)]
+        return [ExtractCopyList([self.Color(self._RecordID, 10, x, 0, y) for y in xrange(0,33)]) for x in xrange(0,33)]
     colors_list = property(get_colors_list, set_colors)
 
     def create_baseTexture(self):
@@ -11275,14 +11275,14 @@ class ObLANDRecord(ObBaseRecord):
 
     ##The Positions accessor is unique in that it duplicates the above accessors. It just presents the data in a more friendly format.
     def get_Positions(self):
-        return [[self.Position(self._RecordID, 14, row, 0, column) for column in range(0,33)] for row in range(0,33)]
+        return [[self.Position(self._RecordID, 14, row, 0, column) for column in xrange(0,33)] for row in xrange(0,33)]
     def set_Positions(self, nElements):
         if nElements is None or len(nElements) != 33: return
-        for oElement, nElement in zip(self.Positions, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in range(0,33)]):
+        for oElement, nElement in zip(self.Positions, nElements if isinstance(nElements[0], tuple) else [ExtractCopyList(nElements[x]) for x in xrange(0,33)]):
             SetCopyList(oElement, nElement)
     Positions = property(get_Positions, set_Positions)
     def get_Positions_list(self):
-        return [ExtractCopyList([self.Position(self._RecordID, 14, x, 0, y) for y in range(0,33)]) for x in range(0,33)]
+        return [ExtractCopyList([self.Position(self._RecordID, 14, x, 0, y) for y in xrange(0,33)]) for x in xrange(0,33)]
     Positions_list = property(get_Positions_list, set_Positions)
     copyattrs = ObBaseRecord.baseattrs + ['data_p', 'normals_list', 'heights_list', 'heightOffset',
                                           'colors_list', 'baseTextures_list', 'alphaLayers_list',

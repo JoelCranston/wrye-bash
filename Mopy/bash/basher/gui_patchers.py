@@ -24,7 +24,6 @@
 from __future__ import division
 import copy
 import re
-from operator import itemgetter
 # Internal
 from .. import bass, bosh, bush, balt, load_order, bolt, exception
 from ..balt import text_wrap, Links, SeparatorLink, CheckLink
@@ -174,7 +173,7 @@ class _AliasesPatcherPanel(_PatcherPanel):
         aliases_text = self.gAliases.text_content
         self.aliases.clear()
         for line in aliases_text.split(u'\n'):
-            fields = map(unicode.strip,line.split(u'>>'))
+            fields = [s.strip() for s in line.split(u'>>')]
             if len(fields) != 2 or not fields[0] or not fields[1]: continue
             self.aliases[GPath(fields[0])] = GPath(fields[1])
         self.SetAliasText()
@@ -185,7 +184,7 @@ class _AliasesPatcherPanel(_PatcherPanel):
         config = super(_AliasesPatcherPanel, self).getConfig(configs)
         #--Update old configs to use Paths instead of strings.
         self.aliases = dict(# map(GPath, item) gives a list (item is a tuple)
-            map(GPath, item) for item in
+            [GPath(i) for i in item] for item in
             config.get('aliases', self.__class__.default_aliases).iteritems())
         return config
 
@@ -778,7 +777,7 @@ class _ListsMergerPanel(_ChoiceMenuMixin, _ListPatcherPanel):
 
     def getItemLabel(self,item):
         """Returns label for item to be used in list"""
-        choice = map(itemgetter(0),self.configChoices.get(item,tuple()))
+        choice = [i[0] for i in self.configChoices.get(item, tuple())]
         item  = u'%s' % item # Path or basestring - YAK
         if choice:
             return u'%s [%s]' % (item,u''.join(sorted(choice)))

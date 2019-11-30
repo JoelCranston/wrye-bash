@@ -507,7 +507,7 @@ class MelBase(object):
             attrs[index] = element[attrIndex]
             if len(element) - attrIndex == 2:
                 defaults[index] = element[-1] # else leave to 0
-        return map(tuple,(attrs,defaults,actions,formAttrs))
+        return [tuple(x) for x in (attrs, defaults, actions, formAttrs)]
 
     def getDefaulters(self,defaulters,base):
         """Registers self as a getDefault(attr) provider."""

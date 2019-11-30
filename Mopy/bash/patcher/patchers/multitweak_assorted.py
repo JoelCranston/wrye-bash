@@ -1108,11 +1108,12 @@ class CBash_AssortedTweak_ScriptEffectSilencer(
         if record.eid == self.SEFF[0]:
             attrs = self.attrs
             newValues = self.newValues
-            oldValues = map(record.__getattribute__, attrs)
+            oldValues = [getattr(record, attr) for attr in attrs]
             if oldValues != newValues:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
-                    map(override.__setattr__, attrs, newValues)
+                    for attr, value in zip(attrs, newValues):
+                        setattr(override, attr, value)
                     record.UnloadRecord()
                     record._RecordID = override._RecordID
 
@@ -1170,11 +1171,12 @@ class CBash_AssortedTweak_HarvestChance(AAssortedTweak_HarvestChance,
         """Edits patch file as desired. """
         if record.eid.startswith(u'Nirnroot'): return #skip Nirnroots
         newValues = [self.choiceValues[self.chosen][0]] * 4
-        oldValues = map(record.__getattribute__, self.attrs)
+        oldValues = [getattr(record, attr) for attr in self.attrs]
         if oldValues != newValues:
             override = record.CopyAsOverride(self.patchFile)
             if override:
-                map(override.__setattr__, self.attrs, newValues)
+                for attr, value in zip(self.attrs, newValues):
+                    setattr(override, attr, value)
                 self.mod_count[modFile.GName] += 1
                 record.UnloadRecord()
                 record._RecordID = override._RecordID

@@ -374,7 +374,7 @@ class FileInfo(AFile):
             snapNew = maSnap.group(1).split(u'.')
             #--Compare shared version numbers
             sharedNums = min(len(snapNew),len(snapLast))
-            for index in range(sharedNums):
+            for index in xrange(sharedNums):
                 (numNew,numLast) = (int(snapNew[index]),int(snapLast[index]))
                 if numNew > numLast:
                     snapLast = snapNew
@@ -753,14 +753,16 @@ class ModInfo(FileInfo):
         :rtype: list[BSAInfo]
         """
         if self.name.cs in bush.game.vanilla_string_bsas: # lowercase !
-            bsa_infos = [bsaInfos[b] for b in map(GPath,
-                bush.game.vanilla_string_bsas[self.name.cs]) if b in bsaInfos]
+            string_bsas = bush.game.vanilla_string_bsas[self.name.cs]
+            bsa_infos = [bsaInfos[b] for b in (GPath(s) for s in string_bsas) if b in bsaInfos]
         else:
             bsa_infos = self.mod_bsas() # first check bsa with same name
             for iniFile in modInfos.ini_files():
                 for key in bush.game.resource_archives_keys:
-                    extraBsas = map(GPath, (x.strip() for x in (
-                        iniFile.getSetting(u'Archive', key, u'').split(u','))))
+                    extraBsas = (
+                        GPath(x.strip())
+                        for x in iniFile.getSetting(u'Archive', key, u'').split(u',')
+                    )
                     bsa_infos.extend(
                         bsaInfos[bsa] for bsa in extraBsas if bsa in bsaInfos)
         return bsa_infos
@@ -1067,7 +1069,7 @@ class SaveInfo(FileInfo):
         # see if we have cosave backups - we must delete cosaves when restoring
         # if the backup does not have a cosave
         for co_type in self.cosave_types:
-            co_paths = tuple(map(co_type.get_cosave_path, back_to_dest[0]))
+            co_paths = tuple(co_type.get_cosave_path(x) for x in back_to_dest[0])
             back_to_dest.append(co_paths)
         return back_to_dest
 
@@ -1724,9 +1726,10 @@ class ModInfos(FileInfos):
     """Collection of modinfos. Represents mods in the Oblivion\Data directory."""
 
     def __init__(self):
-        self.__class__.file_pattern = re.compile(u'(' + u'|'.join(
-            map(re.escape, bush.game.espm_extensions)) + u'' r')(\.ghost)?$',
-                                                 re.I | re.U)
+        self.__class__.file_pattern = re.compile(
+            u'(' + u'|'.join(re.escape(e) for e in bush.game.espm_extensions) + u'' r')(\.ghost)?$',
+            re.I | re.U
+        )
         FileInfos.__init__(self, dirs['mods'], factory=ModInfo)
         #--Info lists/sets
         self.mergeScanned = [] #--Files that have been scanned for mergeability.
@@ -2179,8 +2182,7 @@ class ModInfos(FileInfos):
                 for modName in config_checked:
                     if config_checked[modName] and modName in self:
                         merged_.add(modName)
-            imported_.update(filter(lambda x: x in self,
-                                    patchConfigs.get('ImportedMods', tuple())))
+            imported_.update(x for x in patchConfigs.get('ImportedMods', ()) if x in self)
         return merged_,imported_
 
     def getModList(self,showCRC=False,showVersion=True,fileInfo=None,wtxt=False):
@@ -2403,7 +2405,7 @@ class ModInfos(FileInfos):
             def _activatable(modName):
                 tags = modInfos[modName].getBashTags()
                 return not (u'Deactivate' in tags or u'Filter' in tags)
-            mods = filter(_activatable, mods)
+            mods = [mod for mod in mods if _activatable(mod)]
             mergeable = set(self.mergeable)
             for mod in mods:
                 if not mod in mergeable: _add_to_activate(mod)

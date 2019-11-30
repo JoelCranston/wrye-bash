@@ -27,7 +27,6 @@ import re
 from collections import defaultdict, Counter
 from functools import reduce
 from itertools import chain
-from operator import attrgetter
 # Internal
 from .base import ImportPatcher, CBash_ImportPatcher
 from ..base import AImportPatcher
@@ -197,8 +196,10 @@ class _SimpleImporter(ImportPatcher):
         modFileTops = self.patchFile.tops
         keep = self.patchFile.getKeeper()
         type_count = Counter()
-        types = filter(modFileTops.__contains__, types if types else map(
-            attrgetter('classType'), self.srcClasses))
+        types = filter(
+            lambda t: t in modFileTops,
+            types if types else (getattr(c, 'classType') for c in self.srcClasses)
+        )
         for top_mod_rec in types:
             records = modFileTops[top_mod_rec].records
             self._inner_loop(keep, records, top_mod_rec, type_count)
@@ -2569,7 +2570,7 @@ class StatsPatcher(_AStatsPatcher, ImportPatcher):
                 if longid in id_records: continue
                 itemStats = fid_attr_value.get(longid,None)
                 if not itemStats: continue
-                oldValues = dict(zip(attrs,map(record.__getattribute__,attrs)))
+                oldValues = dict(zip(attrs,(getattr(record, attr) for attr in attrs)))
                 if oldValues != itemStats:
                     patchBlock.setRecord(record.getTypeCopy(mapper))
 
@@ -2588,7 +2589,7 @@ class StatsPatcher(_AStatsPatcher, ImportPatcher):
                 fid = record.fid
                 itemStats = fid_attr_value.get(fid,None)
                 if not itemStats: continue
-                oldValues = dict(zip(attrs,map(record.__getattribute__,attrs)))
+                oldValues = dict(zip(attrs,(getattr(record, attr) for attr in attrs)))
                 if oldValues != itemStats:
                     for attr, value in itemStats.iteritems():
                         setattr(record,attr,value)
