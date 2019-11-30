@@ -421,8 +421,9 @@ class DefaultIniFile(IniFile):
         """Note as_unicode=True strips line endings as opposed to parent -
         this is wanted and does not harm in this case. Note also, the binary
         instantiation of the default ini is with windows EOL."""
-        return map(unicode, self.lines) if as_unicode else '\r\n'.join(
-            self.lines) + '\r\n' # add a newline at the end of the ini
+        if as_unicode:
+            return [unicode(l) for l in self.lines]
+        return '\r\n'.join(self.lines) + '\r\n'  # add a newline at the end of the ini
 
     # Abstract for DefaultIniFile, bit of a smell
     def do_update(self): raise AbstractError

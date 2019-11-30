@@ -261,7 +261,7 @@ class OmodFile(object):
                 subprogress(5)
 
                 # Next 8 bytes are the size of the data stream
-                for i in range(8):
+                for i in xrange(8):
                     out = totalSize >> (i*8)
                     output.write(struct_pack('B', out & 0xFF))
                     done += 1

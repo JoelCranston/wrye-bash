@@ -122,11 +122,12 @@ class CBash_RaceTweaker_BiggerOrcsAndNords(ARaceTweaker_BiggerOrcsAndNords,
         else:
             return
 
-        oldValues = tuple(map(record.__getattribute__, self.attrs))
+        oldValues = tuple(getattr(record, attr) for attr in self.attrs)
         if oldValues != newValues:
             override = record.CopyAsOverride(self.patchFile)
             if override:
-                map(override.__setattr__, self.attrs, newValues)
+                for attr, value in zip(self.attrs, newValues):
+                    setattr(override, attr, value)
                 self.mod_count[modFile.GName] += 1
                 record.UnloadRecord()
                 record._RecordID = override._RecordID

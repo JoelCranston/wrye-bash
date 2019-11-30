@@ -99,7 +99,7 @@ class SaveFileHeader(object):
         # pick out only every 3 bytes, drop the 4th (alpha channel)
         #ssAlpha = ''.join(itertools.islice(ssData, 0, None, 4))
         self.ssData = ''.join(
-            itertools.compress(ssData, itertools.cycle(reversed(range(4)))))
+            itertools.compress(ssData, itertools.cycle(reversed(xrange(4)))))
 
     def load_masters(self, ins):
         self._mastersStart = ins.tell()

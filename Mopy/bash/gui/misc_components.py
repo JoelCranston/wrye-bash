@@ -292,7 +292,7 @@ class CheckListBox(ListBox, WithCharEvents):
                         continue
                     self.lb_set_label_at_index(index, name)
                 self.lb_check_at_index(index, value)
-            for index in range(self.lb_get_items_count(), len(names), -1):
+            for index in xrange(self.lb_get_items_count(), len(names), -1):
                 self.lb_delete_at_index(index - 1)
 
     def toggle_checked_at_index(self, lb_selection_dex):

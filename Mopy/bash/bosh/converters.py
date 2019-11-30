@@ -268,17 +268,21 @@ class InstallerConverter(object):
 
     def __getstate__(self):
         """Used by pickler to save object state. Used for Converters.dat"""
-        return tuple(map(self.__getattribute__, self.persistBCF + self.persistDAT + self.addedPersistDAT))
+        return tuple(getattr(self, a) for a in self.persistBCF + self.persistDAT + self.addedPersistDAT)
 
     def __setstate__(self, values):
         """Used by unpickler to recreate object. Used for Converters.dat"""
         self.__init__()
-        map(self.__setattr__,self.persistBCF + self.persistDAT + self.addedPersistDAT, values)
+        for attr, value in zip(self.persistBCF + self.persistDAT + self.addedPersistDAT, values):
+            setattr(self, attr, value)
 
     def __reduce__(self):
         from . import InstallerConverter as boshInstallerConverter
-        return boshInstallerConverter, (), tuple(map(self.__getattribute__,
-                self.persistBCF + self.persistDAT + self.addedPersistDAT))
+        return (
+            boshInstallerConverter,
+            (),
+            tuple(getattr(self, a) for a in self.persistBCF + self.persistDAT + self.addedPersistDAT)
+        )
 
     def load(self, fullLoad=False):
         """Load BCF.dat. Called once when a BCF is first installed, during a
@@ -300,9 +304,11 @@ class InstallerConverter(object):
                         return re.sub(u'^(bolt|bosh)$', u'' r'bash.\1', s,
                                       flags=re.U)
                 translator = _Translator(stream)
-                map(self.__setattr__, self.persistBCF, pickle.load(translator))
+                for attr, value in zip(self.persistBCF, pickle.load(translator)):
+                    setattr(self, attr, value)
                 if fullLoad:
-                    map(self.__setattr__, self._converter_settings + self.volatile + self.addedSettings, pickle.load(translator))
+                    for attr, value in zip(self._converter_settings + self.volatile + self.addedSettings, pickle.load(translator)):
+                        setattr(self, attr, value)
         with self.fullPath.unicodeSafe() as converter_path:
             # Temp rename if its name wont encode correctly
             command = u'"%s" x "%s" BCF.dat -y -so -sccUTF-8' % (
@@ -313,7 +319,7 @@ class InstallerConverter(object):
     def save(self, destInstaller):
         #--Dump settings into BCF.dat
         def _dump(att, dat):
-            pickle.dump(tuple(map(self.__getattribute__, att)), dat, -1)
+            pickle.dump(tuple(getattr(self, a) for a in att), dat, -1)
         try:
             with bass.getTempDir().join(u'BCF.dat').open(u'wb') as f:
                 _dump(self.persistBCF, f)
@@ -376,8 +382,9 @@ class InstallerConverter(object):
 
     def applySettings(self, destInstaller):
         """Applies the saved settings to an Installer"""
-        map(destInstaller.__setattr__, self._converter_settings + self.addedSettings,
-            map(self.__getattribute__, self._converter_settings + self.addedSettings))
+        attrs = self._converter_settings + self.addedSettings
+        for attr, value in zip(attrs, (getattr(self, a) for a in attrs)):
+            setattr(destInstaller, attr, value)
 
     def _arrangeFiles(self,progress):
         """Copy and/or move extracted files into their proper arrangement."""
@@ -445,7 +452,8 @@ class InstallerConverter(object):
         lastStep = 0
         #--Get settings
         attrs = self._converter_settings
-        map(self.__setattr__, attrs, map(destInstaller.__getattribute__,attrs))
+        for attr, value in zip(attrs, (getattr(destInstaller, a) for a in attrs)):
+            setattr(self, attr, value)
         #--Make list of source files
         for installer in [idata[x] for x in srcArchives]:
             installerCRC = installer.crc
@@ -592,5 +600,5 @@ class InstallerConverter(object):
             tempList.remove()
             bolt.clearReadOnly(subTempDir) ##: do this once
         #--Recursively unpack subArchives
-        for archive in map(subTempDir.join, subArchives):
+        for archive in (subTempDir.join(a) for a in subArchives):
             self._unpack(archive, [u'*']) # it will also unpack the embedded BCF if any...
