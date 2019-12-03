@@ -83,7 +83,7 @@ def setup_locale(cli_lang, _wx):
         # WB does not support the default language, use English instead
         target_locale = _wx.Locale(_wx.LANGUAGE_ENGLISH)
         bolt.deprint(u"No translation file for language '%s', falling back to "
-                     u"English" % target_name)
+                     u'English' % target_name)
         target_name = target_locale.GetSysName().split(u'_', 1)[0]
     bolt.deprint(u"Set wx locale to '%s' (%s)" % (
         target_name, target_locale.GetCanonicalName()))
@@ -104,7 +104,7 @@ def setup_locale(cli_lang, _wx):
                 # standalone build
                 shutil.copy(txt, po)
                 args = [u'm', u'-o', mo, po]
-                if hasattr(sys, 'frozen'):
+                if hasattr(sys, u'frozen'):
                     # Delayed import, since it's only present on standalone
                     import msgfmt
                     old_argv = sys.argv[:]
@@ -176,7 +176,7 @@ def dump_translator(out_path, lang):
     args = [u'p', u'-a', u'-o', full_txt]
     args.extend(_find_all_bash_modules())
     # Need to do this differently on standalone
-    if hasattr(sys, 'frozen'):
+    if hasattr(sys, u'frozen'):
         # Delayed import, since it's only present on standalone
         import pygettext
         old_argv = sys.argv[:]
@@ -203,7 +203,7 @@ def dump_translator(out_path, lang):
             with open(old_txt, u'r') as ins:
                 for line in ins:
                     if not encoding:
-                        encoding_match = re_encoding.match(line.strip('\r\n'))
+                        encoding_match = re_encoding.match(line.strip(u'\r\n'))
                         if encoding_match:
                             encoding = encoding_match.group(1)
                     msg_ids_match = re_msg_ids_start.match(line)
@@ -221,12 +221,12 @@ def dump_translator(out_path, lang):
                             header = True
                             out.write(line)
                         continue
-                    elif line[0:7] == 'msgid "':
-                        stripped = line.strip('\r\n')[7:-1]
+                    elif line[0:7] == u'msgid "':
+                        stripped = line.strip(u'\r\n')[7:-1]
                         # Replace escape sequences
-                        stripped = stripped.replace('\\"','"')      # Quote
-                        stripped = stripped.replace('\\t','\t')     # Tab
-                        stripped = stripped.replace('\\\\', '\\')   # Backslash
+                        stripped = stripped.replace(u'\\"',u'"')      # Quote
+                        stripped = stripped.replace(u'\\t',u'\t')     # Tab
+                        stripped = stripped.replace(u'\\\\', u'\\')   # Backslash
                         # Try translating, check if that changes the string
                         # TODO(inf) Won't this break if we try dumping a
                         #  translation file for a language other than the
@@ -235,20 +235,20 @@ def dump_translator(out_path, lang):
                         if stripped != translated:
                             # Already translated
                             out.write(line)
-                            out.write('msgstr "')
+                            out.write(u'msgstr "')
                             translated = translated.encode(encoding)
                             # Re-escape the escape sequences
-                            translated = translated.replace('\\', '\\\\')
-                            translated = translated.replace('\t', '\\t')
+                            translated = translated.replace(u'\\', u'\\\\')
+                            translated = translated.replace(u'\t', u'\\t')
                             translated = re_non_escaped_quote.sub(sub_quote,
                                                                   translated)
                             out.write(translated)
-                            out.write('"\n')
+                            out.write(u'"\n')
                         else:
                             # Not translated
                             out.write(line)
-                            out.write('msgstr ""\n')
-                    elif line[0:8] == 'msgstr "':
+                            out.write(u'msgstr ""\n')
+                    elif line[0:8] == u'msgstr "':
                         continue
                     else:
                         out.write(line)
@@ -276,22 +276,21 @@ def format_date(secs): # type: (float) -> unicode
         local = time.localtime(secs)
     except ValueError: # local time in windows can't handle negative values
         local = time.gmtime(secs)
-    return bolt.decode(time.strftime('%c', local),
+    return bolt.decode(time.strftime(u'%c', local),
                        locale.getpreferredencoding(do_setlocale=False))
 
 # PY3: Probably drop in py3?
-def unformat_date(date_str, format_str):
+def unformat_date(date_str):
     """Basically a wrapper around time.strptime. Exists to get around bug in
     strptime for Japanese locale.
 
-    :type date_str: str
-    :type format_str: str"""
+    :type date_str: str"""
     try:
-        return time.strptime(date_str, '%c')
+        return time.strptime(date_str, u'%c')
     except ValueError:
-        if format_str == '%c' and bass.active_locale.lower() == u'japanese':
+        if bass.active_locale.lower() == u'japanese':
             date_str = re.sub(u'^([0-9]{4})/([1-9])', r'\1/0\2', date_str,
                               flags=re.U)
-            return time.strptime(date_str, '%c')
+            return time.strptime(date_str, u'%c')
         else:
             raise

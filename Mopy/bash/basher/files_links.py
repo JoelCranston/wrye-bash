@@ -334,7 +334,7 @@ class File_Redate(ItemLink):
             title=_(u'Redate Files'), default=format_date(int(time.time())))
         if not new_time_input: return
         try:
-            new_time = int(time.mktime(unformat_date(new_time_input, '%c')))
+            new_time = int(time.mktime(unformat_date(new_time_input)))
         except ValueError:
             self._showError(_(u'Unrecognized date: ') + new_time_input)
             return
