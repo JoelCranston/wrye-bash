@@ -47,7 +47,7 @@ from . import localize
 # NO OTHER LOCAL IMPORTS HERE (apart from the ones above) !
 basher = balt = initialization = None
 _wx = None
-is_standalone = hasattr(sys, 'frozen')
+is_standalone = hasattr(sys, u'frozen')
 
 def _early_setup(debug):
     """Executes (very) early setup by changing working directory and debug
@@ -72,8 +72,8 @@ def _early_setup(debug):
         # standalone before wxPython is up
         global _bugdump_handle
         # _bugdump_handle = io.open(os.path.join(os.getcwdu(),u'BashBugDump.log'),'w',encoding=u'utf-8')
-        _bugdump_handle = codecs.getwriter('utf-8')(
-            open(os.path.join(os.getcwdu(), u'BashBugDump.log'), 'w'))
+        _bugdump_handle = codecs.getwriter(u'utf-8')(
+            open(os.path.join(os.getcwdu(), u'BashBugDump.log'), u'w'))
         sys.stdout = _bugdump_handle
         sys.stderr = _bugdump_handle
 
@@ -85,10 +85,10 @@ def _import_wx():
         # Hacky fix for loading older settings that pickled classes from
         # moved/deleted wx modules
         from wx import _core
-        sys.modules['wx._gdi'] = _core
+        sys.modules[u'wx._gdi'] = _core
     except Exception:
-        but_kwargs = {'text': u"QUIT",
-                      'fg': 'red'}  # foreground button color
+        but_kwargs = {u'text': u'QUIT',
+                      u'fg': u'red'}  # foreground button color
         msg = u'\n'.join([dump_environment(), u'', u'Unable to load wx:',
                           traceback.format_exc(), u'Exiting.'])
         _tkinter_error_dial(msg, but_kwargs)
@@ -132,7 +132,7 @@ def exit_cleanup():
     if bass.is_restarting:
         cli = cmd_line = bass.sys_argv # list of cli args
         try:
-            if '--uac' in bass.sys_argv: ##: mostly untested - needs revamp
+            if u'--uac' in bass.sys_argv: ##: mostly untested - needs revamp
                 import win32api
                 if is_standalone:
                     exe = cli[0]
@@ -142,7 +142,7 @@ def exit_cleanup():
                 exe = [u'%s', u'"%s"'][u' ' in exe] % exe
                 cli = u' '.join([u'%s', u'"%s"'][u' ' in x] % x for x in cli)
                 cmd_line = u'%s %s' % (exe, cli)
-                win32api.ShellExecute(0, 'runas', exe, cli, None, True)
+                win32api.ShellExecute(0, u'runas', exe, cli, None, True)
                 return
             else:
                 import subprocess
@@ -172,12 +172,12 @@ def dump_environment():
         # Standalone: stdout will actually be pointing to stderr, which has no
         # 'encoding' attribute
         u'Input encoding: %s; output encoding: %s' % (
-            sys.stdin.encoding, getattr(sys.stdout, 'encoding', None)),
+            sys.stdin.encoding, getattr(sys.stdout, u'encoding', None)),
         u'Filesystem encoding: %s%s' % (fse,
             (u' - using %s' % bolt.Path.sys_fs_enc) if not fse else u''),
         u'Command line: %s' % sys.argv,
     ]
-    if getattr(bolt, 'scandir', None) is not None:
+    if getattr(bolt, u'scandir', None) is not None:
         msg.append(u'Using scandir v%s' % bolt.scandir.__version__)
     for m in msg:
         bolt.deprint(m)
@@ -233,7 +233,7 @@ def _main(opts, wx_locale):
         dump_environment()
 
     # Check if there are other instances of Wrye Bash running
-    instance = _wx.SingleInstanceChecker('Wrye Bash') # must stay alive !
+    instance = _wx.SingleInstanceChecker(u'Wrye Bash') # must stay alive !
     assure_single_instance(instance)
 
     global initialization
@@ -321,15 +321,15 @@ def _main(opts, wx_locale):
         if not opts.noUac and not opts.uac:
             # Show a prompt asking if we should restart in Admin Mode
             message = _(
-                u"Wrye Bash needs Administrator Privileges to make changes "
-                u"to the %(gameName)s directory.  If you do not start Wrye "
-                u"Bash with elevated privileges, you will be prompted at "
-                u"each operation that requires elevated privileges.") % {
-                          'gameName': bush_game.displayName}
+                u'Wrye Bash needs Administrator Privileges to make changes '
+                u'to the %(gameName)s directory.  If you do not start Wrye '
+                u'Bash with elevated privileges, you will be prompted at '
+                u'each operation that requires elevated privileges.') % {
+                          u'gameName': bush_game.displayName}
             uacRestart = balt.ask_uac_restart(message,
                                               title=_(u'UAC Protection'),
                                               mopy=bass.dirs[u'mopy'])
-            if uacRestart: bass.update_sys_argv(['--uac'])
+            if uacRestart: bass.update_sys_argv([u'--uac'])
         if uacRestart:
             bass.is_restarting = True
             return
@@ -382,8 +382,8 @@ def _detect_game(opts, backup_bash_ini):
             user_path = ini_user_path
     if user_path:
         drive, path = os.path.splitdrive(user_path)
-        os.environ['HOMEDRIVE'] = drive
-        os.environ['HOMEPATH'] = path
+        os.environ[u'HOMEDRIVE'] = drive
+        os.environ[u'HOMEPATH'] = path
     # Detect the game we're running for ---------------------------------------
     bush_game = _import_bush_and_set_game(opts, bashIni)
     if not bush_game:
@@ -407,13 +407,13 @@ def _import_bush_and_set_game(opts, bashIni):
     if ret is not None:  # None == success
         if len(ret) == 0:
             msgtext = _(
-                u"Wrye Bash could not find a game to manage. Please use\n"
-                u"the -o command line argument to specify the game path.")
+                u'Wrye Bash could not find a game to manage. Please use\n'
+                u'the -o command line argument to specify the game path.')
         else:
             msgtext = _(
-                u"Wrye Bash could not determine which game to manage.\n"
-                u"The following games have been detected, please select "
-                u"one to manage.")
+                u'Wrye Bash could not determine which game to manage.\n'
+                u'The following games have been detected, please select '
+                u'one to manage.')
             msgtext += u'\n\n'
             msgtext += _(
                 u'To prevent this message in the future, use the -o command\n'
@@ -423,7 +423,7 @@ def _import_bush_and_set_game(opts, bashIni):
             bolt.deprint(u'No games were found or selected. Aborting.')
             return None
         # Add the game to the command line, so we use it if we restart
-        bass.update_sys_argv(['--oblivionPath', bush.game_path(retCode).s])
+        bass.update_sys_argv([u'--oblivionPath', bush.game_path(retCode).s])
         bush.detect_and_set_game(opts.oblivionPath, bashIni, retCode)
     # Force Python mode if CBash can't work with this game
     bolt.CBash = opts.mode if bush.game.Esp.canCBash else 1 #1 = python mode...
@@ -579,10 +579,10 @@ def _rightWxVersion():
 def _rightPythonVersion():
     sysVersion = sys.version_info[:3]
     if sysVersion < (2, 7) or sysVersion >= (3,):
-        balt.showError(None, _(u"Only Python 2.7 and newer is supported "
+        balt.showError(None, _(u'Only Python 2.7 and newer is supported '
             u"(%s.%s.%s detected). If you know what you're doing install the "
-            u"WB python version and edit this warning out. "
-            u"Wrye Bash will exit.") % sysVersion,
-            title=_(u"Incompatible Python version detected"))
+            u'WB python version and edit this warning out. '
+            u'Wrye Bash will exit.') % sysVersion,
+            title=_(u'Incompatible Python version detected'))
         return False
     return True
