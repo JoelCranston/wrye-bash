@@ -51,12 +51,13 @@ class MobBase(object):
     """Group of records and/or subgroups. This basic implementation does not
     support unpacking, but can report its number of records and be written."""
 
-    __slots__ = ['header','size','label','groupType','stamp','debug','data',
-                 'changed','numRecords','loadFactory','inName']
+    __slots__ = [u'header', u'size', u'label', u'groupType', u'stamp',
+                 u'debug', u'data', u'changed', u'numRecords', u'loadFactory',
+                 u'inName']
 
     def __init__(self, header, loadFactory, ins=None, do_unpack=False):
         self.header = header
-        if header.recType == 'GRUP':
+        if header.recType == b'GRUP':
             self.size,self.label,self.groupType,self.stamp = (
                 header.size,header.label,header.groupType,header.stamp)
         else:
@@ -123,7 +124,7 @@ class MobBase(object):
             while not readerAtEnd(reader.size,errLabel):
                 header = readerRecHeader()
                 recType,size = header.recType,header.size
-                if recType == 'GRUP': size = 0
+                if recType == b'GRUP': size = 0
                 readerSeek(size,1)
                 numSubRecords += 1
             self.numRecords = numSubRecords + includeGroups
@@ -208,14 +209,14 @@ class MobObjects(MobBase):
     def dump(self,out):
         """Dumps group header and then records."""
         if not self.changed:
-            out.write(RecordHeader('GRUP',self.size, self.label, 0,
+            out.write(RecordHeader(b'GRUP',self.size, self.label, 0,
                                    self.stamp).pack())
             out.write(self.data)
         else:
             size = self.getSize()
             if size == RecordHeader.rec_header_size: return
             out.write(
-                RecordHeader('GRUP', size, self.label, 0, self.stamp).pack())
+                RecordHeader(b'GRUP', size, self.label, 0, self.stamp).pack())
             for record in self.records:
                 record.dump(out)
 
@@ -317,13 +318,13 @@ class MobDials(MobObjects):
                 record = recClass(header,ins,True)
                 recordLoadInfos = record.loadInfos
                 recordsAppend(record)
-            elif recType == 'GRUP':
+            elif recType == b'GRUP':
                 (size, groupType, stamp) = (header.size, header.groupType,
                                             header.stamp)
                 if groupType == 7:
                     try: # record/recordLoadInfos should be initialized in 'if'
                         record.infoStamp = stamp
-                        infoClass = loadGetRecClass('INFO')
+                        infoClass = loadGetRecClass(b'INFO')
                         if infoClass:
                             recordLoadInfos(ins, ins.tell() + size -
                                             header.__class__.rec_header_size,
@@ -369,7 +370,7 @@ class MobDials(MobObjects):
 class MobCell(MobBase):
     """Represents cell block structure -- including the cell and all
     subrecords."""
-    __slots__ = ['cell','persistent','distant','temp', 'land','pgrd']
+    __slots__ = [u'cell', u'persistent', u'distant', u'temp', u'land', u'pgrd']
 
     def __init__(self, header, loadFactory, cell, ins=None, do_unpack=False):
         self.cell = cell
@@ -391,12 +392,12 @@ class MobCell(MobBase):
         tempAppend = temp.append
         distantAppend = distant.append
         insSeek = ins.seek
-        while not insAtEnd(endPos,'Cell Block'):
+        while not insAtEnd(endPos, u'Cell Block'):
             subgroupLoaded = [False,False,False]
             header = insRecHeader()
             recType = header.recType
             recClass = cellGet(recType)
-            if recType == 'GRUP':
+            if recType == b'GRUP':
                 groupType = header.groupType
                 if groupType not in (8, 9, 10):
                     raise ModError(self.inName,
@@ -414,14 +415,14 @@ class MobCell(MobBase):
                                u'group.' % recType)
             elif not recClass:
                 insSeek(header.size,1)
-            elif recType in ('REFR','ACHR','ACRE'):
+            elif recType in (b'REFR',b'ACHR',b'ACRE'):
                 record = recClass(header,ins,True)
                 if   groupType ==  8: persistentAppend(record)
                 elif groupType ==  9: tempAppend(record)
                 elif groupType == 10: distantAppend(record)
-            elif recType == 'LAND':
+            elif recType == b'LAND':
                 self.land = recClass(header,ins,False)
-            elif recType == 'PGRD':
+            elif recType == b'PGRD':
                 self.pgrd = recClass(header,ins,False)
         self.setChanged()
 
@@ -549,7 +550,7 @@ class MobCell(MobBase):
         selfGetter = self.__getattribute__
         srcGetter = srcBlock.__getattribute__
         selfSetter = self.__setattr__
-        for attr in ('cell','pgrd','land'):
+        for attr in (u'cell', u'pgrd', u'land'):
             myRecord = selfGetter(attr)
             record = srcGetter(attr)
             if myRecord and record:
@@ -560,7 +561,7 @@ class MobCell(MobBase):
                     record = record.getTypeCopy(mapper)
                     selfSetter(attr,record)
                     mergeDiscard(record.fid)
-        for attr in ('persistent','temp','distant'):
+        for attr in (u'persistent', u'temp', u'distant'):
             recordList = selfGetter(attr)
             fids = dict(
                 (record.fid,index) for index,record in enumerate(recordList))
@@ -612,7 +613,7 @@ class MobCells(MobBase):
         if fid in self.id_cellBlock:
             self.id_cellBlock[fid].cell = cell
         else:
-            cellBlock = MobCell(RecordHeader('GRUP', 0, 0, 6, self.stamp),
+            cellBlock = MobCell(RecordHeader(b'GRUP', 0, 0, 6, self.stamp),
                                 self.loadFactory, cell)
             cellBlock.setChanged()
             self.cellBlocks.append(cellBlock)
@@ -661,11 +662,11 @@ class MobCells(MobBase):
             bsb0 = (block,None)
             if block != curBlock:
                 curBlock,curSubblock = bsb0
-                outWrite(RecordHeader('GRUP',bsb_size[bsb0],block,
+                outWrite(RecordHeader(b'GRUP',bsb_size[bsb0],block,
                                       blockGroupType,stamp).pack())
             if subblock != curSubblock:
                 curSubblock = subblock
-                outWrite(RecordHeader('GRUP',bsb_size[bsb],subblock,
+                outWrite(RecordHeader(b'GRUP',bsb_size[bsb],subblock,
                                       subBlockGroupType,stamp).pack())
             cellBlock.dump(out)
 
@@ -723,7 +724,7 @@ class MobICells(MobCells):
         cellBlocks = self.cellBlocks
         cell = None
         endBlockPos = endSubblockPos = 0
-        unpackCellBlocks = self.loadFactory.getUnpackCellBlocks('CELL')
+        unpackCellBlocks = self.loadFactory.getUnpackCellBlocks(b'CELL')
         insAtEnd = ins.atEnd
         insRecHeader = ins.unpackRecHeader
         cellBlocksAppend = cellBlocks.append
@@ -743,7 +744,7 @@ class MobICells(MobCells):
                                    u'Interior cell <%X> %s outside of block '
                                    u'or subblock.' % (
                                        cell.fid,cell.eid))
-            elif recType == 'GRUP':
+            elif recType == b'GRUP':
                 size,groupFid,groupType = header.size,header.label, \
                                           header.groupType
                 delta = size - header.__class__.rec_header_size
@@ -808,7 +809,7 @@ class MobWorld(MobCells):
         # subblock = None # unused var
         endBlockPos = endSubblockPos = 0
         cellBlocks = self.cellBlocks
-        unpackCellBlocks = self.loadFactory.getUnpackCellBlocks('WRLD')
+        unpackCellBlocks = self.loadFactory.getUnpackCellBlocks(b'WRLD')
         insAtEnd = ins.atEnd
         insRecHeader = ins.unpackRecHeader
         cellGet = cellType_class.get
@@ -829,10 +830,10 @@ class MobWorld(MobCells):
             recType,size = header.recType,header.size
             delta = size - header.__class__.rec_header_size
             recClass = cellGet(recType)
-            if recType == 'ROAD':
+            if recType == b'ROAD':
                 if not recClass: insSeek(size,1)
                 else: self.road = recClass(header,ins,True)
-            elif recType == 'CELL':
+            elif recType == b'CELL':
                 if cell:
                     cellBlock = MobCell(header,selfLoadFactory,cell)
                     if block:
@@ -863,10 +864,10 @@ class MobWorld(MobCells):
                                        u'Exterior cell <%s> %s after block or'
                                        u' subblock.' % (
                                            hex(cell.fid),cell.eid))
-            elif recType == 'GRUP':
+            elif recType == b'GRUP':
                 groupFid,groupType = header.label,header.groupType
                 if groupType == 4: # Exterior Cell Block
-                    block = struct_unpack('2h', struct_pack('I', groupFid))
+                    block = struct_unpack(u'2h', struct_pack(u'=I', groupFid))
                     block = (block[1],block[0])
                     endBlockPos = insTell() + delta
                 elif groupType == 5: # Exterior Cell Sub-Block
@@ -981,7 +982,7 @@ class MobWorld(MobCells):
         srcGetter = srcBlock.__getattribute__
         selfSetter = self.__setattr__
         mergeDiscard = mergeIds.discard
-        for attr in ('world','road'):
+        for attr in (u'world', u'road'):
             myRecord = selfGetter(attr)
             record = srcGetter(attr)
             if myRecord and record:
@@ -1041,7 +1042,7 @@ class MobWorlds(MobBase):
             if recType == expType:
                 world = recWrldClass(header,ins,True)
                 if isFallout: worlds[world.fid] = world
-            elif recType == 'GRUP':
+            elif recType == b'GRUP':
                 groupFid,groupType = header.label,header.groupType
                 if groupType != 1:
                     raise ModError(ins.inName,
@@ -1081,12 +1082,12 @@ class MobWorlds(MobBase):
         else:
             if not self.worldBlocks: return
             worldHeaderPos = out.tell()
-            header = RecordHeader('GRUP', 0, self.label, 0, self.stamp)
+            header = RecordHeader(b'GRUP', 0, self.label, 0, self.stamp)
             out.write(header.pack())
             totalSize = header.__class__.rec_header_size + sum(
                 x.dump(out) for x in self.worldBlocks)
             out.seek(worldHeaderPos + 4)
-            out.pack('I', totalSize)
+            out.pack(u'=I', totalSize)
             out.seek(worldHeaderPos + totalSize)
 
     def getNumRecords(self,includeGroups=True):
@@ -1130,7 +1131,7 @@ class MobWorlds(MobBase):
             self.id_worldBlocks[fid].world = world
             self.id_worldBlocks[fid].worldCellBlock = worldcellblock
         else:
-            worldBlock = MobWorld(RecordHeader('GRUP',0,0,1,self.stamp),
+            worldBlock = MobWorld(RecordHeader(b'GRUP',0,0,1,self.stamp),
                                   self.loadFactory,world)
             worldBlock.setChanged()
             self.worldBlocks.append(worldBlock)
