@@ -157,7 +157,7 @@ class _RefreshingLink(_SingleInstallable):
         with balt.Progress(title=_(u'Override Skips')) as progress:
             if self._overrides_skips:
                 self.idata.update_for_overridden_skips(set(dest_src), progress)
-            self.idata.irefresh(what='NS', progress=progress)
+            self.idata.irefresh(what=u'NS', progress=progress)
         self.window.RefreshUI()
 
 class _InstallLink(_InstallerLink):
@@ -169,9 +169,9 @@ class _InstallLink(_InstallerLink):
 #------------------------------------------------------------------------------
 class Installer_Fomod(OneItemLink, _InstallerLink):
     """Runs the FOMOD installer"""
-    parentWindow = ''
+    parentWindow = u''
     _text = _(u'FOMOD Installer...')
-    help = _(u"Run the FOMOD installer.")
+    help = _(u'Run the FOMOD installer.')
 
     def _enable(self):
         is_single = super(Installer_Fomod, self)._enable()
@@ -191,8 +191,8 @@ class Installer_Fomod(OneItemLink, _InstallerLink):
             return
         # Install
         ui_refresh = [False, False]
-        installer.extras_dict['fomod_active'] = True
-        installer.extras_dict['fomod_files_dict'] = ret.install_files
+        installer.extras_dict[u'fomod_active'] = True
+        installer.extras_dict[u'fomod_files_dict'] = ret.install_files
         idetails = self.iPanel.detailsPanel
         # FIXME(inf) And even more FOMOD hacks - deselect all subpackages, then
         #  call refresh, otherwise the result in the GUI will be confusing
@@ -209,7 +209,7 @@ class Installer_Fomod(OneItemLink, _InstallerLink):
 
 class Installer_EditWizard(_SingleInstallable):
     """Edit the wizard.txt associated with this project"""
-    _help = _(u"Edit the wizard.txt associated with this project.")
+    _help = _(u'Edit the wizard.txt associated with this project.')
 
     def _initData(self, window, selection):
         super(Installer_EditWizard, self)._initData(window, selection)
@@ -224,15 +224,16 @@ class Installer_EditWizard(_SingleInstallable):
 
 class Installer_Wizard(OneItemLink, _InstallerLink):
     """Runs the install wizard to select subpackages and plugin filtering"""
-    parentWindow = ''
+    parentWindow = u''
 
     def __init__(self, bAuto):
         super(Installer_Wizard, self).__init__()
         self.bAuto = bAuto
         self._text = (_(u'Auto Wizard...') if self.bAuto
                       else _(u'Manual Wizard...'))
-        self._help = _(u"Run the install wizard selecting the default options"
-                       ) if self.bAuto else _(u"Run the install wizard.")
+        self._help = (
+            _(u'Run the install wizard, selecting the default options.')
+            if self.bAuto else _(u'Run the install wizard.'))
 
     def _enable(self):
         single_item = super(Installer_Wizard, self)._enable()
@@ -367,12 +368,12 @@ class Installer_OpenReadme(OneItemLink, _InstallerLink):
 class Installer_Anneal(_InstallLink):
     """Anneal all packages."""
     _text = _(u'Anneal')
-    _help = _(u"Anneal all files in selected package(s).")
+    _help = _(u'Anneal all files in selected package(s).')
 
     def Execute(self):
         ui_refresh = [False, False]
         try:
-            with balt.Progress(_(u"Annealing..."),u'\n'+u' '*60) as progress:
+            with balt.Progress(_(u'Annealing...'),u'\n'+u' '*60) as progress:
                 self.idata.bain_anneal(self._installables, ui_refresh,
                                        progress)
         except (CancelError,SkipError):
@@ -386,8 +387,8 @@ class Installer_Duplicate(OneItemLink, _InstallerLink):
 
     @property
     def menu_help(self):
-        return _(u"Duplicate selected %(installername)s.") % (
-            {'installername': self._selected_item})
+        return _(u'Duplicate selected %(installername)s.') % (
+            {u'installername': self._selected_item})
 
     def _enable(self):
         single_item = super(Installer_Duplicate, self)._enable()
@@ -402,25 +403,25 @@ class Installer_Duplicate(OneItemLink, _InstallerLink):
         if isdir: root,ext = curName,u''
         else: root,ext = curName.root, curName.ext
         newName = self.window.new_name(root + _(u' Copy') + ext)
-        result = self._askText(_(u"Duplicate %s to:") % curName.s,
+        result = self._askText(_(u'Duplicate %s to:') % curName.s,
                                default=newName.s)
         if not result: return
         #--Error checking
         newName = GPath(result).tail
         if not newName.s:
-            self._showWarning(_(u"%s is not a valid name.") % result)
+            self._showWarning(_(u'%s is not a valid name.') % result)
             return
         if newName in self.idata:
-            self._showWarning(_(u"%s already exists.") % newName.s)
+            self._showWarning(_(u'%s already exists.') % newName.s)
             return
         if self.idata.store_dir.join(curName).isfile() and curName.cext != newName.cext:
-            self._showWarning(_(u"%s does not have correct extension (%s).")
+            self._showWarning(_(u'%s does not have correct extension (%s).')
                               % (newName.s,curName.ext))
             return
         #--Duplicate
         with balt.BusyCursor():
             self.idata.copy_installer(curName,newName)
-            self.idata.irefresh(what='N')
+            self.idata.irefresh(what=u'N')
         self.window.RefreshUI(detail_item=newName)
 
 class Installer_Hide(_InstallerLink, UIList_Hide):
@@ -436,7 +437,7 @@ class Installer_Hide(_InstallerLink, UIList_Hide):
 
 class Installer_Rename(UIList_Rename, _InstallerLink):
     """Renames files by pattern."""
-    _help = _(u"Rename selected installer(s).") + u'  ' + _(
+    _help = _(u'Rename selected installer(s).') + u'  ' + _(
         u'All selected installers must be of the same type')
 
     def _enable(self):
@@ -450,7 +451,7 @@ class Installer_Rename(UIList_Rename, _InstallerLink):
 class Installer_HasExtraData(CheckLink, _RefreshingLink):
     """Toggle hasExtraData flag on installer."""
     _text = _(u'Has Extra Directories')
-    _help = _(u"Allow installation of files in non-standard directories.")
+    _help = _(u'Allow installation of files in non-standard directories.')
 
     def _check(self):
         return self._enable() and self._selected_info.hasExtraData
@@ -467,8 +468,8 @@ class Installer_OverrideSkips(CheckLink, _RefreshingLink):
     @property
     def menu_help(self):
         return _(
-            u"Override global file type skipping for %(installername)s.") % (
-                {'installername': self._selected_item}) + u'  '+ _(u'BETA!')
+            u'Override global file type skipping for %(installername)s.') % (
+                {u'installername': self._selected_item}) + u'  '+ _(u'BETA!')
 
     def _check(self):
         return self._enable() and self._selected_info.overrideSkips
@@ -494,20 +495,20 @@ class Installer_SkipRefresh(CheckLink, _SingleProject):
             installer.refreshBasic(progress=None,
                                    recalculate_project_crc=False)
             installer.refreshStatus(self.idata)
-            self.idata.irefresh(what='N')
+            self.idata.irefresh(what=u'N')
             self.window.RefreshUI()
 
 class Installer_Install(_InstallLink):
     """Install selected packages."""
-    mode_title = {'DEFAULT': _(u'Install'), 'LAST': _(u'Install Last'),
-                  'MISSING': _(u'Install Missing Files')}
-    mode_help = {'DEFAULT': _(u'Install selected installer(s)'),
-                 'LAST': _(u'Install the selected installer(s) at the last '
-                           u'position'),
-                 'MISSING': _(u'Install all missing files from the selected '
-                              u'installer(s)')}
+    mode_title = {u'DEFAULT': _(u'Install'), u'LAST': _(u'Install Last'),
+                  u'MISSING': _(u'Install Missing Files')}
+    mode_help = {u'DEFAULT': _(u'Install selected installer(s)'),
+                 u'LAST': _(u'Install the selected installer(s) at the last '
+                            u'position'),
+                 u'MISSING': _(u'Install all missing files from the selected '
+                               u'installer(s)')}
 
-    def __init__(self,mode='DEFAULT'):
+    def __init__(self, mode=u'DEFAULT'):
         super(Installer_Install, self).__init__()
         self.mode = mode
         self._text = self.mode_title[self.mode]
@@ -518,8 +519,8 @@ class Installer_Install(_InstallLink):
         ui_refresh = [False, False]
         try:
             with balt.Progress(_(u'Installing...'),u'\n'+u' '*60) as progress:
-                last = (self.mode == 'LAST')
-                override = (self.mode != 'MISSING')
+                last = (self.mode == u'LAST')
+                override = (self.mode != u'MISSING')
                 try:
                     new_tweaks = self.idata.bain_install(self._installables,
                         ui_refresh, progress, last, override)
@@ -541,7 +542,7 @@ class Installer_Install(_InstallLink):
 
 class Installer_ListStructure(OneItemLink, _InstallerLink): # Provided by Waruddar
     """Copies folder structure of installer to clipboard."""
-    _text = _(u"List Structure...")
+    _text = _(u'List Structure...')
     _help = _(u'Displays the folder structure of the selected installer (and '
               u'copies it to the system clipboard).')
 
@@ -608,7 +609,7 @@ class Installer_Move(_InstallerLink):
         elif newPos == -2: newPos = self.idata[self.idata.lastKey].order+1
         elif newPos < 0: newPos = len(self.idata)
         self.idata.moveArchives(self.selected,newPos)
-        self.idata.irefresh(what='N')
+        self.idata.irefresh(what=u'N')
         self.window.RefreshUI(
             detail_item=self.iPanel.detailsPanel.displayed_item)
 
@@ -643,15 +644,15 @@ class Installer_OpenNexus(AppendableLink, _Installer_OpenAt):
     regexp = bosh.reTesNexus
     _text = _(bush.game.nexusName)
     _help = _(u"Opens this mod's page at the %(nexusName)s.") % \
-            {'nexusName': bush.game.nexusName}
+            {u'nexusName': bush.game.nexusName}
     message = _(
-        u"Attempt to open this as a mod at %(nexusName)s? This assumes that "
+        u'Attempt to open this as a mod at %(nexusName)s? This assumes that '
         u"the trailing digits in the package's name are actually the id "
-        u"number of the mod at %(nexusName)s. If this assumption is wrong, "
+        u'number of the mod at %(nexusName)s. If this assumption is wrong, '
         u"you'll just get a random mod page (or error notice) at %("
-        u"nexusName)s.") % {'nexusName': bush.game.nexusName}
+        u'nexusName)s.') % {u'nexusName': bush.game.nexusName}
     _open_at_continue = bush.game.nexusKey
-    askTitle = _(u'Open at %(nexusName)s') % {'nexusName':bush.game.nexusName}
+    askTitle = _(u'Open at %(nexusName)s') % {u'nexusName':bush.game.nexusName}
     baseUrl = bush.game.nexusUrl + u'mods/'
 
     def _append(self, window): return bool(bush.game.nexusUrl)
@@ -676,11 +677,11 @@ class Installer_OpenTESA(_Installer_OpenAt):
     _open_at_continue = u'bash.installers.openTESA.continue'
     askTitle = _(u'Open at TES Alliance')
     message = _(
-        u"Attempt to open this as a mod at TES Alliance? This assumes that "
+        u'Attempt to open this as a mod at TES Alliance? This assumes that '
         u"the trailing digits in the package's name are actually the id "
-        u"number of the mod at TES Alliance. If this assumption is wrong, "
+        u'number of the mod at TES Alliance. If this assumption is wrong, '
         u"you'll just get a random mod page (or error notice) at TES "
-        u"Alliance.")
+        u'Alliance.')
     baseUrl =u'http://tesalliance.org/forums/index.php?app=downloads&showfile='
 
 #------------------------------------------------------------------------------
@@ -711,8 +712,8 @@ class Installer_SkipVoices(CheckLink, _RefreshingLink):
 
     @property
     def menu_help(self):
-        return _(u"Skip over any voice files in %(installername)s") % (
-                    {'installername': self._selected_item})
+        return _(u'Skip over any voice files in %(installername)s') % (
+                    {u'installername': self._selected_item})
 
     def _check(self): return self._enable() and self._selected_info.skipVoices
 
@@ -730,7 +731,7 @@ class Installer_Uninstall(_InstallLink):
         """Uninstall selected Installers."""
         ui_refresh = [False, False]
         try:
-            with balt.Progress(_(u"Uninstalling..."),u'\n'+u' '*60) as progress:
+            with balt.Progress(_(u'Uninstalling...'),u'\n'+u' '*60) as progress:
                 self.idata.bain_uninstall(self._installables, ui_refresh,
                                           progress)
         except (CancelError,SkipError): # now where could this be raised from ?
@@ -756,14 +757,14 @@ class Installer_CopyConflicts(_SingleInstallable):
         if not src_sizeCrc:
             return _ok(_(u'No files to install for %s'))
         src_order = self._selected_info.order
-        with balt.Progress(_(u"Scanning Packages..."),
+        with balt.Progress(_(u'Scanning Packages...'),
                            u'\n' + u' ' * 60) as progress:
             progress.setFull(len(self.idata))
             numFiles = 0
-            destDir = GPath(u"Conflicts - %03d" % src_order)
+            destDir = GPath(u'Conflicts - %03d' % src_order)
             for i,(package, installer) in enumerate(self.idata.sorted_pairs()):
                 curConflicts = set()
-                progress(i, _(u"Scanning Packages...") + u'\n' + package.s)
+                progress(i, _(u'Scanning Packages...') + u'\n' + package.s)
                 for z, y in installer.refreshDataSizeCrc().iteritems():
                     if z in src_sizeCrc and installer.ci_dest_sizeCrc[z] != \
                             src_sizeCrc[z]:
@@ -797,7 +798,7 @@ class Installer_CopyConflicts(_SingleInstallable):
                 unpack_dir.moveTo(ijoin(destDir, g_path))
                 curFile += len(curConflicts)
             return curFile
-        with balt.Progress(_(u"Copying Conflicts..."),
+        with balt.Progress(_(u'Copying Conflicts...'),
                            u'\n' + u' ' * 60) as progress:
             progress.setFull(numFiles)
             curFile = 0
@@ -805,7 +806,7 @@ class Installer_CopyConflicts(_SingleInstallable):
             curConflicts = srcConflicts
             curFile = _copy_conflicts(curFile)
             for order,package,curConflicts in packConflicts:
-                g_path = GPath(u"%03d - %s" % (
+                g_path = GPath(u'%03d - %s' % (
                     order if order < src_order else order + 1, package.s))
                 curFile = _copy_conflicts(curFile)
         self.idata.refresh_installer(destDir, is_project=True, progress=None,
@@ -859,8 +860,8 @@ class Installer_Espm_Rename(_Installer_Details_Link):
         if curName[0] == u'*':
             curName = curName[1:]
         _file = GPath(curName)
-        newName = self._askText(_(u"Enter new name (without the extension):"),
-                                title=_(u"Rename Plugin"), default=_file.sbody)
+        newName = self._askText(_(u'Enter new name (without the extension):'),
+                                title=_(u'Rename Plugin'), default=_file.sbody)
         if not newName: return
         if newName in self.window.espms: return
         self._installer.setEspmName(curName, newName + _file.cext)
@@ -906,7 +907,7 @@ class Installer_Espm_List(_Installer_Details_Link):
         espm_list = self.window.gEspmList
         for index in xrange(espm_list.lb_get_items_count()):
             subs += [u'   ',u'** '][espm_list.lb_is_checked_at_index(index)] + \
-                    espm_list.lb_get_str_item_at_index(index) + '\n'
+                    espm_list.lb_get_str_item_at_index(index) + u'\n'
         subs += u'[/spoiler]'
         balt.copyToClipboard(subs)
         self._showLog(subs, title=_(u'Plugin List'), fixedFont=False)
@@ -928,7 +929,7 @@ class Installer_Espm_JumpToMod(_Installer_Details_Link):
         return self.target_plugin in bosh.modInfos
 
     def Execute(self):
-        balt.Link.Frame.notebook.SelectPage('Mods', self.target_plugin)
+        balt.Link.Frame.notebook.SelectPage(u'Mods', self.target_plugin)
 
 #------------------------------------------------------------------------------
 # InstallerDetails Subpackage Links -------------------------------------------
@@ -946,7 +947,7 @@ class Installer_Subs_SelectAll(_Installer_Subs):
             self.window.gSubList.lb_check_at_index(index, True)
             if self._installer.has_fomod_conf:
                 if index == 0:
-                    self._installer.extras_dict["fomod_active"] = True
+                    self._installer.extras_dict[u'fomod_active'] = True
                 else:
                     self._installer.subActives[index] = True
             else:
@@ -963,7 +964,7 @@ class Installer_Subs_DeselectAll(_Installer_Subs):
             self.window.gSubList.lb_check_at_index(index, False)
             if self._installer.has_fomod_conf:
                 if index == 0:
-                    self._installer.extras_dict["fomod_active"] = False
+                    self._installer.extras_dict[u'fomod_active'] = False
                 else:
                     self._installer.subActives[index] = False
             else:
@@ -980,8 +981,8 @@ class Installer_Subs_ToggleSelection(_Installer_Subs):
         for index in xrange(self.window.gSubList.lb_get_items_count()):
             if self._installer.has_fomod_conf:
                 if index == 0:
-                    check = not self._installer.extras_dict.get("fomod_active", False)
-                    self._installer.extras_dict["fomod_active"] = check
+                    check = not self._installer.extras_dict.get(u'fomod_active', False)
+                    self._installer.extras_dict[u'fomod_active'] = check
                 else:
                     check = not self._installer.subActives[index]
                     self._installer.subActives[index] = check
@@ -1031,26 +1032,26 @@ class InstallerArchive_Unpack(AppendableLink, _InstallerLink):
         for archive, installer in self.idata.sorted_pairs(self.selected):
             project = archive.root
             if self.isSingleArchive():
-                result = self._askText(_(u"Unpack %s to Project:") % archive.s,
+                result = self._askText(_(u'Unpack %s to Project:') % archive.s,
                                        default=project.s)
                 if not result: return
                 # Error checking
                 project = GPath(result).tail
                 if not project.s or project.cext in archives.readExts:
-                    self._showWarning(_(u"%s is not a valid project name.") %
+                    self._showWarning(_(u'%s is not a valid project name.') %
                                       result)
                     return
                 if self.idata.store_dir.join(project).isfile():
-                    self._showWarning(_(u"%s is a file.") % project.s)
+                    self._showWarning(_(u'%s is a file.') % project.s)
                     return
             if project in self.idata:
                 if not self._askYes(
-                    _(u"%s already exists. Overwrite it?") % project.s,
+                    _(u'%s already exists. Overwrite it?') % project.s,
                     default=False): continue
             # All check passed, we can unpack this
             to_unpack.append((installer, project))
         # We're safe to show the progress dialog now
-        with balt.Progress(_(u"Unpacking to Project..."),u'\n'+u' '*60) \
+        with balt.Progress(_(u'Unpacking to Project...'),u'\n'+u' '*60) \
                 as progress:
             projects = []
             for installer, project in to_unpack:
@@ -1060,7 +1061,7 @@ class InstallerArchive_Unpack(AppendableLink, _InstallerLink):
                     install_order=installer.order + 1, do_refresh=False)
                 projects.append(project)
             if not projects: return
-            self.idata.irefresh(what='NS')
+            self.idata.irefresh(what=u'NS')
             self.window.RefreshUI(detail_item=projects[-1]) # all files ? can status of others change ?
             self.window.SelectItemsNoCallback(projects)
 
@@ -1101,7 +1102,7 @@ class InstallerProject_Sync(_SingleProject):
             progress(0.1,_(u'Updating files.'))
             self._selected_info.syncToData(missing | mismatched)
             self._selected_info.refreshBasic(SubProgress(progress, 0.1, 0.99))
-            self.idata.irefresh(what='NS')
+            self.idata.irefresh(what=u'NS')
             self.window.RefreshUI()
 
 #------------------------------------------------------------------------------
@@ -1170,7 +1171,7 @@ class InstallerConverter_Apply(_InstallerConverter_Link):
     @property
     def menu_help(self):
         return _(u'Applies %(bcf)s to the selected installer(s).') % {
-            'bcf': self.dispName}
+            u'bcf': self.dispName}
 
     @balt.conversation
     def Execute(self):
@@ -1270,7 +1271,7 @@ class InstallerConverter_Create(_InstallerConverter_Link):
             BCFArchive = GPath(BCFArchive.sbody + u'-BCF' + BCFArchive.cext).tail
         if BCFArchive.cext != archives.defaultExt:
             self._showWarning(_(u"BCF's only support %s. The %s extension will"
-                      u" be discarded.") % (
+                      u' be discarded.') % (
                               archives.defaultExt, BCFArchive.cext))
             BCFArchive = GPath(BCFArchive.sbody + archives.defaultExt).tail
         if bass.dirs[u'converters'].join(BCFArchive).exists():
@@ -1292,7 +1293,7 @@ class InstallerConverter_Create(_InstallerConverter_Link):
             #--Add the converter to Bash
             self.idata.converters_data.addConverter(converter)
             #--Refresh UI
-            self.idata.irefresh(what='C')
+            self.idata.irefresh(what=u'C')
             #--Generate log
             log = LogFile(StringIO.StringIO())
             log.setHeader(u'== '+_(u'Overview')+u'\n')
@@ -1328,14 +1329,14 @@ class InstallerConverter_Create(_InstallerConverter_Link):
 #------------------------------------------------------------------------------
 class InstallerOpenAt_MainMenu(balt.MenuLink):
     """Main Open At Menu"""
-    _text = _(u"Open at")
+    _text = _(u'Open at')
     def _enable(self):
         return super(InstallerOpenAt_MainMenu, self)._enable() and isinstance(
             self.window.data_store[self.selected[0]], bosh.InstallerArchive)
 
 class InstallerConverter_ConvertMenu(balt.MenuLink):
     """Apply BCF SubMenu."""
-    _text = _(u"Apply")
+    _text = _(u'Apply')
     def _enable(self):
         """Return False to disable the converter menu, otherwise populate its
         links attribute and return True."""
@@ -1373,7 +1374,7 @@ class InstallerConverter_ConvertMenu(balt.MenuLink):
 
 class InstallerConverter_MainMenu(balt.MenuLink):
     """Main BCF Menu"""
-    _text = _(u"BAIN Conversions")
+    _text = _(u'BAIN Conversions')
     def _enable(self):
         for item in self.selected:
             if not isinstance(self.window.data_store[item], bosh.InstallerArchive):

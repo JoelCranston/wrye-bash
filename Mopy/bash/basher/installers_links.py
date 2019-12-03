@@ -110,9 +110,9 @@ class Installers_MonitorInstall(Installers_Link):
         touchedFiles = sorted(touchedFiles)
         # Show results, select which files to include
         checklists = []
-        newFilesKey = _(u'New Files: %(count)i') % {'count':len(newFiles)}
-        changedFilesKey = _(u'Changed Files: %(count)i') % {'count':len(changedFiles)}
-        touchedFilesKey = _(u'Touched Files: %(count)i') % {'count':len(touchedFiles)}
+        newFilesKey = _(u'New Files: %(count)i') % {u'count':len(newFiles)}
+        changedFilesKey = _(u'Changed Files: %(count)i') % {u'count':len(changedFiles)}
+        touchedFilesKey = _(u'Touched Files: %(count)i') % {u'count':len(touchedFiles)}
         delFilesKey = _(u'Deleted Files')
         if newFiles:
             group = [newFilesKey, _(
@@ -191,7 +191,7 @@ class Installers_AnnealAll(Installers_Link):
         """Anneal all packages."""
         ui_refresh = [False, False]
         try:
-            with balt.Progress(_(u"Annealing..."),u'\n'+u' '*60) as progress:
+            with balt.Progress(_(u'Annealing...'),u'\n'+u' '*60) as progress:
                 self.idata.bain_anneal(None, ui_refresh, progress=progress)
         finally:
             self.iPanel.RefreshUIMods(*ui_refresh)
@@ -204,27 +204,27 @@ class Installers_UninstallAllPackages(Installers_Link):
     @balt.conversation
     def Execute(self):
         """Uninstall all packages."""
-        if not self._askYes(_(u"Really uninstall All Packages?")): return
+        if not self._askYes(_(u'Really uninstall All Packages?')): return
         ui_refresh = [False, False]
         try:
-            with balt.Progress(_(u"Uninstalling..."),u'\n'+u' '*60) as progress:
+            with balt.Progress(_(u'Uninstalling...'),u'\n'+u' '*60) as progress:
                 self.idata.bain_uninstall('ALL', ui_refresh, progress=progress)
         finally:
             self.iPanel.RefreshUIMods(*ui_refresh)
 
 class Installers_Refresh(AppendableLink, Installers_Link):
     """Refreshes all Installers data."""
-    msg = _(u"Refresh ALL data from scratch? This may take five to ten minutes"
-            u" (or more) depending on the number of mods you have installed.")
+    msg = _(u'Refresh ALL data from scratch? This may take five to ten minutes'
+            u' (or more) depending on the number of mods you have installed.')
 
     def __init__(self, full_refresh=False):
         super(Installers_Refresh, self).__init__()
         self.full_refresh = full_refresh
         self._text = _(u'Full Refresh') if full_refresh else _(u'Refresh Data')
         self._help = _(
-            u"Perform a full refresh of all data files, recalculating all "
-            u"CRCs.  This can take 5-15 minutes.") if self.full_refresh else _(
-            u"Rescan the Data directory and all project directories.")
+            u'Perform a full refresh of all data files, recalculating all '
+            u'CRCs.  This can take 5-15 minutes.') if self.full_refresh else _(
+            u'Rescan the Data directory and all project directories.')
 
     def _append(self, window): return bass.settings[u'bash.installers.enabled']
 
@@ -243,7 +243,7 @@ class Installers_UninstallAllUnknownFiles(Installers_Link):
     _text = _(u'Clean Data')
     _help = _(u'This will remove all mod files that are not linked to an'
              u' active installer out of the Data folder.')
-    fullMessage = _(u"Clean Data directory?") + u"  " + _help + u"  " + _(
+    fullMessage = _(u'Clean Data directory?') + u'  ' + _help + u'  ' + _(
         u'This includes files that were installed manually or by another '
         u'program.  Files will be moved to the "%s" directory instead of '
         u'being deleted so you can retrieve them later if necessary.  '
@@ -256,7 +256,7 @@ class Installers_UninstallAllUnknownFiles(Installers_Link):
         if not self._askYes(self.fullMessage): return
         ui_refresh = [False, False]
         try:
-            with balt.Progress(_(u"Cleaning Data Files..."),u'\n' + u' ' * 65):
+            with balt.Progress(_(u'Cleaning Data Files...'),u'\n' + u' ' * 65):
                 self.idata.clean_data_dir(ui_refresh)
         finally:
             self.iPanel.RefreshUIMods(*ui_refresh)
@@ -265,14 +265,14 @@ class Installers_UninstallAllUnknownFiles(Installers_Link):
 # Installers BoolLinks --------------------------------------------------------
 #------------------------------------------------------------------------------
 class Installers_AutoAnneal(BoolLink):
-    _text, _bl_key, _help = _(u'Auto-Anneal'), u'bash.installers.autoAnneal', _(
-        u"Enable/Disable automatic annealing of packages.")
+    _text, _bl_key = _(u'Auto-Anneal'), u'bash.installers.autoAnneal'
+    _help = _(u'Enable/Disable automatic annealing of packages.')
 
 class Installers_AutoWizard(BoolLink):
     _text = _(u'Auto-Anneal/Install Wizards')
     _bl_key = u'bash.installers.autoWizard'
-    _help = _(u"Enable/Disable automatic installing or anneal (as applicable)"
-             u" of packages after running its wizard.")
+    _help = _(u'Enable/Disable automatic installing or anneal (as applicable) '
+              u'of packages after running its wizard.')
 
 class _Installers_BoolLink_Refresh(BoolLink):
     def Execute(self):
@@ -283,8 +283,8 @@ class Installers_WizardOverlay(_Installers_BoolLink_Refresh):
     """Toggle using the wizard overlay icon"""
     _text  = _(u'Wizard Icon Overlay')
     _bl_key = u'bash.installers.wizardOverlay'
-    _help =_(u"Enable/Disable the magic wand icon overlay for packages with"
-            u" Wizards.")
+    _help =_(u'Enable/Disable the magic wand icon overlay for packages with '
+             u'Wizards.')
 
 class Installers_AutoRefreshProjects(BoolLink):
     """Toggle autoRefreshProjects setting and update."""
@@ -317,11 +317,11 @@ class Installers_AutoRefreshBethsoft(BoolLink, Installers_Link):
     _bl_key = u'bash.installers.autoRefreshBethsoft'
     _help = _(u'Skip installing Bethesda ESMs, ESPs, and BSAs')
     opposite = True
-    message = _(u"Enable installation of Bethsoft Content?") + u'\n\n' + _(
-        u"In order to support this, Bethesda ESPs, ESMs, and BSAs need to "
-        u"have their CRCs calculated.  Moreover Bethesda ESPs, ESMs will have "
-        u"their crc recalculated every time on booting BAIN.  Are you sure "
-        u"you want to continue?")
+    message = _(u'Enable installation of Bethsoft Content?') + u'\n\n' + _(
+        u'In order to support this, Bethesda ESPs, ESMs, and BSAs need to '
+        u'have their CRCs calculated.  Moreover Bethesda ESPs, ESMs will have '
+        u'their crc recalculated every time on booting BAIN.  Are you sure '
+        u'you want to continue?')
 
     @balt.conversation
     def Execute(self):
@@ -345,9 +345,9 @@ class Installers_Enabled(BoolLink):
     _text, _bl_key, _help = _(u'Enabled'), u'bash.installers.enabled', _(
         u'Enable/Disable the Installers tab.')
     dialogTitle = _(u'Enable Installers')
-    message = _(u"Do you want to enable Installers?") + u'\n\n\t' + _(
-        u"If you do, Bash will first need to initialize some data. This can "
-        u"take on the order of five minutes if there are many mods installed.")
+    message = _(u'Do you want to enable Installers?') + u'\n\n\t' + _(
+        u'If you do, Bash will first need to initialize some data. This can '
+        u'take on the order of five minutes if there are many mods installed.')
 
     @balt.conversation
     def Execute(self):
@@ -371,7 +371,7 @@ class Installers_BsaRedirection(AppendableLink, BoolLink, EnabledLink):
     def menu_help(self):
         if not self._enable():
             return self._help + u'  ' + _(u'%(ini)s must exist') % {
-                'ini': bush.game.iniFiles[0]}
+                u'ini': bush.game.iniFiles[0]}
         else: return self._help
 
     def _append(self, window):
@@ -421,9 +421,9 @@ class Installers_ConflictsReportShowBSAConflicts(_Installers_BoolLink_Refresh):
 
 class Installers_AvoidOnStart(BoolLink):
     """Ensures faster bash startup by preventing Installers from being startup tab."""
-    _text, _bl_key, _help = _(u'Avoid at Startup'), u'bash.installers.fastStart', _(
-        u"Toggles Wrye Bash to avoid the Installers tab on startup,"
-        u" avoiding unnecessary data scanning.")
+    _text, _bl_key, = _(u'Avoid at Startup'), u'bash.installers.fastStart'
+    _help = _(u'Toggles Wrye Bash to avoid the Installers tab on startup, '
+              u'avoiding unnecessary data scanning.')
 
 class Installers_RemoveEmptyDirs(BoolLink):
     """Toggles option to remove empty directories on file scan."""
@@ -463,7 +463,7 @@ class _Installers_Skip(Installers_Link, BoolLink):
     def menu_help(self):
         # Slice off the starting 'Skip '
         return _(u'Skips the installation of %(files)s.') % {
-            'files': self._text[5:]}
+            u'files': self._text[5:]}
 
     @balt.conversation
     def Execute(self):

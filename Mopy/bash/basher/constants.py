@@ -29,122 +29,122 @@ from ..gui import Image
 
 # Color Descriptions ----------------------------------------------------------
 colorInfo = {
-    'default.text': (_(u'Default Text'),
+    u'default.text': (_(u'Default Text'),
         _(u'This is the text color used for list items when no other is '
           u'specified.  For example, an ESP that is not mergeable or ghosted, '
           u'and has no other problems.'),
     ),
-    'default.bkgd': (_(u'Default Background'),
+    u'default.bkgd': (_(u'Default Background'),
         _(u'This is the text background color used for list items when no '
           u'other is specified.  For example, an ESM that is not ghosted.'),
     ),
-    'mods.text.esm': (_(u'ESM'),
+    u'mods.text.esm': (_(u'ESM'),
         _(u'Tabs: Mods, Saves') + u'\n\n' +
         _(u'This is the text color used for ESMs in the Mods Tab, and in the '
           u'Masters info on both the Mods Tab and Saves Tab.'),),
-    'mods.text.esl': (_(u'ESL'),
+    u'mods.text.esl': (_(u'ESL'),
         _(u'Tabs: Mods, Saves') + u'\n\n' +
         _(u'This is the text color used for ESLs in the Mods Tab, and in the '
           u'Masters info on both the Mods Tab and Saves Tab.'),),
-    'mods.text.eslm': (_(u'ESLM'),
+    u'mods.text.eslm': (_(u'ESLM'),
         _(u'Tabs: Mods, Saves') + u'\n\n' +
         _(u'This is the text color used for ESLs with a master flag in the '
           u'Mods Tab, and in the Masters info on both the Mods Tab and Saves '
           u'Tab.'),),
-    'mods.text.noMerge': (_(u"'NoMerge' Plugin"),
+    u'mods.text.noMerge': (_(u"'NoMerge' Plugin"),
         _(u'Tabs: Mods') + u'\n\n' +
-        _(u"This is the text color used for a mergeable plugin that is "
+        _(u'This is the text color used for a mergeable plugin that is '
           u"tagged 'NoMerge'."),
     ),
-    'mods.text.bashedPatch': (_(u"Bashed Patch"),
+    u'mods.text.bashedPatch': (_(u'Bashed Patch'),
         _(u'Tabs: Mods') + u'\n\n' +
-        _(u"This is the text color used for Bashed Patches."),
+        _(u'This is the text color used for Bashed Patches.'),
     ),
-    'mods.bkgd.doubleTime.exists': (_(u'Inactive Time Conflict'),
+    u'mods.bkgd.doubleTime.exists': (_(u'Inactive Time Conflict'),
         _(u'Tabs: Mods') + u'\n\n' +
         _(u'This is the background color used for a plugin with an inactive '
           u'time conflict.  This means that two or more plugins have the same '
           u'timestamp, but only one (or none) of them is active.'),
     ),
-    'mods.bkgd.doubleTime.load': (_(u'Active Time Conflict'),
+    u'mods.bkgd.doubleTime.load': (_(u'Active Time Conflict'),
         _(u'Tabs: Mods') + u'\n\n' +
         _(u'This is the background color used for a plugin with an active '
           u'time conflict.  This means that two or more plugins with the same '
           u'timestamp are active.'),
     ),
-    'mods.bkgd.deactivate': (_(u"'Deactivate' Plugin"),
+    u'mods.bkgd.deactivate': (_(u"'Deactivate' Plugin"),
         _(u'Tabs: Mods') + u'\n\n' +
-        _(u"This is the background color used for an active plugin that is "
+        _(u'This is the background color used for an active plugin that is '
           u"tagged 'Deactivate'."),
     ),
-    'mods.bkgd.ghosted': (_(u'Ghosted Plugin'),
+    u'mods.bkgd.ghosted': (_(u'Ghosted Plugin'),
         _(u'Tabs: Mods') + u'\n\n' +
         _(u'This is the background color used for a ghosted plugin.'),
     ),
-    'ini.bkgd.invalid': (_(u'Invalid INI Tweak'),
+    u'ini.bkgd.invalid': (_(u'Invalid INI Tweak'),
         _(u'Tabs: INI Edits') + u'\n\n' +
         _(u'This is the background color used for a tweak file that is invalid'
           u' for the currently selected target INI.'),
     ),
-    'tweak.bkgd.invalid': (_(u'Invalid Tweak Line'),
+    u'tweak.bkgd.invalid': (_(u'Invalid Tweak Line'),
         _(u'Tabs: INI Edits') + u'\n\n' +
         _(u'This is the background color used for a line in a tweak file that '
           u'is invalid for the currently selected target INI.'),
     ),
-    'tweak.bkgd.mismatched': (_(u'Mismatched Tweak Line'),
+    u'tweak.bkgd.mismatched': (_(u'Mismatched Tweak Line'),
         _(u'Tabs: INI Edits') + u'\n\n' +
         _(u'This is the background color used for a line in a tweak file that '
           u'does not match what is set in the target INI.'),
     ),
-    'tweak.bkgd.matched': (_(u'Matched Tweak Line'),
+    u'tweak.bkgd.matched': (_(u'Matched Tweak Line'),
         _(u'Tabs: INI Edits') + u'\n\n' +
         _(u'This is the background color used for a line in a tweak file that '
           u'matches what is set in the target INI.'),
     ),
-    'installers.text.complex': (_(u'Complex Installer'),
+    u'installers.text.complex': (_(u'Complex Installer'),
         _(u'Tabs: Installers') + u'\n\n' +
         _(u'This is the text color used for a complex BAIN package.'),
     ),
-    'installers.text.invalid': (_(u'Invalid'),
+    u'installers.text.invalid': (_(u'Invalid'),
         _(u'Tabs: Installers') + u'\n\n' +
         _(u'This is the text color used for invalid packages.'),
     ),
-    'installers.text.marker': (_(u'Marker'),
+    u'installers.text.marker': (_(u'Marker'),
         _(u'Tabs: Installers') + u'\n\n' +
         _(u'This is the text color used for Markers.'),
     ),
-    'installers.bkgd.skipped': (_(u'Skipped Files'),
+    u'installers.bkgd.skipped': (_(u'Skipped Files'),
         _(u'Tabs: Installers') + u'\n\n' +
         _(u'This is the background color used for a package with files that '
           u'will not be installed by BAIN.  This means some files are selected'
           u' to be installed, but due to your current Skip settings (for '
           u'example, Skip DistantLOD), will not be installed.'),
     ),
-    'installers.bkgd.outOfOrder': (_(u'Installer Out of Order'),
+    u'installers.bkgd.outOfOrder': (_(u'Installer Out of Order'),
         _(u'Tabs: Installers') + u'\n\n' +
         _(u'This is the background color used for an installer with files '
           u'installed, that should be overridden by a package with a higher '
           u'install order.  It can be repaired with an Anneal or Anneal All.'),
     ),
-    'installers.bkgd.dirty': (_(u'Dirty Installer'),
+    u'installers.bkgd.dirty': (_(u'Dirty Installer'),
         _(u'Tabs: Installers') + u'\n\n' +
         _(u'This is the background color used for an installer that is '
           u'configured in a "dirty" manner.  This means changes have been made'
           u' to its configuration, and an Anneal or Install needs to be '
           u'performed to make the install match what is configured.'),
     ),
-    'screens.bkgd.image': (_(u'Screenshot Background'),
+    u'screens.bkgd.image': (_(u'Screenshot Background'),
         _(u'Tabs: Saves, Screens') + u'\n\n' +
         _(u'This is the background color used for images.'),
     ),
 }
 if bush.game.check_esl:
-    colorInfo['mods.text.mergeable'] = (_(u'ESL Capable plugin'),
+    colorInfo[u'mods.text.mergeable'] = (_(u'ESL Capable plugin'),
             _(u'Tabs: Mods') + u'\n\n' +
             _(u'This is the text color used for ESL Capable plugins.'),
         )
 else:
-    colorInfo['mods.text.mergeable'] = (_(u'Mergeable Plugin'),
+    colorInfo[u'mods.text.mergeable'] = (_(u'Mergeable Plugin'),
             _(u'Tabs: Mods') + u'\n\n' +
             _(u'This is the text color used for mergeable plugins.'),
         )
@@ -164,7 +164,7 @@ settingDefaults = { # keep current naming format till refactored
     u'bash.CBashEnabled': True,
     u'bash.backupPath': None,
     u'bash.frameMax': False, # True if maximized
-    u'bash.page':1,
+    u'bash.page': 1,
     u'bash.useAltName': True,
     u'bash.pluginEncoding': u'cp1252',    # Western European
     #--Colors
@@ -199,7 +199,7 @@ settingDefaults = { # keep current naming format till refactored
         u'screens.bkgd.image':           (100, 100, 100),
     },
     #--BSA Redirection
-    u'bash.bsaRedirection':True,
+    u'bash.bsaRedirection': True,
     #--Wrye Bash: Load Lists
     u'bash.loadLists.data': {}, ##: to be removed
     # Wrye Bash: Load Order
@@ -232,7 +232,7 @@ settingDefaults = { # keep current naming format till refactored
         u'Mod Status': _(u'Mod Status'),
         u'Author': _(u'Author'),
         u'Cell': _(u'Cell'),
-        u'CRC':_(u'CRC'),
+        u'CRC': _(u'CRC'),
         u'Current Order': _(u'Current LO'),
         u'Date': _(u'Date'),
         u'Day': _(u'Day'),
@@ -240,7 +240,7 @@ settingDefaults = { # keep current naming format till refactored
         u'Files': _(u'Files'),
         u'Group': _(u'Group'),
         u'Header': _(u'Header'),
-        u'Installer':_(u'Installer'),
+        u'Installer': _(u'Installer'),
         u'Karma': _(u'Karma'),
         u'Load Order': _(u'Load Order'),
         u'Modified': _(u'Modified'),
@@ -248,7 +248,7 @@ settingDefaults = { # keep current naming format till refactored
         u'Num': _(u'MI'),
         u'Order': _(u'Order'),
         u'Package': _(u'Package'),
-        u'PlayTime':_(u'Hours'),
+        u'PlayTime': _(u'Hours'),
         u'Player': _(u'Player'),
         u'Rating': _(u'Rating'),
         u'Save Order': _(u'Save Order'),
@@ -271,8 +271,8 @@ settingDefaults = { # keep current naming format till refactored
     u'bash.modDocs.show': False,
     u'bash.modDocs.dir': None,
     #--Installers
-    u'bash.installers.cols': [u'Package', u'Order', u'Modified', u'Size',
-                             u'Files'],
+    u'bash.installers.cols': [u'Package', u'Order', u'Modified' ,u'Size',
+                              u'Files'],
     u'bash.installers.colReverse': {},
     u'bash.installers.sort': u'Order',
     u'bash.installers.colWidths': {
@@ -339,24 +339,24 @@ settingDefaults = { # keep current naming format till refactored
     u'bash.mods.sort': u'Load Order',
     u'bash.mods.colReverse': {},
     u'bash.mods.colWidths': {
-        u'Author':100,
-        u'File':200,
-        u'Group':10,
-        u'Installer':100,
-        u'Load Order':25,
-        u'Modified':135,
-        u'Rating':10,
-        u'Size':75,
-        u'CRC':60,
-        u'Mod Status':50,
-        },
+        u'Author': 100,
+        u'File': 200,
+        u'Group': 10,
+        u'Installer': 100,
+        u'Load Order': 25,
+        u'Modified': 135,
+        u'Rating': 10,
+        u'Size': 75,
+        u'CRC': 60,
+        u'Mod Status': 50,
+    },
     u'bash.mods.renames': {},
     u'bash.mods.scanDirty': True,
     u'bash.mods.export.skip': u'',
     u'bash.mods.export.deprefix': u'',
     u'bash.mods.export.skipcomments': False,
     #--Wrye Bash: Saves
-    u'bash.saves.cols': [u'File',u'Modified',u'Size',u'PlayTime', u'Player',
+    u'bash.saves.cols': [u'File', u'Modified', u'Size', u'PlayTime', u'Player',
                          u'Cell'],
     u'bash.saves.sort': u'Modified',
     u'bash.saves.colReverse': {
@@ -383,7 +383,7 @@ settingDefaults = { # keep current naming format till refactored
     u'bash.BSAs.sort': u'File',
     #--Wrye Bash: Screens
     u'bash.screens.cols': [u'File', u'Modified', u'Size'],
-    u'bash.screens.sort': 'File',
+    u'bash.screens.sort': u'File',
     u'bash.screens.colReverse': {
         u'Modified': 1,
     },
@@ -402,7 +402,7 @@ settingDefaults = { # keep current naming format till refactored
         u'Name': 80,
         u'Karma': 25,
         u'Header': 50,
-        },
+    },
     #--Tes4View/Edit/Trans
     u'tes4View.iKnowWhatImDoing': False,
     u'tes5View.iKnowWhatImDoing': False,
@@ -431,79 +431,79 @@ def _png(fname): return Image(imDirJn(fname))
 #--Image lists
 karmacons = ImageList(16,16)
 karmacons.images.extend({
-    'karma+5': _png(u'checkbox_purple_inc.png'),
-    'karma+4': _png(u'checkbox_blue_inc.png'),
-    'karma+3': _png(u'checkbox_blue_inc.png'),
-    'karma+2': _png(u'checkbox_green_inc.png'),
-    'karma+1': _png(u'checkbox_green_inc.png'),
-    'karma+0': _png(u'checkbox_white_off.png'),
-    'karma-1': _png(u'checkbox_yellow_off.png'),
-    'karma-2': _png(u'checkbox_yellow_off.png'),
-    'karma-3': _png(u'checkbox_orange_off.png'),
-    'karma-4': _png(u'checkbox_orange_off.png'),
-    'karma-5': _png(u'checkbox_red_off.png'),
-    }.items())
+    u'karma+5': _png(u'checkbox_purple_inc.png'),
+    u'karma+4': _png(u'checkbox_blue_inc.png'),
+    u'karma+3': _png(u'checkbox_blue_inc.png'),
+    u'karma+2': _png(u'checkbox_green_inc.png'),
+    u'karma+1': _png(u'checkbox_green_inc.png'),
+    u'karma+0': _png(u'checkbox_white_off.png'),
+    u'karma-1': _png(u'checkbox_yellow_off.png'),
+    u'karma-2': _png(u'checkbox_yellow_off.png'),
+    u'karma-3': _png(u'checkbox_orange_off.png'),
+    u'karma-4': _png(u'checkbox_orange_off.png'),
+    u'karma-5': _png(u'checkbox_red_off.png'),
+}.iteritems())
 installercons = ImageList(16,16)
 installercons.images.extend({
     #--Off/Archive
-    'off.green':  _png(u'checkbox_green_off.png'),
-    'off.grey':   _png(u'checkbox_grey_off.png'),
-    'off.red':    _png(u'checkbox_red_off.png'),
-    'off.white':  _png(u'checkbox_white_off.png'),
-    'off.orange': _png(u'checkbox_orange_off.png'),
-    'off.yellow': _png(u'checkbox_yellow_off.png'),
+    u'off.green':  _png(u'checkbox_green_off.png'),
+    u'off.grey':   _png(u'checkbox_grey_off.png'),
+    u'off.red':    _png(u'checkbox_red_off.png'),
+    u'off.white':  _png(u'checkbox_white_off.png'),
+    u'off.orange': _png(u'checkbox_orange_off.png'),
+    u'off.yellow': _png(u'checkbox_yellow_off.png'),
     #--Off/Archive - Wizard
-    'off.green.wiz':    _png(u'checkbox_green_off_wiz.png'),
+    u'off.green.wiz':    _png(u'checkbox_green_off_wiz.png'),
     #grey
-    'off.red.wiz':      _png(u'checkbox_red_off_wiz.png'),
-    'off.white.wiz':    _png(u'checkbox_white_off_wiz.png'),
-    'off.orange.wiz':   _png(u'checkbox_orange_off_wiz.png'),
-    'off.yellow.wiz':   _png(u'checkbox_yellow_off_wiz.png'),
+    u'off.red.wiz':      _png(u'checkbox_red_off_wiz.png'),
+    u'off.white.wiz':    _png(u'checkbox_white_off_wiz.png'),
+    u'off.orange.wiz':   _png(u'checkbox_orange_off_wiz.png'),
+    u'off.yellow.wiz':   _png(u'checkbox_yellow_off_wiz.png'),
     #--On/Archive
-    'on.green':  _png(u'checkbox_green_inc.png'),
-    'on.grey':   _png(u'checkbox_grey_inc.png'),
-    'on.red':    _png(u'checkbox_red_inc.png'),
-    'on.white':  _png(u'checkbox_white_inc.png'),
-    'on.orange': _png(u'checkbox_orange_inc.png'),
-    'on.yellow': _png(u'checkbox_yellow_inc.png'),
+    u'on.green':  _png(u'checkbox_green_inc.png'),
+    u'on.grey':   _png(u'checkbox_grey_inc.png'),
+    u'on.red':    _png(u'checkbox_red_inc.png'),
+    u'on.white':  _png(u'checkbox_white_inc.png'),
+    u'on.orange': _png(u'checkbox_orange_inc.png'),
+    u'on.yellow': _png(u'checkbox_yellow_inc.png'),
     #--On/Archive - Wizard
-    'on.green.wiz':  _png(u'checkbox_green_inc_wiz.png'),
+    u'on.green.wiz':  _png(u'checkbox_green_inc_wiz.png'),
     #grey
-    'on.red.wiz':    _png(u'checkbox_red_inc_wiz.png'),
-    'on.white.wiz':  _png(u'checkbox_white_inc_wiz.png'),
-    'on.orange.wiz': _png(u'checkbox_orange_inc_wiz.png'),
-    'on.yellow.wiz': _png(u'checkbox_yellow_inc_wiz.png'),
+    u'on.red.wiz':    _png(u'checkbox_red_inc_wiz.png'),
+    u'on.white.wiz':  _png(u'checkbox_white_inc_wiz.png'),
+    u'on.orange.wiz': _png(u'checkbox_orange_inc_wiz.png'),
+    u'on.yellow.wiz': _png(u'checkbox_yellow_inc_wiz.png'),
     #--Off/Directory
-    'off.green.dir':  _png(u'diamond_green_off.png'),
-    'off.grey.dir':   _png(u'diamond_grey_off.png'),
-    'off.red.dir':    _png(u'diamond_red_off.png'),
-    'off.white.dir':  _png(u'diamond_white_off.png'),
-    'off.orange.dir': _png(u'diamond_orange_off.png'),
-    'off.yellow.dir': _png(u'diamond_yellow_off.png'),
+    u'off.green.dir':  _png(u'diamond_green_off.png'),
+    u'off.grey.dir':   _png(u'diamond_grey_off.png'),
+    u'off.red.dir':    _png(u'diamond_red_off.png'),
+    u'off.white.dir':  _png(u'diamond_white_off.png'),
+    u'off.orange.dir': _png(u'diamond_orange_off.png'),
+    u'off.yellow.dir': _png(u'diamond_yellow_off.png'),
     #--Off/Directory - Wizard
-    'off.green.dir.wiz':  _png(u'diamond_green_off_wiz.png'),
+    u'off.green.dir.wiz':  _png(u'diamond_green_off_wiz.png'),
     #grey
-    'off.red.dir.wiz':    _png(u'diamond_red_off_wiz.png'),
-    'off.white.dir.wiz':  _png(u'diamond_white_off_wiz.png'),
-    'off.orange.dir.wiz': _png(u'diamond_orange_off_wiz.png'),
-    'off.yellow.dir.wiz': _png(u'diamond_yellow_off_wiz.png'),
+    u'off.red.dir.wiz':    _png(u'diamond_red_off_wiz.png'),
+    u'off.white.dir.wiz':  _png(u'diamond_white_off_wiz.png'),
+    u'off.orange.dir.wiz': _png(u'diamond_orange_off_wiz.png'),
+    u'off.yellow.dir.wiz': _png(u'diamond_yellow_off_wiz.png'),
     #--On/Directory
-    'on.green.dir':  _png(u'diamond_green_inc.png'),
-    'on.grey.dir':   _png(u'diamond_grey_inc.png'),
-    'on.red.dir':    _png(u'diamond_red_inc.png'),
-    'on.white.dir':  _png(u'diamond_white_inc.png'),
-    'on.orange.dir': _png(u'diamond_orange_inc.png'),
-    'on.yellow.dir': _png(u'diamond_yellow_inc.png'),
+    u'on.green.dir':  _png(u'diamond_green_inc.png'),
+    u'on.grey.dir':   _png(u'diamond_grey_inc.png'),
+    u'on.red.dir':    _png(u'diamond_red_inc.png'),
+    u'on.white.dir':  _png(u'diamond_white_inc.png'),
+    u'on.orange.dir': _png(u'diamond_orange_inc.png'),
+    u'on.yellow.dir': _png(u'diamond_yellow_inc.png'),
     #--On/Directory - Wizard
-    'on.green.dir.wiz':  _png(u'diamond_green_inc_wiz.png'),
+    u'on.green.dir.wiz':  _png(u'diamond_green_inc_wiz.png'),
     #grey
-    'on.red.dir.wiz':    _png(u'diamond_red_inc_wiz.png'),
-    'on.white.dir.wiz':  _png(u'diamond_white_off_wiz.png'),
-    'on.orange.dir.wiz': _png(u'diamond_orange_inc_wiz.png'),
-    'on.yellow.dir.wiz': _png(u'diamond_yellow_inc_wiz.png'),
+    u'on.red.dir.wiz':    _png(u'diamond_red_inc_wiz.png'),
+    u'on.white.dir.wiz':  _png(u'diamond_white_off_wiz.png'),
+    u'on.orange.dir.wiz': _png(u'diamond_orange_inc_wiz.png'),
+    u'on.yellow.dir.wiz': _png(u'diamond_yellow_inc_wiz.png'),
     #--Broken
-    'corrupt':   _png(u'red_x.png'),
-    }.items())
+    u'corrupt':   _png(u'red_x.png'),
+}.iteritems())
 
 #--Buttons
 def imageList(template):

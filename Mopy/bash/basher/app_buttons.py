@@ -48,7 +48,7 @@ class _StatusBar_Hide(ItemLink):
         tip_ = window.tooltip
         self._text = _(u"Hide '%s'") % tip_
         self._help = _(u"Hides %(buttonname)s's status bar button (can be"
-            u" restored through the settings menu).") % ({'buttonname': tip_})
+            u' restored through the settings menu).') % ({u'buttonname': tip_})
 
     def Execute(self): Link.Frame.statusBar.HideButton(self.window)
 
@@ -78,8 +78,8 @@ class StatusBar_Button(ItemLink):
 
     def GetBitmapButton(self, window, image=None, onRClick=None):
         """Create and return gui button - you must define imageKey - WIP overrides"""
-        btn_image = image or balt.images[self.imageKey %
-                        bass.settings[u'bash.statusbar.iconSize']].GetBitmap()
+        btn_image = image or balt.images[self.imageKey % bass.settings[
+            u'bash.statusbar.iconSize']].GetBitmap()
         if self.gButton is not None:
             self.gButton.destroy_component()
         self.gButton = ClickableImage(window, btn_image,
@@ -561,8 +561,8 @@ class _StatefulButton(StatusBar_Button):
         elif state == -1: #--Invert
             self.button_state = True ^ self.button_state
         if self.gButton:
-            self.gButton.image = balt.images[self.imageKey %
-                        bass.settings[u'bash.statusbar.iconSize']].GetBitmap()
+            self.gButton.image = balt.images[self.imageKey % bass.settings[
+                u'bash.statusbar.iconSize']].GetBitmap()
             self.gButton.tooltip = self.sb_button_tip
 
     @property
@@ -608,11 +608,11 @@ class Obse_Button(_StatefulButton):
         return state
 
     @property
-    def sb_button_tip(self): return ((_(u"%s%s Disabled"), _(u"%s%s Enabled"))[
+    def sb_button_tip(self): return ((_(u'%s%s Disabled'), _(u'%s%s Enabled'))[
         self.button_state]) % (bush.game.Se.se_abbrev, self.obseVersion)
 
     def UpdateToolTips(self):
-        tipAttr = ('sb_button_tip', 'obseTip')[self.button_state]
+        tipAttr = (u'sb_button_tip', u'obseTip')[self.button_state]
         for button in _App_Button.obseButtons:
             button.gButton.tooltip = getattr(button, tipAttr, u'')
 
@@ -651,13 +651,13 @@ class AutoQuit_Button(_StatefulButton):
         [u'off', u'x'][self.button_state], u'%d')
 
     @property
-    def sb_button_tip(self): return (_(u"Auto-Quit Disabled"), _(u"Auto-Quit Enabled"))[
+    def sb_button_tip(self): return (_(u'Auto-Quit Disabled'), _(u'Auto-Quit Enabled'))[
         self.button_state]
 
 #------------------------------------------------------------------------------
 class App_Help(StatusBar_Button):
     """Show help browser."""
-    imageKey, _tip = u'help.%s', _(u"Help File")
+    imageKey, _tip = u'help.%s', _(u'Help File')
 
     def Execute(self):
         html = bass.dirs[u'mopy'].join(u'Docs\Wrye Bash General Readme.html')
@@ -669,7 +669,7 @@ class App_Help(StatusBar_Button):
 #------------------------------------------------------------------------------
 class App_DocBrowser(StatusBar_Button):
     """Show doc browser."""
-    imageKey, _tip = u'doc.%s', _(u"Doc Browser")
+    imageKey, _tip = u'doc.%s', _(u'Doc Browser')
 
     def Execute(self):
         if not Link.Frame.docBrowser:
@@ -680,7 +680,7 @@ class App_DocBrowser(StatusBar_Button):
 #------------------------------------------------------------------------------
 class App_Settings(StatusBar_Button):
     """Show settings dialog."""
-    imageKey, _tip = 'settingsbutton.%s', _(u'Settings')
+    imageKey, _tip = u'settingsbutton.%s', _(u'Settings')
 
     def GetBitmapButton(self, window, image=None, onRClick=None):
         return super(App_Settings, self).GetBitmapButton(
@@ -692,12 +692,12 @@ class App_Settings(StatusBar_Button):
 #------------------------------------------------------------------------------
 class App_Restart(StatusBar_Button):
     """Restart Wrye Bash"""
-    _tip = _(u"Restart")
+    _tip = _(u'Restart')
 
     def GetBitmapButton(self, window, image=None, onRClick=None):
         size = bass.settings[u'bash.statusbar.iconSize']
         return super(App_Restart, self).GetBitmapButton(
-            window, staticBitmap(window, special='undo', size=(size,size)),
+            window, staticBitmap(window, special=u'undo', size=(size,size)),
             onRClick)
 
     def Execute(self): Link.Frame.Restart()
@@ -705,7 +705,7 @@ class App_Restart(StatusBar_Button):
 #------------------------------------------------------------------------------
 class App_GenPickle(StatusBar_Button):
     """Generate PKL File. Ported out of bish.py which wasn't working."""
-    imageKey, _tip = 'pickle.%s', _(u"Generate PKL File")
+    imageKey, _tip = u'pickle.%s', _(u'Generate PKL File')
 
     def Execute(self): self._update_pkl()
 
@@ -717,7 +717,7 @@ class App_GenPickle(StatusBar_Button):
         #--Data base
         import cPickle as pickle  # PY3
         try:
-            fids = pickle.load(GPath(bush.game.pklfile).open(u'r'))['GMST']
+            fids = pickle.load(GPath(bush.game.pklfile).open(u'r'))[b'GMST']
             if fids:
                 maxId = max(fids.values())
             else:
@@ -727,7 +727,7 @@ class App_GenPickle(StatusBar_Button):
             maxId = 0
         maxId = max(maxId, 0xf12345)
         maxOld = maxId
-        print('maxId', hex(maxId))
+        print(u'maxId', hex(maxId))
         #--Eid list? - if the GMST has a 00000000 eid when looking at it in
         # the CS with nothing but oblivion.esm loaded you need to add the
         # gmst to this list, rebuild the pickle and overwrite the old one.
@@ -735,7 +735,7 @@ class App_GenPickle(StatusBar_Button):
             if eid not in fids:
                 maxId += 1
                 fids[eid] = maxId
-                print('%08X  %08X %s' % (0, maxId, eid))
+                print(u'%08X  %08X %s' % (0, maxId, eid))
         #--Source file
         if fileName:
             sorter = lambda a: a.eid
@@ -748,12 +748,12 @@ class App_GenPickle(StatusBar_Button):
                 if gmst.eid not in fids:
                     maxId += 1
                     fids[gmst.eid] = maxId
-                    print('%08X  %08X %s' % (gmst.fid, maxId, gmst.eid))
+                    print(u'%08X  %08X %s' % (gmst.fid, maxId, gmst.eid))
         #--Changes?
         if maxId > maxOld:
-            outData = {'GMST': fids}
+            outData = {b'GMST': fids}
             pickle.dump(outData, GPath(bush.game.pklfile).open(u'w'))
-            print(_(u"%d new gmst ids written to " + bush.game.pklfile) % (
+            print(_(u'%d new gmst ids written to ' + bush.game.pklfile) % (
                 (maxId - maxOld),))
         else:
             print(_(u'No changes necessary. PKL data unchanged.'))
@@ -761,7 +761,7 @@ class App_GenPickle(StatusBar_Button):
 #------------------------------------------------------------------------------
 class App_ModChecker(StatusBar_Button):
     """Show mod checker."""
-    imageKey, _tip = 'modchecker.%s', _(u"Mod Checker")
+    imageKey, _tip = u'modchecker.%s', _(u'Mod Checker')
 
     def Execute(self):
         if not Link.Frame.modChecker:
