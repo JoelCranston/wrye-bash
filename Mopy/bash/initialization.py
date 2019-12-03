@@ -44,12 +44,12 @@ def getPersonalPath(bash_ini_, my_docs_path):
     #  Attempt to pull from, in order: Command Line, Ini, win32com, Registry
     if my_docs_path:
         my_docs_path = GPath(my_docs_path)
-        sErrorInfo = _(u"Folder path specified on command line (-p)")
+        sErrorInfo = _(u'Folder path specified on command line (-p)')
     else:
         my_docs_path = get_path_from_ini(bash_ini_, u'sPersonalPath')
         if my_docs_path:
             sErrorInfo = _(
-                u"Folder path specified in bash.ini (%s)") % u'sPersonalPath'
+                u'Folder path specified in bash.ini (%s)') % u'sPersonalPath'
         else:
             my_docs_path, sErrorInfo = get_personal_path()
     #  If path is relative, make absolute
@@ -57,8 +57,8 @@ def getPersonalPath(bash_ini_, my_docs_path):
         my_docs_path = dirs[u'app'].join(my_docs_path)
     #  Error check
     if not my_docs_path.exists():
-        raise BoltError(u"Personal folder does not exist.\n"
-                        u"Personal folder: %s\nAdditional info:\n%s"
+        raise BoltError(u'Personal folder does not exist.\n'
+                        u'Personal folder: %s\nAdditional info:\n%s'
                         % (my_docs_path.s, sErrorInfo))
     return my_docs_path
 
@@ -67,12 +67,12 @@ def getLocalAppDataPath(bash_ini_, app_data_local_path):
     #  Attempt to pull from, in order: Command Line, Ini, win32com, Registry
     if app_data_local_path:
         app_data_local_path = GPath(app_data_local_path)
-        sErrorInfo = _(u"Folder path specified on command line (-l)")
+        sErrorInfo = _(u'Folder path specified on command line (-l)')
     else:
         app_data_local_path = get_path_from_ini(bash_ini_,
                                                 u'sLocalAppDataPath')
         if app_data_local_path:
-            sErrorInfo = _(u"Folder path specified in bash.ini (%s)") % u'sLocalAppDataPath'
+            sErrorInfo = _(u'Folder path specified in bash.ini (%s)') % u'sLocalAppDataPath'
         else:
             app_data_local_path, sErrorInfo = get_local_app_data_path()
     #  If path is relative, make absolute
@@ -80,7 +80,7 @@ def getLocalAppDataPath(bash_ini_, app_data_local_path):
         app_data_local_path = dirs[u'app'].join(app_data_local_path)
     #  Error check
     if not app_data_local_path.exists():
-        raise BoltError(u"Local AppData folder does not exist.\nLocal AppData folder: %s\nAdditional info:\n%s"
+        raise BoltError(u'Local AppData folder does not exist.\nLocal AppData folder: %s\nAdditional info:\n%s'
                         % (app_data_local_path.s, sErrorInfo))
     return app_data_local_path
 
@@ -282,7 +282,7 @@ def getLocalSaveDirs():
     bad = set()
     for folder in localSaveDirs:
         try:
-            folder.s.encode('cp1252')
+            folder.s.encode(u'cp1252')
         except UnicodeEncodeError:
             bad.add(folder)
     localSaveDirs = [x for x in localSaveDirs if x not in bad]
