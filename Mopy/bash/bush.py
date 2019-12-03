@@ -65,7 +65,7 @@ def _supportedGames():
         if not ispkg: continue # game support modules are packages
         # Equivalent of "from game import <modname>"
         try:
-            module = __import__('game',globals(),locals(),[modname],-1)
+            module = __import__(u'game',globals(),locals(),[modname],-1)
             submod = getattr(module,modname)
             game_type = submod.GAME_TYPE
             _allModules[game_type.fsName] = submod
@@ -119,7 +119,7 @@ def _detectGames(cli_path=u'', bash_ini_=None):
         test_path = GPath(cli_path)
         if not test_path.isabs():
             test_path = Path.getcwd().join(test_path)
-        installPaths['cmd'] = (test_path,
+        installPaths[u'cmd'] = (test_path,
             _(u'Set game mode to %(gamename)s specified via -o argument') +
               u': ',
             _(u'No known game in the path specified via -o argument: ' +
@@ -130,7 +130,7 @@ def _detectGames(cli_path=u'', bash_ini_=None):
         test_path = GPath(ini_game_path.strip())
         if not test_path.isabs():
             test_path = Path.getcwd().join(test_path)
-        installPaths['ini'] = (test_path,
+        installPaths[u'ini'] = (test_path,
             _(u'Set game mode to %(gamename)s based on sOblivionPath setting '
               u'in bash.ini') + u': ',
             _(u'No known game in the path specified in sOblivionPath ini '
@@ -141,7 +141,7 @@ def _detectGames(cli_path=u'', bash_ini_=None):
         test_path = GPath(test_path.s[:-5])
         if not test_path.isabs():
             test_path = Path.getcwd().join(test_path)
-        installPaths['upMopy'] = (test_path,
+        installPaths[u'upMopy'] = (test_path,
             _(u'Set game mode to %(gamename)s found in parent directory of'
               u' Mopy') + u': ',
             _(u'No known game in parent directory of Mopy: %(path)s'))
@@ -152,11 +152,11 @@ def _detectGames(cli_path=u'', bash_ini_=None):
         for gamename, info in _allGames.items():
             if test_path.join(*info.game_detect_file).exists():
                 # Must be this game
-                deprint(foundMsg % {'gamename': gamename}, test_path)
+                deprint(foundMsg % {u'gamename': gamename}, test_path)
                 foundGames_[gamename] = test_path
                 return foundGames_, gamename
         # no game exe in this install path - print error message
-        deprint(errorMsg % {'path': test_path.s})
+        deprint(errorMsg % {u'path': test_path.s})
     # no game found in installPaths - foundGames are the ones from the registry
     return foundGames_, None
 
@@ -167,7 +167,7 @@ def __setGame(gamename, msg):
     gamePath = foundGames[gamename]
     game = _allGames[gamename](gamePath)
     game_mod = _allModules[gamename]
-    deprint(msg % {'gamename': gamename}, gamePath)
+    deprint(msg % {u'gamename': gamename}, gamePath)
     # Unload the other modules from the cache
     _allGames.clear()
     _allModules.clear()
