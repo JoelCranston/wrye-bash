@@ -51,7 +51,7 @@ from ..exception import SaveHeaderError, raise_bolt_error
 def _pack(out, fmt, pack_arg): out.write(struct_pack(fmt, pack_arg))
 
 class SaveFileHeader(object):
-    save_magic = 'OVERRIDE'
+    save_magic = b'OVERRIDE'
     # common slots Bash code expects from SaveHeader (added header_size and
     # turned image to a property)
     __slots__ = (u'header_size', u'pcName', u'pcLevel', u'pcLocation',
@@ -98,7 +98,7 @@ class SaveFileHeader(object):
         ssData = ins.read(4 * self.ssWidth * self.ssHeight)
         # pick out only every 3 bytes, drop the 4th (alpha channel)
         #ssAlpha = ''.join(itertools.islice(ssData, 0, None, 4))
-        self.ssData = ''.join(
+        self.ssData = b''.join(
             itertools.compress(ssData, itertools.cycle(reversed(xrange(4)))))
 
     def load_masters(self, ins):
@@ -119,7 +119,7 @@ class SaveFileHeader(object):
         out.write(ins.read(self._mastersStart))
         oldMasters = self._write_masters(ins, out)
         #--Copy the rest
-        for block in iter(partial(ins.read, 0x5000000), ''):
+        for block in iter(partial(ins.read, 0x5000000), b''):
             out.write(block)
         return oldMasters
 
@@ -161,19 +161,19 @@ class SaveFileHeader(object):
         return True
 
 class OblivionSaveHeader(SaveFileHeader):
-    save_magic = 'TES4SAVEGAME'
+    save_magic = b'TES4SAVEGAME'
     __slots__ = ('gameTime', 'ssSize')
     unpackers = OrderedDict([
-        ('header_size', (34, unpack_int)),
-        ('pcName',      (42, unpack_str8)),
-        ('pcLevel',     (00, unpack_short)),
-        ('pcLocation',  (00, unpack_str8)),
-        ('gameDays',    (00, unpack_float)),
-        ('gameTicks',   (00, unpack_int)),
-        ('gameTime',    (00, lambda ins: unpack_string(ins, 16))),
-        ('ssSize',      (00, unpack_int)),
-        ('ssWidth',     (00, unpack_int)),
-        ('ssHeight',    (00, unpack_int)),
+        (u'header_size', (34, unpack_int)),
+        (u'pcName',      (42, unpack_str8)),
+        (u'pcLevel',     (00, unpack_short)),
+        (u'pcLocation',  (00, unpack_str8)),
+        (u'gameDays',    (00, unpack_float)),
+        (u'gameTicks',   (00, unpack_int)),
+        (u'gameTime',    (00, lambda ins: unpack_string(ins, 16))),
+        (u'ssSize',      (00, unpack_int)),
+        (u'ssWidth',     (00, unpack_int)),
+        (u'ssHeight',    (00, unpack_int)),
     ])
 
     def _write_masters(self, ins, out):
@@ -195,7 +195,7 @@ class OblivionSaveHeader(SaveFileHeader):
 
 class SkyrimSaveHeader(SaveFileHeader):
     """Valid Save Game Versions 8, 9, 12 (?)"""
-    save_magic = 'TESV_SAVEGAME'
+    save_magic = b'TESV_SAVEGAME'
     # extra slots - only version is really used, gameDate used once (calc_time)
     # _formVersion distinguish between old and new save formats
     # _compressType of Skyrim SE saves - used to decide how to read/write them
@@ -204,20 +204,20 @@ class SkyrimSaveHeader(SaveFileHeader):
                  u'_compressType', u'_sse_start', u'has_esl_masters')
 
     unpackers = OrderedDict([
-        ('header_size', (00, unpack_int)),
-        ('version',     (00, unpack_int)),
-        ('saveNumber',  (00, unpack_int)),
-        ('pcName',      (00, unpack_str16)),
-        ('pcLevel',     (00, unpack_int)),
-        ('pcLocation',  (00, unpack_str16)),
-        ('gameDate',    (00, unpack_str16)),
-        ('raceEid',     (00, unpack_str16)), # pcRace
-        ('pcSex',       (00, unpack_short)),
-        ('pcExp',       (00, unpack_float)),
-        ('pcLvlExp',    (00, unpack_float)),
-        ('filetime',    (00, lambda ins: unpack_string(ins, 8))),
-        ('ssWidth',     (00, unpack_int)),
-        ('ssHeight',    (00, unpack_int)),
+        (u'header_size', (00, unpack_int)),
+        (u'version',     (00, unpack_int)),
+        (u'saveNumber',  (00, unpack_int)),
+        (u'pcName',      (00, unpack_str16)),
+        (u'pcLevel',     (00, unpack_int)),
+        (u'pcLocation',  (00, unpack_str16)),
+        (u'gameDate',    (00, unpack_str16)),
+        (u'raceEid',     (00, unpack_str16)), # pcRace
+        (u'pcSex',       (00, unpack_short)),
+        (u'pcExp',       (00, unpack_float)),
+        (u'pcLvlExp',    (00, unpack_float)),
+        (u'filetime',    (00, lambda ins: unpack_string(ins, 8))),
+        (u'ssWidth',     (00, unpack_int)),
+        (u'ssHeight',    (00, unpack_int)),
     ])
 
     def __is_sse(self): return self.version == 12
@@ -328,7 +328,7 @@ class SkyrimSaveHeader(SaveFileHeader):
 
     def calc_time(self):
         # gameDate format: hours.minutes.seconds
-        hours, minutes, seconds = [int(x) for x in self.gameDate.split('.')]
+        hours, minutes, seconds = [int(x) for x in self.gameDate.split(u'.')]
         playSeconds = hours * 60 * 60 + minutes * 60 + seconds
         self.gameDays = float(playSeconds) / (24 * 60 * 60)
         self.gameTicks = playSeconds * 1000
@@ -392,7 +392,7 @@ class SkyrimSaveHeader(SaveFileHeader):
 
 class Fallout4SaveHeader(SkyrimSaveHeader): # pretty similar to skyrim
     """Valid Save Game Versions 11, 12, 13, 15 (?)"""
-    save_magic = 'FO4_SAVEGAME'
+    save_magic = b'FO4_SAVEGAME'
 
     __slots__ = ()
 
@@ -417,7 +417,7 @@ class Fallout4SaveHeader(SkyrimSaveHeader): # pretty similar to skyrim
         # russian game format: '0д.0ч.9м.0 д.0 ч.9 мин'
         self.gameDate = unicode(self.gameDate, encoding=u'utf-8')
         days, hours, minutes, _days, _hours, _minutes = self.gameDate.split(
-            '.')
+            u'.')
         days = int(days[:-1])
         hours = int(hours[:-1])
         minutes = int(minutes[:-1])
@@ -432,21 +432,21 @@ class Fallout4SaveHeader(SkyrimSaveHeader): # pretty similar to skyrim
         super(SkyrimSaveHeader, self).writeMasters(ins, out)
 
 class FalloutNVSaveHeader(SaveFileHeader):
-    save_magic = 'FO3SAVEGAME'
+    save_magic = b'FO3SAVEGAME'
     __slots__ = ('language', 'ssDepth', 'pcNick', '_unknown', 'gameDate')
     _masters_unknown_byte = 0x1B
     unpackers = OrderedDict([
-        ('header_size', (00, unpack_int)),
-        ('_unknown',    (00, unpack_str_int_delim)),
-        ('language',    (00, lambda ins: unpack_many(ins, '64sc')[0])),
-        ('ssWidth',     (00, unpack_str_int_delim)),
-        ('ssHeight',    (00, unpack_str_int_delim)),
-        ('ssDepth',     (00, unpack_str_int_delim)),
-        ('pcName',      (00, unpack_str16_delim_null)),
-        ('pcNick',      (00, unpack_str16_delim_null)),
-        ('pcLevel',     (00, unpack_str_int_delim)),
-        ('pcLocation',  (00, unpack_str16_delim_null)),
-        ('gameDate',    (00, unpack_str16_delim_null)),
+        (u'header_size', (00, unpack_int)),
+        (u'_unknown',    (00, unpack_str_int_delim)),
+        (u'language',    (00, lambda ins: unpack_many(ins, u'64sc')[0])),
+        (u'ssWidth',     (00, unpack_str_int_delim)),
+        (u'ssHeight',    (00, unpack_str_int_delim)),
+        (u'ssDepth',     (00, unpack_str_int_delim)),
+        (u'pcName',      (00, unpack_str16_delim_null)),
+        (u'pcNick',      (00, unpack_str16_delim_null)),
+        (u'pcLevel',     (00, unpack_str_int_delim)),
+        (u'pcLocation',  (00, unpack_str16_delim_null)),
+        (u'gameDate',    (00, unpack_str16_delim_null)),
     ])
 
     def load_masters(self, ins):
@@ -486,12 +486,12 @@ class FalloutNVSaveHeader(SaveFileHeader):
             oldMasters.append(unpack_str16_delim_null(ins))
         # Write new masters - note the silly delimiters
         _pack(out, '=B', len(self.masters))
-        _pack(out, '=c', '|')
+        _pack(out, '=c', b'|')
         for master in self.masters:
             _pack(out, '=H', len(master))
-            _pack(out, '=c', '|')
+            _pack(out, '=c', b'|')
             out.write(master.s)
-            _pack(out, '=c', '|')
+            _pack(out, '=c', b'|')
         return oldMasters
 
     def _master_block_size(self):
@@ -499,17 +499,17 @@ class FalloutNVSaveHeader(SaveFileHeader):
 
     def calc_time(self):
         # gameDate format: hours.minutes.seconds
-        hours, minutes, seconds = [int(x) for x in self.gameDate.split('.')]
+        hours, minutes, seconds = [int(x) for x in self.gameDate.split(u'.')]
         playSeconds = hours * 60 * 60 + minutes * 60 + seconds
         self.gameDays = float(playSeconds) / (24 * 60 * 60)
         self.gameTicks = playSeconds * 1000
 
 class Fallout3SaveHeader(FalloutNVSaveHeader):
-    save_magic = 'FO3SAVEGAME'
+    save_magic = b'FO3SAVEGAME'
     __slots__ = ()
     _masters_unknown_byte = 0x15
     unpackers = copy.copy(FalloutNVSaveHeader.unpackers)
-    del unpackers['language']
+    del unpackers[u'language']
 
 class MorrowindSaveHeader(SaveFileHeader):
     """Morrowind saves are identical in format to record definitions.

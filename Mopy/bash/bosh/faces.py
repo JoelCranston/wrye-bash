@@ -33,8 +33,8 @@ from ..brec import getModIndex, MreRecord, genFid, RecordHeader, null2
 class PCFaces(object):
     """Package: Objects and functions for working with face data."""
     pcf_flags = Flags(0, Flags.getNames(
-        'name', 'race', 'gender', 'hair', 'eye', 'iclass', 'stats', 'factions',
-        'modifiers', 'spells'))
+        u'name', u'race', u'gender', u'hair', u'eye', u'iclass', u'stats', u'factions',
+        u'modifiers', u'spells'))
 
     class PCFace(object):
         """Represents a face."""
@@ -44,8 +44,8 @@ class PCFaces(object):
         def __init__(self):
             self.masters = []
             self.eid = self.pcName = u'generic'
-            self.fggs_p = self.fgts_p = '\x00'*4*50
-            self.fgga_p = '\x00'*4*30
+            self.fggs_p = self.fgts_p = b'\x00'*4*50
+            self.fgga_p = b'\x00'*4*30
             self.unused2 = null2
             self.health = self.unused3 = self.baseSpell = self.fatigue = self.level = 0
             self.skills = self.attributes = self.iclass = None
@@ -115,7 +115,7 @@ class PCFaces(object):
             saveFile.load()
         faces = {}
         for record in saveFile.created:
-            if record.recType != 'NPC_': continue
+            if record.recType != b'NPC_': continue
             #--Created NPC record
             if targetid and record.fid != targetid: continue
             npc = record.getTypeCopy()
@@ -212,9 +212,9 @@ class PCFaces(object):
                 saveFile.created[index] = npc
                 break
         else:
-            raise StateError(u"Record %08X not found in %s." % (targetid,saveFile.fileInfo.name.s))
-        if npc.recType != 'NPC_':
-            raise StateError(u"Record %08X in %s is not an NPC." % (targetid,saveFile.fileInfo.name.s))
+            raise StateError(u'Record %08X not found in %s.' % (targetid,saveFile.fileInfo.name.s))
+        if npc.recType != b'NPC_':
+            raise StateError(u'Record %08X in %s is not an NPC.' % (targetid,saveFile.fileInfo.name.s))
         #--Update masters
         for fid in (face.race, face.eye, face.hair):
             if not fid: continue
@@ -253,7 +253,7 @@ class PCFaces(object):
         if changeRecord is None: return
         fid,recType,recFlags,version,data = changeRecord
         npc = SreNPC(recFlags,data)
-        if not npc.acbs: npc.acbs = npc.getDefault('acbs')
+        if not npc.acbs: npc.acbs = npc.getDefault(u'acbs')
         npc.acbs.flags.female = face.gender
         npc.acbs.level = face.level
         npc.acbs.baseSpell = face.baseSpell
@@ -319,7 +319,7 @@ class PCFaces(object):
             postName = buff.getvalue()[buff.tell()+len(saveFile.pcName)+2:]
             buffPack('B',len(face.pcName)+1)
             buff.write(
-                encode(face.pcName, firstEncoding=Path.sys_fs_enc) + '\x00')
+                encode(face.pcName, firstEncoding=Path.sys_fs_enc) + b'\x00')
             buff.write(postName)
             buff.seek(-len(postName),1)
             saveFile.pcName = face.pcName
@@ -394,7 +394,7 @@ class PCFaces(object):
     def mod_getFaces(modInfo):
         """Returns an array of PCFaces from a mod file."""
         #--Mod File
-        loadFactory = LoadFactory(False,MreRecord.type_class['NPC_'])
+        loadFactory = LoadFactory(False,MreRecord.type_class[b'NPC_'])
         modFile = ModFile(modInfo,loadFactory)
         modFile.load(True)
         faces = {}
@@ -416,7 +416,7 @@ class PCFaces(object):
     @staticmethod
     def mod_getRaceFaces(modInfo):
         """Returns an array of Race Faces from a mod file."""
-        loadFactory = LoadFactory(False,MreRecord.type_class['RACE'])
+        loadFactory = LoadFactory(False,MreRecord.type_class[b'RACE'])
         modFile = ModFile(modInfo,loadFactory)
         modFile.load(True)
         faces = {}
@@ -432,7 +432,7 @@ class PCFaces(object):
     def mod_addFace(modInfo,face):
         """Writes a pcFace to a mod file."""
         #--Mod File
-        loadFactory = LoadFactory(True,MreRecord.type_class['NPC_'])
+        loadFactory = LoadFactory(True,MreRecord.type_class[b'NPC_'])
         modFile = ModFile(modInfo,loadFactory)
         if modInfo.getPath().exists():
             modFile.load(True)
@@ -448,7 +448,7 @@ class PCFaces(object):
         masterMap = MasterMap(face.masters,tes4.masters+[modInfo.name])
         #--Eid
         npcEids = set([record.eid for record in modFile.NPC_.records])
-        eidForm = u''.join((u"sg", bush.game.raceShortNames.get(face.race,u'Unk'),
+        eidForm = u''.join((u'sg', bush.game.raceShortNames.get(face.race,u'Unk'),
             (face.gender and u'a' or u'u'), re.sub(u'' r'\W', u'', face.pcName), u'%02d'))
         count,eid = 0, eidForm % 0
         while eid in npcEids:
@@ -456,8 +456,8 @@ class PCFaces(object):
             eid = eidForm % count
         #--NPC
         npcid = genFid(len(tes4.masters),tes4.getNextObject())
-        npc = MreRecord.type_class['NPC_'](
-            RecordHeader('NPC_', 0, 0x40000, npcid, 0))
+        npc = MreRecord.type_class[b'NPC_'](
+            RecordHeader(b'NPC_', 0, 0x40000, npcid, 0))
         npc.eid = eid
         npc.full = face.pcName
         npc.flags.female = face.gender

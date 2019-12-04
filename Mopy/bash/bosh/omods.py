@@ -122,7 +122,7 @@ class OmodFile(object):
             cmd7z = [archives.exe7z, u'l', u'-r', u'-sccUTF-8', tempOmod.s]
             with subprocess.Popen(cmd7z, stdout=PIPE, stdin=PIPE, startupinfo=startupinfo).stdout as ins:
                 for line in ins:
-                    line = unicode(line,'utf8')
+                    line = unicode(line,u'utf8')
                     maFileSize = reFileSize.match(line)
                     if maFileSize: #also matches the last line with total sizes
                         size = int(maFileSize.group(1))
@@ -190,8 +190,8 @@ class OmodFile(object):
             else:
                 extract = self.extractFilesZip
 
-            pluginSize = sizes_.get('plugins',0)
-            dataSize = sizes_.get('data',0)
+            pluginSize = sizes_.get(u'plugins',0)
+            dataSize = sizes_.get(u'data',0)
             subprogress = bolt.SubProgress(progress, 0.5, 1)
             with stageDir.unicodeSafe() as tempOut:
                 if extractDir.join(u'plugins.crc').exists() and extractDir.join(u'plugins').exists():
@@ -345,7 +345,7 @@ class OmodConfig(object):
             for attr in ('author','email','website','abstract'):
                 # OBMM reads it fine if in UTF-8, so we'll do that.
                 _writeNetString(out, getattr(config, attr).encode('utf-8'))
-            out.write('\x74\x1a\x74\x67\xf2\x7a\xca\x88') #--Random date time
+            out.write(b'\x74\x1a\x74\x67\xf2\x7a\xca\x88') #--Random date time
             out.write(struct_pack('b', 0)) #--zip compression (will be ignored)
-            out.write('\xFF\xFF\xFF\xFF')
+            out.write(b'\xFF\xFF\xFF\xFF')
         configPath.untemp()

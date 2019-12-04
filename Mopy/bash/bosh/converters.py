@@ -57,13 +57,13 @@ class ConvertersData(DataDict):
     def load(self):
         self.converterFile.load()
         convertData = self.converterFile.data
-        self.bcfCRC_converter = convertData.get('bcfCRC_converter', dict())
-        self.srcCRC_converters = convertData.get('srcCRC_converters', dict())
+        self.bcfCRC_converter = convertData.get(u'bcfCRC_converter', dict())
+        self.srcCRC_converters = convertData.get(u'srcCRC_converters', dict())
         return True
 
     def save(self):
-        self.converterFile.data['bcfCRC_converter'] = self.bcfCRC_converter
-        self.converterFile.data['srcCRC_converters'] = self.srcCRC_converters
+        self.converterFile.data[u'bcfCRC_converter'] = self.bcfCRC_converter
+        self.converterFile.data[u'srcCRC_converters'] = self.srcCRC_converters
         self.converterFile.save()
 
     def refreshConvertersNeeded(self):
@@ -133,7 +133,7 @@ class ConvertersData(DataDict):
         self.bcfCRC_converter = newData
         pendingChanged = False
         if bool(pending):
-            progress(0, _(u"Scanning Converters..."))
+            progress(0, _(u'Scanning Converters...'))
             progress.setFull(len(pending))
             for index, bcf_archive in enumerate(sorted(pending)):
                 progress(index,
@@ -226,8 +226,8 @@ class InstallerConverter(object):
         #--Do NOT reorder persistBCF,persistDAT,addedPersist or you will
         # break existing BCFs!
         #--Do NOT add new attributes to persistBCF, persistDAT.
-        self.persistBCF = ['srcCRCs']
-        self.persistDAT = ['crc', 'fullPath']
+        self.persistBCF = [u'srcCRCs']
+        self.persistDAT = [u'crc', u'fullPath']
         #--Any new BCF persistent variables are not allowed. Additional work
         #  needed to support backwards compat.
         #--Any new DAT persistent variables must be appended to
@@ -243,13 +243,13 @@ class InstallerConverter(object):
         # They're always read from BCF.dat
         #--Do NOT reorder settings,volatile,addedSettings or you will break
         # existing BCFs!
-        self._converter_settings = ['comments', 'espmNots', 'hasExtraData',
-                                    'isSolid', 'skipVoices', 'subActives']
-        self.volatile = ['convertedFiles', 'dupeCount']
+        self._converter_settings = [u'comments', u'espmNots', u'hasExtraData',
+                                    u'isSolid', u'skipVoices', u'subActives']
+        self.volatile = [u'convertedFiles', u'dupeCount']
         #--Any new saved variables, whether they're settings or volatile
         # must be appended to addedSettings.
         #----They must be able to handle being set to None
-        self.addedSettings = ['blockSize', ]
+        self.addedSettings = [u'blockSize', ]
         self.convertedFiles = []
         self.dupeCount = {}
         #--Cheap init overloading...
@@ -314,7 +314,7 @@ class InstallerConverter(object):
             command = u'"%s" x "%s" BCF.dat -y -so -sccUTF-8' % (
                 archives.exe7z, converter_path.s)
             archives.wrapPopenOut(command, translate, errorMsg=
-                u"\nLoading %s:\nBCF extraction failed." % self.fullPath.s)
+                u'\nLoading %s:\nBCF extraction failed.' % self.fullPath.s)
 
     def save(self, destInstaller):
         #--Dump settings into BCF.dat
@@ -390,7 +390,7 @@ class InstallerConverter(object):
         """Copy and/or move extracted files into their proper arrangement."""
         tmpDir = bass.getTempDir()
         destDir = bass.newTempDir()
-        progress(0, _(u"Moving files..."))
+        progress(0, _(u'Moving files...'))
         progress.setFull(1 + len(self.convertedFiles))
         #--Make a copy of dupeCount
         dupes = dict(self.dupeCount.iteritems())
@@ -407,14 +407,14 @@ class InstallerConverter(object):
                 srcDir = u'%s' % srcDir # Path defines __unicode__()
                 srcFile = tempJoin(srcDir, srcFile)
             else:
-                srcFile = tempJoin(u"%08X" % srcDir, srcFile)
+                srcFile = tempJoin(u'%08X' % srcDir, srcFile)
             destFile = destJoin(destFile)
             if not srcFile.exists():
-                raise StateError(u"%s: Missing source file:\n%s" % (
+                raise StateError(u'%s: Missing source file:\n%s' % (
                     self.fullPath.stail, srcFile.s))
             if destFile is None:
                 raise StateError(
-                    u"%s: Unable to determine file destination for:\n%s" % (
+                    u'%s: Unable to determine file destination for:\n%s' % (
                     self.fullPath.stail, srcFile.s))
             numDupes = dupes[crcValue]
             #--Keep track of how many times the file is referenced by
@@ -569,7 +569,7 @@ class InstallerConverter(object):
         extracted to its own sub-directory to prevent file thrashing"""
         #--Sanity check
         if not fileNames: raise ArgumentError(
-                u"No files to extract for %s." % srcInstaller)
+                u'No files to extract for %s.' % srcInstaller)
         tmpDir = bass.getTempDir()
         tempList = bolt.Path.baseTempDir().join(u'WryeBash_listfile.txt')
         #--Dump file list
@@ -577,7 +577,7 @@ class InstallerConverter(object):
             with tempList.open(u'w', encoding=u'utf-8-sig') as out:
                 out.write(u'\n'.join(fileNames))
         except Exception as e:
-            raise StateError, (u"Error creating file list for 7z:\nError: %s"
+            raise StateError, (u'Error creating file list for 7z:\nError: %s'
                                % e), sys.exc_info()[2]
         #--Determine settings for 7z
         installerCRC = srcInstaller.crc
@@ -587,7 +587,7 @@ class InstallerConverter(object):
             apath = installers_dir.join(srcInstaller)
         else:
             apath = srcInstaller
-        subTempDir = tmpDir.join(u"%08X" % installerCRC)
+        subTempDir = tmpDir.join(u'%08X' % installerCRC)
         if progress:
             progress(0, srcInstaller.s + u'\n' + _(u'Extracting files...'))
             progress.setFull(1 + len(fileNames))

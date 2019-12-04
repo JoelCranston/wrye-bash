@@ -158,6 +158,7 @@ class _PluginEntry(object):
         assumed as the default.
 
         :type yaml_entry: dict"""
+        # PY3: Check what PyYAML emits in py3 before changing anything
         self.dirty_crcs = {c['crc'] for c in yaml_entry.get('dirty', ())}
         self.tags_added = set()
         self.tags_removed = set()
@@ -591,6 +592,7 @@ def _parse_list(list_path):
             list_contents = yaml.load(yaml_data, Loader=SafeLoader)
         else:
             list_contents = yaml.load(ins, Loader=SafeLoader)
+    # PY3: Same note as in PluginEntry.__init__ applies here
     ##: Are the decode calls here (and in _PluginEntry.__init__) needed?
     return LowerDict({decode(p['name']): _PluginEntry(p) for p
                       in list_contents.get('plugins', ())})

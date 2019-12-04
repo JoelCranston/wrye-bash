@@ -158,7 +158,7 @@ class MasterInfo(object):
         return 30 if not self.mod_info else 0
 
     def __repr__(self):
-        return self.__class__.__name__ + u"<" + repr(self.curr_name) + u">"
+        return self.__class__.__name__ + u'<' + repr(self.curr_name) + u'>'
 
 #------------------------------------------------------------------------------
 class FileInfo(AFile):
@@ -418,10 +418,10 @@ class ModInfo(FileInfo):
         self.setmtime(crc_changed=True)
 
     def calculate_crc(self, recalculate=False):
-        cached_crc = modInfos.table.getItem(self.name, 'crc')
+        cached_crc = modInfos.table.getItem(self.name, u'crc')
         if not recalculate:
-            cached_mtime = modInfos.table.getItem(self.name, 'crc_mtime')
-            cached_size = modInfos.table.getItem(self.name, 'crc_size')
+            cached_mtime = modInfos.table.getItem(self.name, u'crc_mtime')
+            cached_size = modInfos.table.getItem(self.name, u'crc_size')
             recalculate = cached_crc is None \
                           or self._file_mod_time != cached_mtime \
                           or self._file_size != cached_size
@@ -429,18 +429,18 @@ class ModInfo(FileInfo):
         if recalculate:
             path_crc = self.abs_path.crc
             if path_crc != cached_crc:
-                modInfos.table.setItem(self.name,'crc',path_crc)
-                modInfos.table.setItem(self.name,'ignoreDirty',False)
-            modInfos.table.setItem(self.name, 'crc_mtime', self._file_mod_time)
-            modInfos.table.setItem(self.name, 'crc_size', self._file_size)
+                modInfos.table.setItem(self.name,u'crc',path_crc)
+                modInfos.table.setItem(self.name,u'ignoreDirty',False)
+            modInfos.table.setItem(self.name, u'crc_mtime', self._file_mod_time)
+            modInfos.table.setItem(self.name, u'crc_size', self._file_size)
         return path_crc, cached_crc
 
     def cached_mod_crc(self): # be sure it's valid before using it!
-        return modInfos.table.getItem(self.name, 'crc')
+        return modInfos.table.getItem(self.name, u'crc')
 
     def crc_string(self):
         try:
-            return u'%08X' % modInfos.table.getItem(self.name, 'crc')
+            return u'%08X' % modInfos.table.getItem(self.name, u'crc')
         except TypeError: # None, should not happen so let it show
             return u'UNKNOWN!'
 
@@ -449,7 +449,7 @@ class ModInfo(FileInfo):
         set_time = FileInfo.setmtime(self, set_time)
         # Prevent re-calculating the File CRC
         if not crc_changed:
-            modInfos.table.setItem(self.name,'crc_mtime', set_time)
+            modInfos.table.setItem(self.name,u'crc_mtime', set_time)
         else:
             self.calculate_crc(recalculate=True)
 
@@ -499,7 +499,7 @@ class ModInfo(FileInfo):
     #--Bash Tags --------------------------------------------------------------
     def setBashTags(self,keys):
         """Sets bash keys as specified."""
-        modInfos.table.setItem(self.name,'bashTags',keys)
+        modInfos.table.setItem(self.name,u'bashTags',keys)
 
     def setBashTagsDesc(self,keys):
         """Sets bash keys as specified."""
@@ -509,7 +509,7 @@ class ModInfo(FileInfo):
             strKeys = u'{{BASH:'+(u','.join(sorted(keys)))+u'}}\n'
         else:
             strKeys = u''
-        description = self.header.description or ''
+        description = self.header.description or u''
         if reBashTags.search(description):
             description = reBashTags.sub(strKeys,description)
         else:
@@ -597,7 +597,7 @@ class ModInfo(FileInfo):
                     self.header.dump(out)
                     #--Write remainder
                     outWrite = out.write
-                    for block in iter(partial(ins.read, 0x5000000), ''):
+                    for block in iter(partial(ins.read, 0x5000000), b''):
                         outWrite(block)
                 except struct.error as rex:
                     raise ModError(self.name,u'Struct.error: %s' % rex)
@@ -605,9 +605,9 @@ class ModInfo(FileInfo):
         filePath.untemp()
         self.setmtime(crc_changed=True)
         #--Merge info
-        size,canMerge = modInfos.table.getItem(self.name,'mergeInfo',(None,None))
+        size,canMerge = modInfos.table.getItem(self.name,u'mergeInfo',(None,None))
         if size is not None:
-            modInfos.table.setItem(self.name,'mergeInfo',(filePath.size,canMerge))
+            modInfos.table.setItem(self.name,u'mergeInfo',(filePath.size,canMerge))
 
     def writeDescription(self,description):
         """Sets description to specified text and then writes hedr."""
@@ -670,7 +670,7 @@ class ModInfo(FileInfo):
         # type: (basestring) -> Iterable[Path]
         sbody, ext = self.name.sbody, self.get_extension()
         for join, format_str in bush.game.Esp.stringsFiles:
-            fname = format_str % {'body': sbody, 'ext': ext, 'language': lang}
+            fname = format_str % {u'body': sbody, u'ext': ext, u'language': lang}
             assetPath = empty_path.join(*join).join(fname)
             yield assetPath
 
@@ -724,7 +724,7 @@ class ModInfo(FileInfo):
                     bsa.extract_assets(assets, out_path.s)
                 except BSAError as e:
                     raise ModError(self.name,
-                                   u"Could not extract Strings File from "
+                                   u'Could not extract Strings File from '
                                    u"'%s': %s" % (bsa.name, e))
                 paths.update(imap(out_path.join, assets))
         return paths
@@ -868,7 +868,7 @@ class INIInfo(IniFile):
         match = False
         mismatch = 0
         ini_settings = target_ini.get_ci_settings()
-        self_installer = infos.table.getItem(self.abs_path.tail, 'installer')
+        self_installer = infos.table.getItem(self.abs_path.tail, u'installer')
         for section_key in tweak_settings:
             if section_key not in ini_settings:
                 return _status(-10)
@@ -886,7 +886,7 @@ class INIInfo(IniFile):
                         for name, ini_info in infos.iteritems():
                             if self is ini_info: continue
                             if self_installer != infos.table.getItem(
-                                    name, 'installer'): continue
+                                    name, u'installer'): continue
                             # It's from the same installer
                             if self._incompatible(ini_info): continue
                             value = ini_info.getSetting(section_key, item, None)
@@ -955,7 +955,7 @@ from . import cosaves
 
 class SaveInfo(FileInfo):
     cosave_types = () # cosave types for this game - set once in SaveInfos
-    _cosave_ui_string = {PluggyCosave: 'XP', xSECosave: 'XO'} # ui strings
+    _cosave_ui_string = {PluggyCosave: u'XP', xSECosave: u'XO'} # ui strings
 
     def __init__(self, fullpath, load_cache=False):
         # Dict of cosaves that may come with this save file. Need to get this
@@ -1045,7 +1045,7 @@ class SaveInfo(FileInfo):
             if inst and inst.abs_path.exists():
                 co_ui_strings[j] = self._cosave_ui_string[co_typ][
                     abs(inst.abs_path.mtime - self.mtime) < 10]
-        return '\n'.join(co_ui_strings)
+        return u'\n'.join(co_ui_strings)
 
     def backup_restore_paths(self, first=False, fname=None):
         """Return as parent and in addition back up paths for the cosaves."""
@@ -1137,12 +1137,12 @@ class DataStore(DataDict):
         """Deletes member file(s)."""
         full_delete_paths, delete_info = self.files_to_delete(delete_keys,
             raise_on_master_deletion=kwargs.pop(
-                'raise_on_master_deletion', True))
+                u'raise_on_master_deletion', True))
         try:
             self._delete_operation(full_delete_paths, delete_info, **kwargs)
         finally:
             #--Refresh
-            if kwargs.pop('doRefresh', True):
+            if kwargs.pop(u'doRefresh', True):
                 self.delete_refresh(full_delete_paths, delete_info,
                                     check_existence=True)
 
@@ -1150,8 +1150,8 @@ class DataStore(DataDict):
         raise AbstractError
 
     def _delete_operation(self, paths, delete_info, **kwargs):
-        confirm = kwargs.pop('confirm', False)
-        recycle = kwargs.pop('recycle', True)
+        confirm = kwargs.pop(u'confirm', False)
+        recycle = kwargs.pop(u'recycle', True)
         env.shellDelete(paths, confirm=confirm, recycle=recycle)
 
     def delete_refresh(self, deleted, deleted2, check_existence):
@@ -1245,7 +1245,7 @@ class TableFileInfos(DataStore):
         info = self[fileName] = self.factory(self.store_dir.join(fileName),
                                              load_cache=True)
         if owner is not None:
-            self.table.setItem(fileName, 'installer', owner)
+            self.table.setItem(fileName, u'installer', owner)
         if notify_bain:
             self._notify_bain(changed={info.abs_path})
         return info
@@ -1456,7 +1456,7 @@ class DefaultIniInfo(DefaultIniFile, INIInfo):
     def is_default_tweak(self): return True
 
 # noinspection PyUnusedLocal
-def ini_info_factory(fullpath, load_cache='Ignored'):
+def ini_info_factory(fullpath, load_cache=u'Ignored'):
     """INIInfos factory
     :param fullpath: fullpath to the ini file to wrap
     :param load_cache: dummy param used in INIInfos#new_info factory call
@@ -2027,7 +2027,7 @@ class ModInfos(FileInfos):
         changed = []
         toGhost = bass.settings.get(u'bash.mods.autoGhost',False)
         if force or toGhost:
-            allowGhosting = self.table.getColumn('allowGhosting')
+            allowGhosting = self.table.getColumn(u'allowGhosting')
             for mod, modInfo in self.iteritems():
                 modGhost = toGhost and not load_order.cached_is_active(mod) \
                            and allowGhosting.get(mod, True)
@@ -2042,7 +2042,7 @@ class ModInfos(FileInfos):
         #--Mods that need to be rescanned - call rescanMergeable !
         newMods = []
         self.mergeable.clear()
-        name_mergeInfo = self.table.getColumn('mergeInfo')
+        name_mergeInfo = self.table.getColumn(u'mergeInfo')
         #--Add known/unchanged and esms - we need to scan dependent mods
         # first to account for mergeability of their masters
         for mpath, modInfo in sorted(self.items(),
@@ -2065,7 +2065,7 @@ class ModInfos(FileInfos):
         """Rescan specified mods. Return value is only meaningful when
         return_results is set to True."""
         messagetext = _(u'Check ESL Qualifications') if bush.game.check_esl \
-            else _(u"Mark Mergeable")
+            else _(u'Mark Mergeable')
         with prog or balt.Progress(_(messagetext) + u' ' * 30) as prog:
             return self._rescanMergeable(names, prog, doCBash, return_results)
 
@@ -2081,7 +2081,7 @@ class ModInfos(FileInfos):
             is_mergeable = isCBashMergeable
         else:
             is_mergeable = isPBashMergeable
-        mod_mergeInfo = self.table.getColumn('mergeInfo')
+        mod_mergeInfo = self.table.getColumn(u'mergeInfo')
         progress.setFull(max(len(names),1))
         result, tagged_no_merge = OrderedDict(), set()
         for i,fileName in enumerate(names):
@@ -2120,15 +2120,15 @@ class ModInfos(FileInfos):
     def reloadBashTags(self):
         """Reloads bash tags for all mods set to receive automatic bash tags."""
         for modName, mod in self.iteritems():
-            autoTag = self.table.getItem(modName, 'autoBashTags')
+            autoTag = self.table.getItem(modName, u'autoBashTags')
             if autoTag is None and self.table.getItem(
-                    modName, 'bashTags') is None:
+                    modName, u'bashTags') is None:
                 # A new mod, set autoBashTags to True (default)
-                self.table.setItem(modName, 'autoBashTags', True)
+                self.table.setItem(modName, u'autoBashTags', True)
                 autoTag = True
             elif autoTag is None:
                 # An old mod that had manual bash tags added, disable autoBashTags
-                self.table.setItem(modName, 'autoBashTags', False)
+                self.table.setItem(modName, u'autoBashTags', False)
             if autoTag:
                 mod.reloadBashTags()
 
@@ -2160,16 +2160,16 @@ class ModInfos(FileInfos):
         merged_,imported_ = set(),set()
         patches = masters & self.bashed_patches
         for patch in patches:
-            patchConfigs = self.table.getItem(patch, 'bash.patch.configs')
+            patchConfigs = self.table.getItem(patch, u'bash.patch.configs')
             if not patchConfigs: continue
-            patcherstr = 'CBash_PatchMerger' if patcher.configIsCBash(
-                patchConfigs) else 'PatchMerger'
-            if patchConfigs.get(patcherstr,{}).get('isEnabled'):
-                config_checked = patchConfigs[patcherstr]['configChecks']
+            patcherstr = u'CBash_PatchMerger' if patcher.configIsCBash(
+                patchConfigs) else u'PatchMerger'
+            if patchConfigs.get(patcherstr,{}).get(u'isEnabled'):
+                config_checked = patchConfigs[patcherstr][u'configChecks']
                 for modName in config_checked:
                     if config_checked[modName] and modName in self:
                         merged_.add(modName)
-            imported_.update(x for x in patchConfigs.get('ImportedMods', ()) if x in self)
+            imported_.update(x for x in patchConfigs.get(u'ImportedMods', ()) if x in self)
         return merged_,imported_
 
     def getModList(self,showCRC=False,showVersion=True,fileInfo=None,wtxt=False):
@@ -2259,11 +2259,11 @@ class ModInfos(FileInfos):
         if dir_removed:
             tagList = _tags(_(u'Removed by %s: ') % tags_file,
                             sorted(dir_removed), tagList)
-        if not modInfos.table.getItem(mname, 'autoBashTags') and \
-               modInfos.table.getItem(mname, 'bashTags', u''):
+        if not modInfos.table.getItem(mname, u'autoBashTags') and \
+               modInfos.table.getItem(mname, u'bashTags', u''):
             tagList = _tags(
                 _(u'From Manual (overrides all other sources): '),
-                sorted(modInfos.table.getItem(mname, 'bashTags', u'')),
+                sorted(modInfos.table.getItem(mname, u'bashTags', u'')),
                 tagList)
         return _tags(_(u'Result: '), sorted(modInfo.getBashTags()), tagList)
 
@@ -2448,7 +2448,7 @@ class ModInfos(FileInfos):
 
     def getDirtyMessage(self, modname):
         """Returns a dirty message from LOOT."""
-        if self.table.getItem(modname, 'ignoreDirty', False):
+        if self.table.getItem(modname, u'ignoreDirty', False):
             return False, u''
         return configHelpers.getDirtyMessage(modname, self)
 
@@ -2542,7 +2542,7 @@ class ModInfos(FileInfos):
     def files_to_delete(self, filenames, **kwargs):
         for f in set(filenames):
             if f.s in bush.game.masterFiles:
-                if kwargs.pop('raise_on_master_deletion', True):
+                if kwargs.pop(u'raise_on_master_deletion', True):
                     raise BoltError(
                         u"Cannot delete the game's master file(s).")
                 else:
@@ -2594,7 +2594,7 @@ class ModInfos(FileInfos):
             if authorDir.isdir():
                 return authorDir
         #--Use group subdirectory instead?
-        file_group = self.table.getItem(name, 'group')
+        file_group = self.table.getItem(name, u'group')
         if file_group:
             groupDir = dest_dir.join(file_group)
             if groupDir.isdir():
@@ -2605,7 +2605,7 @@ class ModInfos(FileInfos):
     def getVersion(self, fileName):
         """Extracts and returns version number for fileName from header.hedr.description."""
         if not fileName in self.data or not self.data[fileName].header:
-            return ''
+            return u''
         maVersion = reVersion.search(self[fileName].header.description)
         return (maVersion and maVersion.group(2)) or u''
 
@@ -2723,7 +2723,7 @@ class ModInfos(FileInfos):
                             (arcSaves, newSaves))
         load_order.swap(arcPath, newPath)
         # Swap Oblivion version to memorized version
-        voNew = saveInfos.profiles.setItemDefault(newSaves, 'vOblivion',
+        voNew = saveInfos.profiles.setItemDefault(newSaves, u'vOblivion',
                                                   self.voCurrent)
         if voNew in self.voAvailable: self.setOblivionVersion(voNew)
 
@@ -2898,7 +2898,7 @@ class BSAInfos(FileInfos):
 
         class BSAInfo(FileInfo, _bsa_type):
             _default_mtime = time.mktime(
-                time.strptime('01-01-2006 00:00:00', '%m-%d-%Y %H:%M:%S'))
+                time.strptime(u'01-01-2006 00:00:00', '%m-%d-%Y %H:%M:%S'))
 
             def __init__(self, fullpath, load_cache=False):
                 try:  # Never load_cache for memory reasons - let it be
@@ -3298,30 +3298,30 @@ def initSettings(readOnly=False, _dat=u'BashSettings.dat',
     except pickle.UnpicklingError as err:
         msg = _(
             u"Error reading the Bash Settings database (the error is: '%s'). "
-            u"This is probably not recoverable with the current file. Do you "
-            u"want to try the backup BashSettings.dat? (It will have all your "
-            u"UI choices of the time before last that you used Wrye Bash.")
-        usebck = balt.askYes(None, msg % repr(err), _(u"Settings Load Error"))
+            u'This is probably not recoverable with the current file. Do you '
+            u'want to try the backup BashSettings.dat? (It will have all your '
+            u'UI choices of the time before last that you used Wrye Bash.')
+        usebck = balt.askYes(None, msg % repr(err), _(u'Settings Load Error'))
         if usebck:
             try:
                 bass.settings = _loadBakOrEmpty()
             except pickle.UnpicklingError as err:
                 msg = _(
-                    u"Error reading the BackupBash Settings database (the "
+                    u'Error reading the BackupBash Settings database (the '
                     u"error is: '%s'). This is probably not recoverable with "
-                    u"the current file. Do you want to delete the corrupted "
-                    u"settings and load Wrye Bash without your saved UI "
+                    u'the current file. Do you want to delete the corrupted '
+                    u'settings and load Wrye Bash without your saved UI '
                     u"settings?. (Otherwise Wrye Bash won't start up)")
                 delete = balt.askYes(None, msg % repr(err),
-                                     _(u"Settings Load Error"))
+                                     _(u'Settings Load Error'))
                 if delete: bass.settings = _loadBakOrEmpty(delBackup=True)
                 else:raise
         else:
             msg = _(
-                u"Do you want to delete the corrupted settings and load Wrye "
-                u"Bash without your saved UI settings?. (Otherwise Wrye Bash "
+                u'Do you want to delete the corrupted settings and load Wrye '
+                u'Bash without your saved UI settings?. (Otherwise Wrye Bash '
                 u"won't start up)")
-            delete = balt.askYes(None, msg, _(u"Settings Load Error"))
+            delete = balt.askYes(None, msg, _(u'Settings Load Error'))
             if delete: # ignore bak but don't delete
                 bass.settings = _loadBakOrEmpty(ignoreBackup=True)
             else: raise

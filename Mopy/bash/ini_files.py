@@ -403,11 +403,11 @@ class DefaultIniFile(IniFile):
         self.lines, current_line = [], 0
         self._ci_settings_cache_linenum = OrderedLowerDict()
         for sect, setts in settings_dict.iteritems():
-            self.lines.append('[' + str(sect) + ']')
+            self.lines.append(u'[' + unicode(sect) + u']')
             self._ci_settings_cache_linenum[sect] = OrderedLowerDict()
             current_line += 1
             for sett, val in setts.iteritems():
-                self.lines.append(str(sett) + '=' + str(val))
+                self.lines.append(unicode(sett) + u'=' + unicode(val))
                 self._ci_settings_cache_linenum[sect][sett] = (val, current_line)
                 current_line += 1
         self._deleted_cache = self.__empty
@@ -423,7 +423,7 @@ class DefaultIniFile(IniFile):
         instantiation of the default ini is with windows EOL."""
         if as_unicode:
             return [unicode(l) for l in self.lines]
-        return '\r\n'.join(self.lines) + '\r\n'  # add a newline at the end of the ini
+        return u'\r\n'.join(self.lines) + u'\r\n'  # add a newline at the end of the ini
 
     # Abstract for DefaultIniFile, bit of a smell
     def do_update(self): raise AbstractError

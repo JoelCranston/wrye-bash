@@ -48,16 +48,16 @@ class SreNPC(object):
     """NPC change record."""
     __slots__ = ('form','health','unused2','attributes','acbs','spells','factions','full','ai','skills','modifiers')
     sre_flags = Flags(0, Flags.getNames(
-        (0,'form'),
-        (2,'health'),
-        (3,'attributes'),
-        (4,'acbs'),
-        (5,'spells'),
-        (6,'factions'),
-        (7,'full'),
-        (8,'ai'),
-        (9,'skills'),
-        (28,'modifiers'),
+        (0,u'form'),
+        (2,u'health'),
+        (3,u'attributes'),
+        (4,u'acbs'),
+        (5,u'spells'),
+        (6,u'factions'),
+        (7,u'full'),
+        (8,u'ai'),
+        (9,u'skills'),
+        (28,u'modifiers'),
         ))
 
     class ACBS(object):
@@ -222,11 +222,11 @@ class SreNPC(object):
 class SaveFile(object):
     """Represents a Tes4 Save file."""
     recordFlags = Flags(0,Flags.getNames(
-        'form','baseid','moved','havocMoved','scale','allExtra','lock','owner','unk8','unk9',
-        'mapMarkerFlags','hadHavokMoveFlag','unk12','unk13','unk14','unk15',
-        'emptyFlag','droppedItem','doorDefaultState','doorState','teleport',
-        'extraMagic','furnMarkers','oblivionFlag','movementExtra','animation',
-        'script','inventory','created','unk29','enabled'))
+        u'form',u'baseid',u'moved',u'havocMoved',u'scale',u'allExtra',u'lock',u'owner',u'unk8',u'unk9',
+        u'mapMarkerFlags',u'hadHavokMoveFlag',u'unk12',u'unk13',u'unk14',u'unk15',
+        u'emptyFlag',u'droppedItem',u'doorDefaultState',u'doorState',u'teleport',
+        u'extraMagic',u'furnMarkers',u'oblivionFlag',u'movementExtra',u'animation',
+        u'script',u'inventory',u'created',u'unk29',u'enabled'))
 
     def __init__(self,saveInfo=None,canSave=True):
         self.fileInfo = saveInfo
@@ -338,7 +338,7 @@ class SaveFile(object):
     def save(self,outPath=None,progress=None):
         """Save data to file.
         outPath -- Path of the output file to write to. Defaults to original file path."""
-        if not self.canSave: raise StateError(u"Insufficient data to write file.")
+        if not self.canSave: raise StateError(u'Insufficient data to write file.')
         outPath = outPath or self.fileInfo.getPath()
         with outPath.open(u'wb') as out:
             def _pack(fmt, *data):
@@ -354,7 +354,7 @@ class SaveFile(object):
             _pack('=IIB',5+len(pcName)+1+len(self.postNameHeader),
                 self.saveNum, len(pcName)+1)
             out.write(pcName)
-            out.write('\x00')
+            out.write(b'\x00')
             out.write(self.postNameHeader)
             #--Masters
             _pack('B',len(self.masters))
@@ -624,12 +624,12 @@ class SaveFile(object):
             if fullAttr in citem.__class__.__slots__:
                 full = citem.__getattribute__(fullAttr)
             else:
-                full = citem.getSubString('FULL')
+                full = citem.getSubString(b'FULL')
             if full:
                 createdCounts[(citem.recType, full)] += 1
             progress.plus()
         for key in createdCounts.keys()[:]:
-            minCount = (50,100)[key[0] == 'ALCH']
+            minCount = (50,100)[key[0] == b'ALCH']
             if createdCounts[key] < minCount:
                 del createdCounts[key]
         #--Change records
@@ -658,7 +658,7 @@ class SaveFile(object):
                 if 'full' in citem.__class__.__slots__:
                     full = citem.__getattribute__('full')
                 else:
-                    full = citem.getSubString('FULL')
+                    full = citem.getSubString(b'FULL')
                 if full and (citem.recType,full) in uncreateKeys:
                     uncreated.add(citem.fid)
                     numUncreated += 1
@@ -739,24 +739,24 @@ class SaveSpells(object):
         saveName = self.saveInfo.name
         progress(progress.full-1,saveName.s)
         for record in saveFile.created:
-            if record.recType == 'SPEL':
+            if record.recType == b'SPEL':
                 allSpells[(saveName,getObjectIndex(record.fid))] = record.getTypeCopy()
 
     def importMod(self,modInfo):
         """Imports spell info from specified mod."""
         #--Spell list already extracted?
-        if 'bash.spellList' in modInfo.extras:
-            self.allSpells.update(modInfo.extras['bash.spellList'])
+        if u'bash.spellList' in modInfo.extras:
+            self.allSpells.update(modInfo.extras[u'bash.spellList'])
             return
         #--Else extract spell list
-        loadFactory = LoadFactory(False, MreRecord.type_class['SPEL'])
+        loadFactory = LoadFactory(False, MreRecord.type_class[b'SPEL'])
         modFile = ModFile(modInfo, loadFactory)
         try: modFile.load(True)
         except ModError as err:
             deprint(_(u'skipped mod due to read error (%s)') % err)
             return
-        modFile.convertToLongFids(('SPEL',))
-        spells = modInfo.extras['bash.spellList'] = dict(
+        modFile.convertToLongFids((b'SPEL',))
+        spells = modInfo.extras[u'bash.spellList'] = dict(
             [(record.fid,record) for record in modFile.SPEL.getActiveRecords()])
         self.allSpells.update(spells)
 
@@ -819,7 +819,7 @@ class SaveEnchantments(object):
         saveName = self.saveInfo.name
         progress(progress.full-1,saveName.s)
         for index,record in enumerate(saveFile.created):
-            if record.recType == 'ENCH':
+            if record.recType == b'ENCH':
                 record = record.getTypeCopy()
                 record.getSize() #--Since type copy makes it changed.
                 saveFile.created[index] = record
