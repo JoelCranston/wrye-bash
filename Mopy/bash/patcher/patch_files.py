@@ -67,7 +67,7 @@ class _PFile(object):
         loadMods = [m for m in load_order.cached_lower_loading_espms(
             self.patchName) if load_order.cached_is_active(m)]
         if not loadMods:
-            raise BoltError(u"No active mods loading before the bashed patch")
+            raise BoltError(u'No active mods loading before the bashed patch')
         self.loadMods = tuple(loadMods)
         self.loadSet = frozenset(self.loadMods)
         self.set_mergeable_mods([])
@@ -82,22 +82,22 @@ class _PFile(object):
 
     def _log_header(self, log, patch_name):
         log.setHeader((u'= %s' % patch_name) + u' ' + u'=' * 30 + u'#', True)
-        log(u"{{CONTENTS=1}}")
+        log(u'{{CONTENTS=1}}')
         #--Load Mods and error mods
         log.setHeader(u'= ' + _(u'Overview'), True)
         log.setHeader(u'=== ' + _(u'Date/Time'))
         log(u'* ' + format_date(time.time()))
-        log(u'* ' + _(u'Elapsed Time: ') + 'TIMEPLACEHOLDER')
+        log(u'* ' + _(u'Elapsed Time: ') + u'TIMEPLACEHOLDER')
         def _link(link_id):
             return (readme_url(mopy=bass.dirs[u'mopy'], advanced=True),
                     u'#%s' % link_id)
         if self.patcher_mod_skipcount:
             log.setHeader(u'=== ' + _(u'Skipped Imports'))
-            log(_(u"The following import patchers skipped records because the "
-                  u"imported record required a missing or non-active mod to "
-                  u"work properly. If this was not intentional, rebuild the "
-                  u"patch after either deactivating the imported mods listed "
-                  u"below or activating the missing mod(s)."))
+            log(_(u'The following import patchers skipped records because the '
+                  u'imported record required a missing or non-active mod to '
+                  u'work properly. If this was not intentional, rebuild the '
+                  u'patch after either deactivating the imported mods listed '
+                  u'below or activating the missing mod(s).'))
             for patcher, mod_skipcount in \
                     self.patcher_mod_skipcount.iteritems():
                 log(u'* ' + _(u'%s skipped %d records:') % (
@@ -108,36 +108,36 @@ class _PFile(object):
                         mod, skipcount))
         if self.unFilteredMods:
             log.setHeader(u'=== ' + _(u'Unfiltered Mods'))
-            log(_(u"The following mods were active when the patch was built. "
-                  u"For the mods to work properly, you should deactivate the "
-                  u"mods and then rebuild the patch with the mods [["
-                  u"%s%s|Merged]] in.") % _link(u'patch-filter'))
+            log(_(u'The following mods were active when the patch was built. '
+                  u'For the mods to work properly, you should deactivate the '
+                  u'mods and then rebuild the patch with the mods [['
+                  u'%s%s|Merged]] in.') % _link(u'patch-filter'))
             for mod in self.unFilteredMods: log(u'* ' + mod.s)
         if self.loadErrorMods:
             log.setHeader(u'=== ' + _(u'Load Error Mods'))
-            log(_(u"The following mods had load errors and were skipped while "
-                  u"building the patch. Most likely this problem is due to a "
-                  u"badly formatted mod. For more info, see [["
-                  u"http://www.uesp.net/wiki/Tes4Mod:Wrye_Bash/Bashed_Patch"
-                  u"#Error_Messages|Bashed Patch: Error Messages]]."))
+            log(_(u'The following mods had load errors and were skipped while '
+                  u'building the patch. Most likely this problem is due to a '
+                  u'badly formatted mod. For more info, see [['
+                  u'http://www.uesp.net/wiki/Tes4Mod:Wrye_Bash/Bashed_Patch'
+                  u'#Error_Messages|Bashed Patch: Error Messages]].'))
             for (mod, e) in self.loadErrorMods: log(
                 u'* ' + mod.s + u': %s' % e)
         if self.worldOrphanMods:
             log.setHeader(u'=== ' + _(u'World Orphans'))
-            log(_(u"The following mods had orphaned world groups, which were "
-                  u"skipped. This is not a major problem, but you might want "
+            log(_(u'The following mods had orphaned world groups, which were '
+                  u'skipped. This is not a major problem, but you might want '
                   u"to use Bash's [[%s%s|Remove World Orphans]] command to "
-                  u"repair the mods.") % _link(u'modsRemoveWorldOrphans'))
+                  u'repair the mods.') % _link(u'modsRemoveWorldOrphans'))
             for mod in self.worldOrphanMods: log(u'* ' + mod.s)
         if self.compiledAllMods:
             log.setHeader(u'=== ' + _(u'Compiled All'))
-            log(_(u"The following mods have an empty compiled version of "
-                u"genericLoreScript. This is usually a sign that the mod "
-                u"author did a __compile all__ while editing scripts. This "
-                u"may interfere with the behavior of other mods that "
-                u"intentionally modify scripts from Oblivion.esm. (E.g. Cobl "
+            log(_(u'The following mods have an empty compiled version of '
+                u'genericLoreScript. This is usually a sign that the mod '
+                u'author did a __compile all__ while editing scripts. This '
+                u'may interfere with the behavior of other mods that '
+                u'intentionally modify scripts from Oblivion.esm. (E.g. Cobl '
                 u"and Unofficial Oblivion Patch.) You can use Bash's [["
-                u"%s%s|Decompile All]] command to repair the mods."
+                u'%s%s|Decompile All]] command to repair the mods.'
                   ) % _link(u'modsDecompileAll'))
             for mod in self.compiledAllMods: log(u'* ' + mod.s)
         log.setHeader(u'=== ' + _(u'Active Mods'), True)
@@ -193,7 +193,7 @@ class PatchFile(_PFile, ModFile):
 
     def initFactories(self,progress):
         """Gets load factories."""
-        progress(0,_(u"Processing."))
+        progress(0,_(u'Processing.'))
         readClasses = {x for x in bush.game.readClasses}
         writeClasses = {x for x in bush.game.writeClasses}
         for patcher in self._patcher_instances:
@@ -221,15 +221,15 @@ class PatchFile(_PFile, ModFile):
                 modFile = ModFile(modInfo,loadFactory)
                 modFile.load(True,SubProgress(progress,index,index+0.5))
             except ModError as e:
-                deprint('load error:', traceback=True)
+                deprint(u'load error:', traceback=True)
                 self.loadErrorMods.append((modName,e))
                 continue
             try:
                 #--Error checks
-                if 'WRLD' in modFile.tops and modFile.WRLD.orphansSkipped:
+                if b'WRLD' in modFile.tops and modFile.WRLD.orphansSkipped:
                     self.worldOrphanMods.append(modName)
                 # TODO adapt for other games
-                if bush.game.fsName == u'Oblivion' and 'SCPT' in \
+                if bush.game.fsName == u'Oblivion' and b'SCPT' in \
                         modFile.tops and modName != GPath(u'Oblivion.esm'):
                     gls = modFile.SCPT.getRecord(0x00025811)
                     if gls and gls.compiled_size == 4 and gls.last_index == 0:
@@ -254,7 +254,7 @@ class PatchFile(_PFile, ModFile):
             except CancelError:
                 raise
             except:
-                print(_(u"MERGE/SCAN ERROR:"),modName.s)
+                print(_(u'MERGE/SCAN ERROR:'),modName.s)
                 raise
         progress(progress.full,_(u'Load mods scanned.'))
 
@@ -264,7 +264,7 @@ class PatchFile(_PFile, ModFile):
         mergeIdsAdd = mergeIds.add
         loadSet = self.loadSet
         modFile.convertToLongFids()
-        badForm = (GPath(u"Oblivion.esm"),0xA31D) #--DarkPCB record
+        badForm = (GPath(u'Oblivion.esm'),0xA31D) #--DarkPCB record
         selfLoadFactoryRecTypes = self.loadFactory.recTypes
         selfMergeFactoryType_class = self.mergeFactory.type_class
         selfReadFactoryAddClass = self.readFactory.addClass
@@ -280,7 +280,7 @@ class PatchFile(_PFile, ModFile):
             patchBlock = getattr(self,blockType)
             patchBlockSetRecord = patchBlock.setRecord
             if not isinstance(patchBlock,MobObjects):
-                raise BoltError(u"Merge unsupported for type: "+blockType)
+                raise BoltError(u'Merge unsupported for type: '+blockType)
             filtered = []
             filteredAppend = filtered.append
             loadSetIssuperset = loadSet.issuperset
@@ -309,8 +309,8 @@ class PatchFile(_PFile, ModFile):
     def update_patch_records_from_mod(self, modFile):
         """Scans file and overwrites own records with modfile records."""
         #--Keep all MGEFs
-        modFile.convertToLongFids(('MGEF',))
-        if 'MGEF' in modFile.tops:
+        modFile.convertToLongFids((b'MGEF',))
+        if b'MGEF' in modFile.tops:
             for record in modFile.MGEF.getActiveRecords():
                 self.MGEF.setRecord(record.getTypeCopy())
         #--Merger, override.
@@ -339,7 +339,7 @@ class PatchFile(_PFile, ModFile):
         # Convert masters to short fids
         self.tes4.masters = self.getMastersUsed()
         self.convertToShortFids()
-        progress(1.0,_(u"Compiled."))
+        progress(1.0,_(u'Compiled.'))
         # Build the description
         numRecords = sum([x.getNumRecords(False) for x in self.tops.values()])
         self.tes4.description = (
@@ -366,21 +366,21 @@ class CBash_PatchFile(_PFile, ObModFile):
         self.mgef_name = bush.game.mgef_name.copy()
         self.hostileEffects = bush.game.hostile_effects.copy()
         self.scanSet = set()
-        self.races_vanilla = ['argonian', 'breton', 'dremora', 'dark elf',
-                              'dark seducer', 'golden saint', 'high elf',
-                              'imperial', 'khajiit', 'nord', 'orc', 'redguard',
-                              'wood elf']
-        self.races_data = {'EYES': [], 'HAIR': []}
+        self.races_vanilla = [u'argonian', u'breton', u'dremora', u'dark elf',
+                              u'dark seducer', u'golden saint', u'high elf',
+                              u'imperial', u'khajiit', u'nord', u'orc',
+                              u'redguard', u'wood elf']
+        self.races_data = {b'EYES': [], b'HAIR': []}
         _PFile.__init__(self, patch_name)
 
     def mergeModFile(self,modFile,progress,doFilter,iiMode,group):
         """Copies contents of modFile group into self."""
-        if iiMode and group not in ('LVLC','LVLI','LVSP'): return
+        if iiMode and group not in (b'LVLC',b'LVLI',b'LVSP'): return
         mergeIds = self.mergeIds
-        badForm = FormID(GPath(u"Oblivion.esm"),0xA31D) #--DarkPCB record
+        badForm = FormID(GPath(u'Oblivion.esm'),0xA31D) #--DarkPCB record
         for record in getattr(modFile,group):
             #don't merge deleted items
-            if record.IsDeleted and group not in ('REFRS','ACHRS','ACRES'):
+            if record.IsDeleted and group not in (b'REFRS',b'ACHRS',b'ACRES'):
                 print(group)
                 continue
             fid = record.fid
@@ -392,16 +392,16 @@ class CBash_PatchFile(_PFile, ObModFile):
                     if doFilter:
                         record.mergeFilter(self)
                         if record.HasInvalidFormIDs():
-                            print(u"Debugging mergeModFile - Skipping", fid, u"in mod (", record.GetParentMod().ModName, u")due to failed merge filter")
+                            print(u'Debugging mergeModFile - Skipping', fid, u'in mod (', record.GetParentMod().ModName, u')due to failed merge filter')
                             dump_record(record)
                             print()
                             continue
                     else:
-                        print(u"Debugging mergeModFile - Skipping", fid, u"in mod (", record.GetParentMod().ModName, u")due to invalid formIDs")
+                        print(u'Debugging mergeModFile - Skipping', fid, u'in mod (', record.GetParentMod().ModName, u')due to invalid formIDs')
                         dump_record(record)
                         print()
                         continue
-                if record.IsDeleted and group in ('REFRS','ACHRS','ACRES'):
+                if record.IsDeleted and group in (b'REFRS',b'ACHRS',b'ACRES'):
                     undelete = True
                     override = record.Conflicts()[1].CopyAsOverride(self, UseWinningParents=True)
                 else:
@@ -418,16 +418,16 @@ class CBash_PatchFile(_PFile, ObModFile):
         #Parent records must be processed before any children
         #EYES,HAIR must be processed before RACE
         # This should probably be updated for FO3/FNV/TES5 - see issue #287
-        groupOrder = ['GMST','GLOB','MGEF','CLAS','HAIR','EYES','RACE',
-                      'SOUN','SKIL','SCPT','LTEX','ENCH','SPEL','BSGN',
-                      'ACTI','APPA','ARMO','BOOK','CLOT','DOOR','INGR',
-                      'LIGH','MISC','STAT','GRAS','TREE','FLOR','FURN',
-                      'WEAP','AMMO','FACT','LVLC','LVLI','LVSP','NPC_',
-                      'CREA','CONT','SLGM','KEYM','ALCH','SBSP','SGST',
-                      'WTHR','QUST','IDLE','PACK','CSTY','LSCR','ANIO',
-                      'WATR','EFSH','CLMT','REGN','DIAL','INFOS','WRLD',
-                      'ROADS','CELL','CELLS','PGRDS','LANDS','ACHRS',
-                      'ACRES','REFRS']
+        groupOrder = [b'GMST',b'GLOB',b'MGEF',b'CLAS',b'HAIR',b'EYES',b'RACE',
+                      b'SOUN',b'SKIL',b'SCPT',b'LTEX',b'ENCH',b'SPEL',b'BSGN',
+                      b'ACTI',b'APPA',b'ARMO',b'BOOK',b'CLOT',b'DOOR',b'INGR',
+                      b'LIGH',b'MISC',b'STAT',b'GRAS',b'TREE',b'FLOR',b'FURN',
+                      b'WEAP',b'AMMO',b'FACT',b'LVLC',b'LVLI',b'LVSP',b'NPC_',
+                      b'CREA',b'CONT',b'SLGM',b'KEYM',b'ALCH',b'SBSP',b'SGST',
+                      b'WTHR',b'QUST',b'IDLE',b'PACK',b'CSTY',b'LSCR',b'ANIO',
+                      b'WATR',b'EFSH',b'CLMT',b'REGN',b'DIAL',b'INFOS',b'WRLD',
+                      b'ROADS',b'CELL',b'CELLS',b'PGRDS',b'LANDS',b'ACHRS',
+                      b'ACRES',b'REFRS']
 
         iiModeSet = {u'InventOnly', u'IIM'}
         levelLists = bush.game.listTypes
@@ -455,9 +455,9 @@ class CBash_PatchFile(_PFile, ObModFile):
 
         if self.Current.LookupModFileLoadOrder(self.patchName.temp.s) <= 0:
             print((u'\n'.join(
-                (_(u"Please copy this entire message and report it on the "
-                   u"current official thread at "
-                   u"https://afkmods.com/index.php?/topic/4966-wrye-bash-all-games/."),
+                (_(u'Please copy this entire message and report it on the '
+                   u'current official thread at '
+                   u'https://afkmods.com/index.php?/topic/4966-wrye-bash-all-games/.'),
                  _(u'Also with:'),
                  _(u'1. Your OS:'),
                  _(u'2. Your installed MS Visual C++ redistributable '
@@ -579,13 +579,13 @@ class CBash_PatchFile(_PFile, ObModFile):
                             if record.HasInvalidFormIDs():
                                 record.mergeFilter(self)
                                 if record.HasInvalidFormIDs():
-                                    print(u"Debugging buildPatch - Skipping", record.fid, u"in mod (", record.GetParentMod().ModName, u")due to failed merge filter")
+                                    print(u'Debugging buildPatch - Skipping', record.fid, u'in mod (', record.GetParentMod().ModName, u')due to failed merge filter')
                                     dump_record(record)
                                     print()
                                     continue
 
                         if not isScanned and record.HasInvalidFormIDs():
-                            print(u"Debugging buildPatch - Skipping", record.fid, u"in mod (", record.GetParentMod().ModName, u")due to invalid formIDs")
+                            print(u'Debugging buildPatch - Skipping', record.fid, u'in mod (', record.GetParentMod().ModName, u')due to invalid formIDs')
                             dump_record(record)
                             print()
                             continue
@@ -647,9 +647,9 @@ class CBash_PatchFile(_PFile, ObModFile):
         for index,patcher in enumerate(sorted(self._patcher_instances, key=attrgetter('editOrder'))):
             subProgress(index,_(u'Completing')+u'\n%s...' % patcher.getName())
             patcher.buildPatchLog(log)
-        progress(1.0,_(u"Compiled."))
+        progress(1.0,_(u'Compiled.'))
         #--Description
         numRecords = sum([len(x) for x in self.aggregates.values()])
         self.TES4.description = (
-                _(u"Updated: %s") % format_date(time.time()) + u'\n\n' + _(
+                _(u'Updated: %s') % format_date(time.time()) + u'\n\n' + _(
                 u'Records Changed') + u': %d' % numRecords)

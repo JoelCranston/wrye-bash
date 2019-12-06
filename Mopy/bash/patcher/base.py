@@ -129,10 +129,10 @@ class AListPatcher(Abstract_Patcher):
         """Logs the Source mods for this patcher."""
         log(self.__class__.srcsHeader)
         if not self.srcs:
-            log(u". ~~%s~~" % _(u'None'))
+            log(u'. ~~%s~~' % _(u'None'))
         else:
             for srcFile in self.srcs:
-                log(u"* " +srcFile.s)
+                log(u'* ' +srcFile.s)
 
 class AMultiTweaker(Abstract_Patcher):
     """Combines a number of sub-tweaks which can be individually enabled and
@@ -180,7 +180,7 @@ class AMultiTweakItem(object):
             self.choiceValues.append(choice_tuple[1:])
         #--Config
         self.isEnabled = False
-        self.defaultEnabled = kwargs.get('defaultEnabled', False)
+        self.defaultEnabled = kwargs.get(u'defaultEnabled', False)
         self.chosen = 0
         #--Log
         self.logHeader = u'=== '+ self.tweak_name
@@ -219,7 +219,7 @@ class AMultiTweakItem(object):
     def isNew(self):
         """returns whether this tweak is new (i.e. whether the value was not
         loaded from a saved config"""
-        return getattr(self, "_isNew", False)
+        return getattr(self, '_isNew', False)
 
     def getListLabel(self):
         """Returns label to be used in list"""

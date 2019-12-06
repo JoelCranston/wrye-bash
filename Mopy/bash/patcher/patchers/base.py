@@ -195,12 +195,12 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
             progress.plus()
 
     def getReadClasses(self):
-        return tuple(
-            MreRecord.simpleTypes | ({'CELL', 'WRLD', 'REFR', 'ACHR', 'ACRE'}))
+        return tuple(MreRecord.simpleTypes | (
+            {b'CELL', b'WRLD', b'REFR', b'ACHR', b'ACRE'}))
 
     def getWriteClasses(self):
-        return tuple(
-            MreRecord.simpleTypes | ({'CELL', 'WRLD', 'REFR', 'ACHR', 'ACRE'}))
+        return tuple(MreRecord.simpleTypes | (
+        {b'CELL', b'WRLD', b'REFR', b'ACHR', b'ACRE'}))
 
     def scanModFile(self,modFile,progress):
         """Scans specified mod file to extract info. May add record to patch mod,
@@ -208,13 +208,13 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
         mapper = modFile.getLongMapper()
         patchCells = self.patchFile.CELL
         patchWorlds = self.patchFile.WRLD
-        modFile.convertToLongFids(('CELL','WRLD','REFR','ACRE','ACHR'))
+        modFile.convertToLongFids((b'CELL',b'WRLD',b'REFR',b'ACRE',b'ACHR'))
 ##        for type in MreRecord.simpleTypes:
 ##            for record in getattr(modFile,type).getActiveRecords():
 ##                record = record.getTypeCopy(mapper)
 ##                if record.fid in self.old_new:
 ##                    getattr(self.patchFile,type).setRecord(record)
-        if 'CELL' in modFile.tops:
+        if b'CELL' in modFile.tops:
             for cellBlock in modFile.CELL.cellBlocks:
                 cellImported = False
                 if cellBlock.cell.fid in patchCells.id_cellBlock:
@@ -244,7 +244,7 @@ class UpdateReferences(AUpdateReferences,ListPatcher):
                                 break
                         else:
                             patchCells.id_cellBlock[cellBlock.cell.fid].persistent.append(record)
-        if 'WRLD' in modFile.tops:
+        if b'WRLD' in modFile.tops:
             for worldBlock in modFile.WRLD.worldBlocks:
                 worldImported = False
                 if worldBlock.world.fid in patchWorlds.id_worldBlocks:
@@ -350,12 +350,13 @@ from ...parsers import CBash_FidReplacer
 
 class CBash_UpdateReferences(AUpdateReferences, CBash_ListPatcher):
     _read_write_records = (
-        'MOD', 'FACT', 'RACE', 'MGEF', 'SCPT', 'LTEX', 'ENCH', 'SPEL', 'BSGN',
-        'ACTI', 'APPA', 'ARMO', 'BOOK', 'CLOT', 'CONT', 'DOOR', 'INGR', 'LIGH',
-        'MISC', 'FLOR', 'FURN', 'WEAP', 'AMMO', 'NPC_', 'CREA', 'LVLC', 'SLGM',
-        'KEYM', 'ALCH', 'SGST', 'LVLI', 'WTHR', 'CLMT', 'REGN', 'CELLS',
-        'WRLD', 'ACHRS', 'ACRES', 'REFRS', 'DIAL', 'INFOS', 'QUST', 'IDLE',
-        'PACK', 'LSCR', 'LVSP', 'ANIO', 'WATR')
+        b'MOD', b'FACT', b'RACE', b'MGEF', b'SCPT', b'LTEX', b'ENCH', b'SPEL',
+        b'BSGN', b'ACTI', b'APPA', b'ARMO', 'BOOK', b'CLOT', b'CONT', b'DOOR',
+        b'INGR', b'LIGH', b'MISC', b'FLOR', b'FURN', b'WEAP', b'AMMO', b'NPC_',
+        b'CREA', b'LVLC', b'SLGM', b'KEYM', b'ALCH', b'SGST', b'LVLI', b'WTHR',
+        b'CLMT', b'REGN', b'CELLS', b'WRLD', b'ACHRS', b'ACRES', b'REFRS',
+        b'DIAL', b'INFOS', b'QUST', b'IDLE', b'PACK', b'LSCR', b'LVSP',
+        b'ANIO', b'WATR')
 
     def __init__(self, p_name, p_file, p_sources):
         super(CBash_UpdateReferences, self).__init__(p_name, p_file, p_sources)
@@ -470,7 +471,7 @@ class ImportPatcher(AImportPatcher, ListPatcher):
         log(self.__class__.logMsg)
         for type_,count in sorted(type_count.iteritems()):
             if count: log(u'* ' + _(u'Modified %(type)s Records: %(count)d')
-                          % {'type': type_, 'count': count})
+                          % {u'type': type_, u'count': count})
 
     def _plog1(self,log,mod_count): # common logging variation
         log(self.__class__.logMsg % sum(mod_count.values()))

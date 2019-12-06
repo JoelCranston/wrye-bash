@@ -49,13 +49,13 @@ class GlobalsTweak(DynamicNamedTweak, MultiTweakItem):
                         keep(record.fid)
                     break
         log(u'* ' + _(u'%(label)s set to') % {
-            'label': (u'%s ' % self.tweak_name)} + (u': %4.2f' % value))
+            u'label': (u'%s ' % self.tweak_name)} + (u': %4.2f' % value))
 
 class CBash_GlobalsTweak(DynamicNamedTweak, CBash_MultiTweakItem):
     """Sets a global to specified value"""
     scanOrder = 29
     editOrder = 29
-    tweak_read_classes = 'GLOB',
+    tweak_read_classes = b'GLOB',
 
     #--Patch Phase ------------------------------------------------------------
     def apply(self,modFile,record,bashTags):
@@ -76,7 +76,7 @@ class CBash_GlobalsTweak(DynamicNamedTweak, CBash_MultiTweakItem):
         """Will write to log."""
         #--Log
         if self.count: log(u'* ' + _(u'%(label)s set to') % {
-            'label': (u'%s ' % self.tweak_name)} + (u': %4.2f' % self.value))
+            u'label': (u'%s ' % self.tweak_name)} + (u': %4.2f' % self.value))
 
 #------------------------------------------------------------------------------
 class GmstTweak(DynamicNamedTweak, MultiTweakItem):
@@ -89,7 +89,7 @@ class GmstTweak(DynamicNamedTweak, MultiTweakItem):
         for eid,value in zip(eids,self.choiceValues[self.chosen]):
             if isOblivion and value < 0:
                 deprint(_(u"GMST values can't be negative - currently %s - "
-                          u"skipping setting GMST.") % value)
+                          u'skipping setting GMST.') % value)
                 return
             eidLower = eid.lower()
             for record in patchFile.GMST.records:
@@ -99,8 +99,8 @@ class GmstTweak(DynamicNamedTweak, MultiTweakItem):
                         keep(record.fid)
                     break
             else:
-                gmst = MreRecord.type_class['GMST'](
-                    RecordHeader('GMST', 0, 0, 0, 0))
+                gmst = MreRecord.type_class[b'GMST'](
+                    RecordHeader(b'GMST', 0, 0, 0, 0))
                 gmst.eid,gmst.value,gmst.longFids = eid,value,True
                 fid = gmst.fid = keep(gmst.getGMSTFid())
                 patchFile.GMST.setRecord(gmst)
@@ -124,7 +124,7 @@ class CBash_GmstTweak(DynamicNamedTweak, CBash_MultiTweakItem):
     """Sets a gmst to specified value"""
     scanOrder = 29
     editOrder = 29
-    tweak_read_classes = 'GMST',
+    tweak_read_classes = b'GMST',
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
@@ -136,15 +136,15 @@ class CBash_GmstTweak(DynamicNamedTweak, CBash_MultiTweakItem):
                 break
         else:
             return
-        if recEid.startswith(u"f") and type(newValue) != float:
-            deprint(_(u"converting custom value to float for GMST %s: %s") % (
+        if recEid.startswith(u'f') and type(newValue) != float:
+            deprint(_(u'converting custom value to float for GMST %s: %s') % (
                 recEid, newValue))
             newValue = float(newValue)
         if record.value != newValue:
             self.eid_count[eid] = 1
             if newValue < 0:
                 deprint(_(u"GMST values can't be negative - currently %s - "
-                          u"skipping setting GMST.") % newValue)
+                          u'skipping setting GMST.') % newValue)
                 return
             override = record.CopyAsOverride(self.patchFile)
             if override:
@@ -159,7 +159,7 @@ class CBash_GmstTweak(DynamicNamedTweak, CBash_MultiTweakItem):
         subProgress.setFull(max(len(values),1))
         pstate = 0
         for eid,value in zip(self.key,values):
-            subProgress(pstate, _(u"Finishing GMST Tweaks..."))
+            subProgress(pstate, _(u'Finishing GMST Tweaks...'))
             if not self.eid_count.get(eid,0):
                 self.eid_count[eid] = 1
                 record = patchFile.create_GMST(eid)
@@ -168,10 +168,10 @@ class CBash_GmstTweak(DynamicNamedTweak, CBash_MultiTweakItem):
                     print(patchFile.Current.Debug_DumpModFiles())
                     for conflict in patchFile.Current.LookupRecords(eid,False):
                         print(conflict.GetParentMod().ModName)
-                    raise StateError(u"Tweak Settings: Unable to create GMST!")
-                if eid.startswith("f") and type(value) != float:
-                    deprint(_(u"converting custom value to float for GMST"
-                              u" %s: %s") % (eid, value))
+                    raise StateError(u'Tweak Settings: Unable to create GMST!')
+                if eid.startswith(u'f') and type(value) != float:
+                    deprint(_(u'converting custom value to float for GMST'
+                              u' %s: %s') % (eid, value))
                     value = float(value)
                 record.value = value
             pstate += 1

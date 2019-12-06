@@ -28,7 +28,7 @@ PatcherInfo = namedtuple('PatcherInfo', ['clazz', 'twin_patcher', 'cls_vars'])
 
 def configIsCBash(patchConfigs): ##: belongs to basher but used also in bosh
     for key in patchConfigs:
-        if 'CBash' in key:
+        if u'CBash' in key:
             return True
     return False
 
@@ -43,7 +43,7 @@ def exportConfig(patch_name, config, isCBash, win, outDir):
     if outPath:
         table = bolt.Table(bolt.PickleDict(outPath))
         table.setItem(bolt.GPath(u'Saved Bashed Patch Configuration (%s)' % (
-            [u'Python', u'CBash'][isCBash])), 'bash.patch.configs', config)
+            [u'Python', u'CBash'][isCBash])), u'bash.patch.configs', config)
         table.save()
 
 def getPatchesPath(fileName):

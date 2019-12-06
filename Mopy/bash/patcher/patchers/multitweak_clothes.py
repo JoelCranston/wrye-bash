@@ -33,7 +33,7 @@ from ...patcher.patchers.base import MultiTweaker, CBash_MultiTweaker
 
 # Patchers: 30 ----------------------------------------------------------------
 class AClothesTweak(DynamicNamedTweak):
-    tweak_read_classes = 'CLOT',
+    tweak_read_classes = b'CLOT',
     clothes_flags = {
         u'hoods':    0x00000002,
         u'shirts':   0x00000004,
@@ -191,32 +191,32 @@ class CBash_ClothesTweak_Unblock(CBash_ClothesTweak):
 class _AClothesTweaker(AMultiTweaker):
     """Patches clothes in miscellaneous ways."""
 
-    _unblock = ((_(u"Unlimited Amulets"),
+    _unblock = ((_(u'Unlimited Amulets'),
                  _(u"Wear unlimited number of amulets - but they won't display."),
                  u'amulets.unblock.amulets',),
-                (_(u"Unlimited Rings"),
+                (_(u'Unlimited Rings'),
                  _(u"Wear unlimited number of rings - but they won't display."),
                  u'rings.unblock.rings'),
-                (_(u"Gloves Show Rings"),
-                 _(u"Gloves will always show rings. (Conflicts with Unlimited "
-                   u"Rings.)"),
+                (_(u'Gloves Show Rings'),
+                 _(u'Gloves will always show rings. (Conflicts with Unlimited '
+                   u'Rings.)'),
                  u'gloves.unblock.rings2'),
-                (_(u"Robes Show Pants"),
+                (_(u'Robes Show Pants'),
                 _(u"Robes will allow pants, greaves, skirts - but they'll clip."),
                 u'robes.unblock.pants'),
-                (_(u"Robes Show Amulets"),
-                _(u"Robes will always show amulets. (Conflicts with Unlimited "
-                  u"Amulets.)"),
+                (_(u'Robes Show Amulets'),
+                _(u'Robes will always show amulets. (Conflicts with Unlimited '
+                  u'Amulets.)'),
                 u'robes.show.amulets2'),)
-    _max_weight = ((_(u"Max Weight Amulets"),
-                _(u"Amulet weight will be capped."),
+    _max_weight = ((_(u'Max Weight Amulets'),
+                _(u'Amulet weight will be capped.'),
                 u'amulets.maxWeight',
                 (u'0.0',0),
                 (u'0.1',0.1),
                 (u'0.2',0.2),
                 (u'0.5',0.5),
                 (_(u'Custom'),0),),
-                (_(u"Max Weight Rings"),
+                (_(u'Max Weight Rings'),
                 _(u'Ring weight will be capped.'),
                 u'rings.maxWeight',
                 (u'0.0',0.0),
@@ -224,7 +224,7 @@ class _AClothesTweaker(AMultiTweaker):
                 (u'0.2',0.2),
                 (u'0.5',0.5),
                 (_(u'Custom'),0.0),),
-                (_(u"Max Weight Hoods"),
+                (_(u'Max Weight Hoods'),
                 _(u'Hood weight will be capped.'),
                 u'hoods.maxWeight',
                 (u'0.2',0.2),
@@ -246,7 +246,7 @@ class ClothesTweaker(_AClothesTweaker,MultiTweaker):
                       key=lambda a: a.tweak_name.lower())
 
     def scanModFile(self,modFile,progress):
-        if not self.isActive or 'CLOT' not in modFile.tops: return
+        if not self.isActive or b'CLOT' not in modFile.tops: return
         mapper = modFile.getLongMapper()
         patchRecords = self.patchFile.CLOT
         id_records = patchRecords.id_records

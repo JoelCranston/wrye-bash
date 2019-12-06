@@ -46,7 +46,7 @@ def _is_templated(record, flag_name):
 # Patchers: 30 ----------------------------------------------------------------
 class BasalNPCTweaker(MultiTweakItem):
     """Base for all NPC tweakers"""
-    tweak_read_classes = 'NPC_',
+    tweak_read_classes = b'NPC_',
 
     def scanModFile(self,modFile,progress,patchFile):
         mapper = modFile.getLongMapper()
@@ -59,7 +59,7 @@ class BasalNPCTweaker(MultiTweakItem):
 
 class BasalCreatureTweaker(MultiTweakItem):
     """Base for all Creature tweakers"""
-    tweak_read_classes = 'CREA',
+    tweak_read_classes = b'CREA',
 
     def scanModFile(self,modFile,progress,patchFile):
         mapper = modFile.getLongMapper()
@@ -71,11 +71,11 @@ class BasalCreatureTweaker(MultiTweakItem):
     def buildPatch(self,log,progress,patchFile): raise AbstractError
 
 class _NpcCTweak(CBash_MultiTweakItem):
-    tweak_read_classes = 'NPC_',
+    tweak_read_classes = b'NPC_',
     playerFid = FormID(GPath(u'Oblivion.esm'), 0x000007) # used in 4/6 derived
 
 class _CreaCTweak(CBash_MultiTweakItem):
-    tweak_read_classes = 'CREA',
+    tweak_read_classes = b'CREA',
 
 #------------------------------------------------------------------------------
 class AMAONPCSkeletonPatcher(AMultiTweakItem):
@@ -114,12 +114,12 @@ class MAONPCSkeletonPatcher(AMAONPCSkeletonPatcher,BasalNPCTweaker):
                 # with no skeleton assigned to them(!)
                 continue
             newModPath = u"Mayu's Projects[M]\\Animation " \
-                         u"Overhaul\\Vanilla\\SkeletonBeast.nif"
+                         u'Overhaul\\Vanilla\\SkeletonBeast.nif'
             try:
                 if oldModPath.lower() == \
                         u'characters\\_male\\skeletonsesheogorath.nif':
                     newModPath = u"Mayu's Projects[M]\\Animation " \
-                                 u"Overhaul\\Vanilla\\SkeletonSESheogorath.nif"
+                                 u'Overhaul\\Vanilla\\SkeletonSESheogorath.nif'
             except AttributeError:  # in case modPath was None. Try/Except
                 # has no overhead if exception isn't thrown.
                 pass
@@ -140,13 +140,13 @@ class CBash_MAONPCSkeletonPatcher(AMAONPCSkeletonPatcher, _NpcCTweak):
             elif choice == 2 and record.IsFemale: return
             oldModPath = record.modPath
             newModPath = u"Mayu's Projects[M]\\Animation " \
-                         u"Overhaul\\Vanilla\\SkeletonBeast.nif"
+                         u'Overhaul\\Vanilla\\SkeletonBeast.nif'
             try:
                 if oldModPath == \
                         u'characters\\_male\\skeletonsesheogorath.nif':  #
                     # modPaths do case insensitive comparisons by default
                     newModPath = u"Mayu's Projects[M]\\Animation " \
-                                 u"Overhaul\\Vanilla\\SkeletonSESheogorath.nif"
+                                 u'Overhaul\\Vanilla\\SkeletonSESheogorath.nif'
             except AttributeError:  # in case modPath was None. Try/Except
                 # has no overhead if exception isn't thrown.
                 pass
@@ -162,9 +162,9 @@ class CBash_MAONPCSkeletonPatcher(AMAONPCSkeletonPatcher, _NpcCTweak):
 class AVORB_NPCSkeletonPatcher(AMultiTweakItem):
     """Changes all NPCs to use the diverse skeleton for different look."""
     tweak_name = _(u"VadersApp's Oblivion Real Bodies Skeleton Tweaker")
-    tweak_tip = _(u"Changes all (modded and vanilla) NPCs to use diverse "
-                  u"skeletons for different look.  Not compatible with MAO, "
-                  u"Requires VadersApp's Oblivion Real Bodies.")
+    tweak_tip = _(u'Changes all (modded and vanilla) NPCs to use diverse '
+                  u'skeletons for different look.  Not compatible with MAO, '
+                  u"requires VadersApp's Oblivion Real Bodies.")
 
     def __init__(self):
         super(AVORB_NPCSkeletonPatcher, self).__init__(u'VORB',
@@ -217,7 +217,7 @@ class VORB_NPCSkeletonPatcher(AVORB_NPCSkeletonPatcher,BasalNPCTweaker):
                 except AttributeError:  # for freaking weird esps with
                     # NPC's with no skeleton assigned to them(!)
                     continue
-                specialSkelMesh = u"skel_special_%X.nif" % record.fid[1]
+                specialSkelMesh = u'skel_special_%X.nif' % record.fid[1]
                 if specialSkelMesh in skeletonSetSpecial:
                     newModPath = modSkeletonDir.join(specialSkelMesh)
                 else:
@@ -257,7 +257,7 @@ class CBash_VORB_NPCSkeletonPatcher(AVORB_NPCSkeletonPatcher, _NpcCTweak):
             except AttributeError:  # for freaking weird esps with NPC's with
                 # no skeleton assigned to them(!)
                 pass
-            specialSkelMesh = u"skel_special_%X.nif" % recordId[1]
+            specialSkelMesh = u'skel_special_%X.nif' % recordId[1]
             if specialSkelMesh in self.skeletonSetSpecial:
                 newModPath = self.modSkeletonDir.join(specialSkelMesh)
             else:
@@ -304,7 +304,7 @@ class VanillaNPCSkeletonPatcher(AVanillaNPCSkeletonPatcher,BasalNPCTweaker):
         """Edits patch file as desired. Will write to log."""
         count = Counter()
         keep = patchFile.getKeeper()
-        newModPath = u"Characters\\_Male\\SkeletonBeast.nif"
+        newModPath = u'Characters\\_Male\\SkeletonBeast.nif'
         for record in patchFile.NPC_.records:
             try:
                 oldModPath = record.model.modPath
@@ -330,7 +330,7 @@ class CBash_VanillaNPCSkeletonPatcher(AVanillaNPCSkeletonPatcher, _NpcCTweak):
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
         oldModPath = record.modPath
-        newModPath = u"Characters\\_Male\\SkeletonBeast.nif"
+        newModPath = u'Characters\\_Male\\SkeletonBeast.nif'
         try:
             if oldModPath != u'characters\\_male\\skeleton.nif': #modPaths do
                 # case insensitive comparisons by default
@@ -369,7 +369,7 @@ class RedguardNPCPatcher(ARedguardNPCPatcher,BasalNPCTweaker):
         for record in patchFile.NPC_.records:
             if not record.race: continue
             if record.race[1] == 0x00d43:
-                record.fgts_p = '\x00'*200
+                record.fgts_p = b'\x00'*200
                 keep(record.fid)
                 count[record.fid[0]] += 1
         self._patchLog(log,count)
@@ -441,7 +441,7 @@ class AAsIntendedImpsPatcher(AMultiTweakItem):
     """Set all imps to have the Bethesda imp spells that were never assigned
     (discovered by the UOP team, made into a mod by Tejon)."""
     reImpModPath = re.compile(u'' r'(imp(?!erial)|gargoyle)\\.', re.I | re.U)
-    reImp  = re.compile(u'(imp(?!erial)|gargoyle)',re.I|re.U)
+    reImp  = re.compile(u'(imp(?!erial)|gargoyle)', re.I | re.U)
     tweak_name = _(u'As Intended: Imps')
     tweak_tip = _(u'Set imps to have the unassigned Bethesda Imp Spells as '
                   u'discovered by the UOP team and made into a mod by Tejon.')
@@ -517,7 +517,7 @@ class AAsIntendedBoarsPatcher(AMultiTweakItem):
     """Set all boars to have the Bethesda boar spells that were never
     assigned (discovered by the UOP team, made into a mod by Tejon)."""
     reBoarModPath = re.compile(u'' r'(boar)\\.', re.I | re.U)
-    reBoar  = re.compile(u'(boar)', re.I|re.U)
+    reBoar  = re.compile(u'(boar)', re.I | re.U)
     tweak_name = _(u'As Intended: Boars')
     tweak_tip = _(u'Set boars to have the unassigned Bethesda Boar Spells as '
                   u'discovered by the UOP team and made into a mod by Tejon.')
@@ -559,7 +559,7 @@ class CBash_AsIntendedBoarsPatcher(AAsIntendedBoarsPatcher, _CreaCTweak):
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
-        if not self.reBoarModPath.search(record.modPath or ''): return
+        if not self.reBoarModPath.search(record.modPath or u''): return
         reBoar  = self.reBoar
         for bodyPart in record.bodyParts:
             if reBoar.search(bodyPart):
@@ -582,12 +582,12 @@ class ASWALKNPCAnimationPatcher(AMultiTweakItem):
     """Changes all female NPCs to use Mur Zuk's Sexy Walk."""
     tweak_name = _(u'Sexy Walk for female NPCs')
     tweak_tip = _(u"Changes all female NPCs to use Mur Zuk's Sexy Walk - "
-                  u"Requires Mur Zuk's Sexy Walk animation file.")
+                  u"requires Mur Zuk's Sexy Walk animation file.")
 
     def __init__(self):
         super(ASWALKNPCAnimationPatcher, self).__init__(u'Mur Zuk SWalk',
             (u'1.0', u'1.0'))
-        self.logMsg = u'* '+_(u'NPCs Tweaked') + u' :%d'
+        self.logMsg = u'* '+_(u'NPCs Tweaked :%d')
 
 class SWALKNPCAnimationPatcher(ASWALKNPCAnimationPatcher,BasalNPCTweaker):
 
@@ -621,7 +621,7 @@ class ARWALKNPCAnimationPatcher(AMultiTweakItem):
     """Changes all female NPCs to use Mur Zuk's Real Walk."""
     tweak_name = _(u'Real Walk for female NPCs')
     tweak_tip = _(u"Changes all female NPCs to use Mur Zuk's Real Walk - "
-                  u"Requires Mur Zuk's Real Walk animation file.")
+                  u"requires Mur Zuk's Real Walk animation file.")
 
     def __init__(self):
         super(ARWALKNPCAnimationPatcher, self).__init__(u'Mur Zuk RWalk',
@@ -660,8 +660,8 @@ class AQuietFeetPatcher(AMultiTweakItem):
     """Removes 'foot' sounds from all/specified creatures - like the mod by
     the same name but works on all modded creatures."""
     tweak_name = _(u'Quiet Feet')
-    tweak_tip = _(u"Removes all/some 'foot' sounds from creatures; on some"
-                  u" computers can have a significant performance boost.")
+    tweak_tip = _(u"Removes all/some 'foot' sounds from creatures; on some "
+                  u'computers can have a significant performance boost.')
 
     def __init__(self):
         super(AQuietFeetPatcher, self).__init__(u'silent n sneaky!',
@@ -733,7 +733,7 @@ class AIrresponsibleCreaturesPatcher(AMultiTweakItem):
     """Sets responsibility to 0 for all/specified creatures - like the mod
     by the name of Irresponsible Horses but works on all modded creatures."""
     tweak_name = _(u'Irresponsible Creatures')
-    tweak_tip = _(u"Sets responsibility to 0 for all/specified creatures - so "
+    tweak_tip = _(u'Sets responsibility to 0 for all/specified creatures - so '
                   u"they can't report you for crimes.")
 
     def __init__(self):

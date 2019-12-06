@@ -45,11 +45,11 @@ class _AListsMerger(AListPatcher):
         OOOMods = {GPath(u"Oscuro's_Oblivion_Overhaul.esm"),
                    GPath(u"Oscuro's_Oblivion_Overhaul.esp")}
         FransMods = {GPath(u"Francesco's Leveled Creatures-Items Mod.esm"),
-                     GPath(u"Francesco.esp")}
-        WCMods = {GPath(u"Oblivion Warcry.esp"),
-                  GPath(u"Oblivion Warcry EV.esp")}
-        TIEMods = {GPath(u"TIE.esp")}
-        OverhaulCompat = GPath(u"Unofficial Oblivion Patch.esp") in mods and (
+                     GPath(u'Francesco.esp')}
+        WCMods = {GPath(u'Oblivion Warcry.esp'),
+                  GPath(u'Oblivion Warcry EV.esp')}
+        TIEMods = {GPath(u'TIE.esp')}
+        OverhaulCompat = GPath(u'Unofficial Oblivion Patch.esp') in mods and (
                 (OOOMods | WCMods) & mods) or (
                                  FransMods & mods and not (TIEMods & mods))
         if OverhaulCompat:
@@ -320,13 +320,13 @@ class CBash_ListsMerger(_AListsMerger, CBash_ListPatcher):
         self._overhaul_compat(importMods, _skip_id)
 
     def getTypes(self):
-        return ['LVLC','LVLI','LVSP']
+        return [b'LVLC',b'LVLI',b'LVSP']
 
     def scan(self, modFile, record, bashTags, __empty=frozenset()):
         """Records information needed to apply the patch."""
         recordId = record.fid
         if recordId in self.OverhaulUOPSkips and modFile.GName == GPath(
-                'Unofficial Oblivion Patch.esp'):
+                u'Unofficial Oblivion Patch.esp'):
             return
         script = record.script
         if script and not script.ValidateFormID(self.patchFile):
@@ -636,7 +636,7 @@ class ContentsChecker(_AContentsChecker,Patcher):
                         keep(record.fid)
                 # Log the result if we removed at least one entry
                 if id_removed:
-                    log(u"\n=== " + rec_type)
+                    log(u'\n=== ' + rec_type)
                     for contId in sorted(id_removed):
                         log(u'* ' + id_eid[contId])
                         for removedId in sorted(id_removed[contId]):
@@ -655,7 +655,7 @@ class CBash_ContentsChecker(_AContentsChecker,CBash_Patcher):
 
     def getTypes(self):
         """Returns the group types that this patcher checks"""
-        return ['CONT','CREA','NPC_','LVLI','LVLC','LVSP']
+        return [b'CONT',b'CREA',b'NPC_',b'LVLI',b'LVLC',b'LVSP']
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired."""
