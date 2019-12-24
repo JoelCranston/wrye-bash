@@ -22,34 +22,32 @@
 #
 # =============================================================================
 
-__author__ = "Ganda"
+__author__ = u'Ganda'
 
 from collections import defaultdict
 import wx
 import wx.wizard as wiz
 
 from .. import balt, bass, bolt, bosh, bush, env
+from ..gui import CENTER, CheckBox, HBoxedLayout, HLayout, Label, \
+    LayoutOptions, TextArea, VLayout, WizardDialog, EventResult
 from ..fomod import FailedCondition, FomodInstaller
 
-
-class WizardReturn(object):
-    __slots__ = ("cancelled", "install_files", "install", "page_size", "pos")
+class FomodInstallInfo(object):
+    __slots__ = (u'canceled', u'install_files', u'should_install')
 
     def __init__(self):
-        # cancelled: true if the user canceled or if an error occurred
-        self.cancelled = False
+        # canceled: true if the user canceled or if an error occurred
+        self.canceled = False
         # install_files: file->dest mapping of files to install
         self.install_files = bolt.LowerDict()
-        # install: boolean on whether to install the files
-        self.install = True
-        # page_size: Tuple/wxSize of the saved size of the Wizard
-        self.page_size = balt.defSize
-        # pos: Tuple/wxPoint of the saved position of the Wizard
-        self.pos = balt.defPos
+        # should_install: boolean on whether to install the files
+        self.should_install = True
 
+class InstallerFomod(WizardDialog):
+    _def_size = (600, 500)
 
-class InstallerFomod(wiz.Wizard):
-    def __init__(self, parent_window, installer, page_size, pos):
+    def __init__(self, parent_window, installer):
         # True prevents actually moving to the 'next' page.
         # We use this after the "Next" button is pressed,
         # while the parser is running to return the _actual_ next page
@@ -60,71 +58,36 @@ class InstallerFomod(wiz.Wizard):
         # saving this list allows for faster processing of the files the fomod
         # installer will return.
         self.files_list = [a[0] for a in installer.fileSizeCrcs]
-
         fomod_file = installer.fomod_file().s
-        data_path = bass.dirs["mods"]
-        ver = env.get_file_version(bass.dirs["app"].join(
+        data_path = bass.dirs[u'mods']
+        ver = env.get_file_version(bass.dirs[u'app'].join(
             *bush.game.version_detect_file).s)
-        game_ver = u".".join([unicode(i) for i in ver])
-
-        self.parser = FomodInstaller(fomod_file, self.files_list, data_path, game_ver)
-
-        style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX
-        wiz.Wizard.__init__(
-            self,
-            parent_window,
-            title=_(u"FOMOD Installer - " + self.parser.fomod_name),
-            pos=pos,
-            style=style,
-        )
-
+        self.parser = FomodInstaller(fomod_file, self.files_list, data_path,
+                                     u'.'.join([unicode(i) for i in ver]))
+        super(InstallerFomod, self).__init__(
+            parent_window, sizes_dict=bass.settings,
+            title=_(u'FOMOD Installer - %s') % self.parser.fomod_name,
+            size_key=u'bash.fomod.size', pos_key=u'bash.fomod.pos')
         self.is_archive = isinstance(installer, bosh.InstallerArchive)
         if self.is_archive:
             self.archive_path = bass.getTempDir()
         else:
-            self.archive_path = bass.dirs["installers"].join(installer.archive)
-
+            self.archive_path = bass.dirs[u'installers'].join(
+                installer.archive)
         # 'dummy' page tricks the wizard into always showing the "Next" button
-        self.dummy = wiz.PyWizardPage(self)
-
+        class _PageDummy(wiz.WizardPage): pass
+        self.dummy = _PageDummy(self._native_widget)
         # Intercept the changing event so we can implement 'block_change'
-        self.Bind(wiz.EVT_WIZARD_PAGE_CHANGING, self.on_change)
-        self.ret = WizardReturn()
-        self.ret.page_size = page_size
-
-        # So we can save window size
-        self.Bind(wx.EVT_SIZE, self.on_size)
-        self.Bind(wx.EVT_CLOSE, self.on_close)
-        self.Bind(wiz.EVT_WIZARD_CANCEL, self.on_close)
-        self.Bind(wiz.EVT_WIZARD_FINISHED, self.on_close)
-
-        # Set the minimum size for pages, and setup on_size to resize the
-        # First page to the saved size
-        self.SetPageSize((600, 500))
+        self.on_wiz_page_change.subscribe(self.on_change)
+        self.ret = FomodInstallInfo()
         self.first_page = True
 
-    def on_close(self, event):
-        if not self.IsMaximized():
-            # Only save the current size if the page isn't maximized
-            self.ret.page_size = self.GetSize()
-            self.ret.pos = self.GetPosition()
-        event.Skip()
+    def save_size(self):
+        # Otherwise, regular resize, save the size if we're not maximized
+        self.on_closing(destroy=False)
 
-    def on_size(self, event):
-        if self.first_page:
-            # On the first page, resize it to the saved size
-            self.first_page = False
-            self.SetSize(self.ret.page_size)
-        else:
-            # Otherwise, regular resize, save the size if we're not
-            # maximized
-            if not self.IsMaximized():
-                self.ret.page_size = self.GetSize()
-                self.pos = self.GetPosition()
-            event.Skip()
-
-    def on_change(self, event):
-        if event.GetDirection():
+    def on_change(self, is_forward, evt_page):
+        if is_forward:
             if not self.finishing:
                 # Next, continue script execution
                 if self.block_change:
@@ -132,97 +95,94 @@ class InstallerFomod(wiz.Wizard):
                     # So the parser can continue parsing,
                     # Then show the page that the parser returns,
                     # rather than the dummy page
-                    selection = event.GetPage().on_next()
-                    event.Veto()
+                    selection = evt_page.on_next()
                     self.block_change = False
                     next_page = self.parser.next_(selection)
                     if next_page is None:
                         self.finishing = True
-                        self.ShowPage(PageFinish(self))
+                        self._native_widget.ShowPage(
+                            PageFinish(self))
                     else:
                         self.finishing = False
-                        self.ShowPage(PageSelect(self, next_page))
+                        self._native_widget.ShowPage(
+                            PageSelect(self, next_page))
+                    return EventResult.CANCEL
                 else:
                     self.block_change = True
         else:
             # Previous, pop back to the last state,
             # and resume execution
-            event.Veto()
             self.block_change = False
             self.finishing = False
             payload = self.parser.previous()
-            if payload is None:  # at the start
-                return  # do nothing
-            page, previous_selection = payload
-            gui_page = PageSelect(self, page)
-            gui_page.select(previous_selection)
-            self.ShowPage(gui_page)
+            if payload:  # at the start
+                page, previous_selection = payload
+                gui_page = PageSelect(self, page)
+                gui_page.select(previous_selection)
+                self._native_widget.ShowPage(gui_page)
+            return EventResult.CANCEL
 
     def run(self):
         try:
             first_page = self.parser.start()
         except FailedCondition as exc:
-            msg = "This installer cannot start due to the following unmet conditions:\n"
+            msg = _(u'This installer cannot start due to the following unmet '
+                    u'conditions:\n')
             for line in str(exc).splitlines():
-                msg += "  {}\n".format(line)
-            balt.showWarning(self, msg, title="Cannot Run Installer",
+                msg += u'  {}\n'.format(line)
+            balt.showWarning(self, msg, title=_(u'Cannot Run Installer'),
                              do_center=True)
-            self.ret.cancelled = True
+            self.ret.canceled = True
         else:
             if first_page is not None:  # if installer has any gui pages
-                self.ret.cancelled = not self.RunWizard(PageSelect(self, first_page))
+                self.ret.canceled = not self._native_widget.RunWizard(
+                    PageSelect(self, first_page))
             self.ret.install_files = bolt.LowerDict(self.parser.files())
         # Clean up temp files
         if self.is_archive:
             bass.rmTempDir()
         return self.ret
 
+class PageInstaller(wiz.WizardPage):
+    """Base class for all the parser wizard pages, just to handle a couple
+    simple things here."""
 
-# PageInstaller ----------------------------------------------
-#  base class for all the parser wizard pages, just to handle
-#  a couple simple things here
-# ------------------------------------------------------------
-class PageInstaller(wiz.PyWizardPage):
     def __init__(self, parent):
-        wiz.PyWizardPage.__init__(self, parent)
-        self.parent = parent
+        super(PageInstaller, self).__init__(parent._native_widget)
+        self._page_parent = parent
         self._enableForward(True)
 
-    def _enableForward(self, enable):
-        self.parent.FindWindowById(wx.ID_FORWARD).Enable(enable)
+    def _enableForward(self, do_enable):
+        self._page_parent.enable_forward_btn(do_enable)
 
     def GetNext(self):
-        return self.parent.dummy
+        return self._page_parent.dummy
 
     def GetPrev(self):
-        return self.parent.dummy
+        if self._page_parent.parser.has_previous():
+            return self._page_parent.dummy
+        return None
 
     def on_next(self):
-        # This is what needs to be implemented by sub-classes,
-        # this is where flow control objects etc should be
-        # created
+        """Create flow control objects etc, implemented by sub-classes."""
         pass
 
-
-# PageError --------------------------------------------------
-#  Page that shows an error message, has only a "Cancel"
-#  button enabled, and cancels any changes made
-# -------------------------------------------------------------
 class PageError(PageInstaller):
-    def __init__(self, parent, title, error_msg):
-        PageInstaller.__init__(self, parent)
+    """Page that shows an error message, has only a "Cancel" button enabled,
+    and cancels any changes made."""
 
+    def __init__(self, parent, title, error_msg):
+        super(PageError, self).__init__(parent)
         # Disable the "Finish"/"Next" button
         self._enableForward(False)
-
-        # Layout stuff
-        sizer_main = wx.FlexGridSizer(2, 1, 5, 5)
-        text_error = balt.RoTextCtrl(self, error_msg, autotooltip=False)
-        sizer_main.Add(balt.StaticText(parent, label=title))
-        sizer_main.Add(text_error, 0, wx.ALL | wx.CENTER | wx.EXPAND)
-        sizer_main.AddGrowableCol(0)
-        sizer_main.AddGrowableRow(1)
-        self.SetSizer(sizer_main)
+        VLayout(spacing=5, items=[
+            Label(parent, title),
+            (TextArea(self, init_text=error_msg, editable=False,
+                auto_tooltip=False), LayoutOptions(expand=True, weight=1)),
+        ]).apply_to(self)
+        # TODO(inf) Are all these Layout() calls needed? belt does them, so I
+        #  assume that's why they're here, but belt isn't a good GUI example :P
+        #  If yes, then: de-wx!
         self.Layout()
 
     def GetNext(self):
@@ -231,137 +191,105 @@ class PageError(PageInstaller):
     def GetPrev(self):
         return None
 
-
-# PageSelect -------------------------------------------------
-#  A Page that shows a message up top, with a selection box on
-#  the left (multi- or single- selection), with an optional
-#  associated image and description for each option, shown when
-#  that item is selected
-# ------------------------------------------------------------
 class PageSelect(PageInstaller):
+    """A Page that shows a message up top, with a selection box on the left
+    (multi- or single- selection), with an optional associated image and
+    description for each option, shown when that item is selected."""
+
     _option_type_string = defaultdict(str)
-    _option_type_string["Required"] = "=== This option is required ===\n\n"
-    _option_type_string["Recommended"] = \
-        "=== This option is recommended ===\n\n"
-    _option_type_string["CouldBeUsable"] = \
-        "=== This option could result in instability ===\n\n"
-    _option_type_string["NotUsable"] = \
-        "=== This option cannot be selected ===\n\n"
+    _option_type_string[u'Required'] = _(u'=== This option is required '
+                                         u'===\n\n')
+    _option_type_string[u'Recommended'] = _(u'=== This option is recommended '
+                                            u'===\n\n')
+    _option_type_string[u'CouldBeUsable'] = _(u'=== This option could result '
+                                              u'in instability ===\n\n')
+    _option_type_string[u'NotUsable'] = _(u'=== This option cannot be '
+                                          u'selected ===\n\n')
 
     def __init__(self, parent, page):
-        PageInstaller.__init__(self, parent)
-
-        # group_sizer -> [option_button, ...]
-        self.group_option_map = {}
-
-        sizer_main = wx.FlexGridSizer(2, 1, 10, 10)
-        label_step_name = balt.StaticText(self, page.name,
-                                          style=wx.ALIGN_CENTER)
-        label_step_name.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
-        sizer_main.Add(label_step_name, 0, wx.EXPAND)
-        sizer_content = wx.GridSizer(1, 2, 5, 5)
-
-        sizer_extra = wx.GridSizer(2, 1, 5, 5)
+        super(PageSelect, self).__init__(parent)
+        self.group_option_map = defaultdict(list)
         self.bmp_item = balt.Picture(self, 0, 0, background=None)
         self._img_cache = {} # creating images can be really expensive
-        self.text_item = balt.RoTextCtrl(self, autotooltip=False)
-        sizer_extra.Add(self.bmp_item, 1, wx.EXPAND | wx.ALL)
-        sizer_extra.Add(self.text_item, 1, wx.EXPAND | wx.ALL)
-
-        panel_groups = wx.ScrolledWindow(self, -1)
+        self.text_item = TextArea(self, editable=False, auto_tooltip=False)
+        # TODO(inf) de-wx!
+        panel_groups = wx.ScrolledWindow(self)
         panel_groups.SetScrollbars(20, 20, 50, 50)
-        sizer_groups = wx.FlexGridSizer(len(page), 1, 5, 5)
-        for row in xrange(len(page)):
-            sizer_groups.AddGrowableRow(row)
+        groups_layout = VLayout(spacing=5, item_expand=True)
         for group in page:
-            options_num = len(group)
-
-            sizer_group = wx.FlexGridSizer(2, 1, 7, 7)
-            sizer_group.AddGrowableRow(1)
-            sizer_group.group_object = group
-            sizer_group.Add(balt.StaticText(panel_groups, group.name))
-
-            sizer_options = wx.GridSizer(options_num, 1, 2, 2)
-            sizer_group.Add(sizer_options)
-
+            options_layout = VLayout(spacing=2)
             first_selectable = None
             any_selected = False
-
-            # whenever there is a required option in a exactlyone/atmostone group
-            # all other options need to be disable to ensure the required stays
-            # selected
+            # whenever there is a required option in a exactlyone/atmostone
+            # group all other options need to be disabled to ensure the
+            # required stays selected
             required_disable = False
-
             # group type forces selection
             group_type = group.type
-            group_force_selection = group_type in (
-                "SelectExactlyOne",
-                "SelectAtLeastOne",
-            )
-
+            group_force_selection = group_type in (u'SelectExactlyOne',
+                                                   u'SelectAtLeastOne')
             for option in group:
-                if group_type in ("SelectExactlyOne", "SelectAtMostOne"):
-                    radio_style = wx.RB_GROUP if option is group[0] else 0
+                if group_type in (u'SelectExactlyOne', u'SelectAtMostOne'):
+                    # TODO(inf) de-wx!
                     button = wx.RadioButton(
-                        panel_groups, label=option.name, style=radio_style
-                    )
+                        panel_groups, label=option.name,
+                        style=wx.RB_GROUP if option is group[0] else 0)
                 else:
-                    button = balt.checkBox(panel_groups, label=option.name)
-                    if group_type == "SelectAll":
-                        button.SetValue(True)
+                    button = CheckBox(panel_groups, label=option.name)
+                    if group_type == u'SelectAll':
+                        button.is_checked = True
                         any_selected = True
-                        button.Disable()
-
-                if option.type == "Required":
-                    button.SetValue(True)
+                        button.enabled = False
+                if option.type == u'Required':
+                    SetComponentValue_(button, True)
                     any_selected = True
-                    if group_type in ("SelectExactlyOne", "SelectAtMostOne"):
+                    if group_type in (u'SelectExactlyOne', u'SelectAtMostOne'):
                         required_disable = True
                     else:
-                        button.Disable()
-                elif option.type == "Recommended":
+                        EnableComponent_(button, False)
+                elif option.type == u'Recommended':
                     if not any_selected or not group_force_selection:
-                        button.SetValue(True)
+                        SetComponentValue_(button, True)
                         any_selected = True
-                elif option.type in ("Optional", "CouldBeUsable"):
+                elif option.type in (u'Optional', u'CouldBeUsable'):
                     if first_selectable is None:
                         first_selectable = button
-                elif option.type == "NotUsable":
-                    button.SetValue(False)
-                    button.Disable()
-
-                button.option_object = option
-                sizer_options.Add(button)
-                button.Bind(wx.EVT_ENTER_WINDOW, self.on_hover)
-                self.group_option_map.setdefault(sizer_group, []).append(button)
-
+                elif option.type == u'NotUsable':
+                    SetComponentValue_(button, False)
+                    EnableComponent_(button, False)
+                # TODO(inf) This is very hacky, there has to a better way than
+                #  abusing __dict__ for this
+                LinkOptionObject_(button, option)
+                options_layout.add(button)
+                BindCallback_(button, wx.EVT_ENTER_WINDOW, self.on_hover)
+                self.group_option_map[group].append(button)
             if not any_selected and group_force_selection:
                 if first_selectable is not None:
-                    first_selectable.SetValue(True)
+                    SetComponentValue_(first_selectable, True)
                     any_selected = True
-
             if required_disable:
-                for button in self.group_option_map[sizer_group]:
-                    button.Disable()
-
-            if group_type == "SelectAtMostOne":
-                none_button = wx.RadioButton(panel_groups, label="None")
+                for button in self.group_option_map[group]:
+                    EnableComponent_(button, False)
+            if group_type == u'SelectAtMostOne':
+                none_button = wx.RadioButton(panel_groups, label=_(u'None'))
                 if not any_selected:
                     none_button.SetValue(True)
                 elif required_disable:
                     none_button.Disable()
-                sizer_options.Add(none_button)
-
-            sizer_groups.Add(sizer_group, wx.ID_ANY, wx.EXPAND)
-
-        panel_groups.SetSizer(sizer_groups)
-        sizer_content.Add(panel_groups, 1, wx.EXPAND)
-        sizer_content.Add(sizer_extra, 1, wx.EXPAND)
-        sizer_main.Add(sizer_content, 1, wx.EXPAND)
-        sizer_main.AddGrowableRow(1)
-        sizer_main.AddGrowableCol(0)
-
-        self.SetSizer(sizer_main)
+                options_layout.add(none_button)
+            groups_layout.add(HBoxedLayout(
+                panel_groups, title=group.name, item_expand=True,
+                item_weight=1, items=[options_layout]))
+        groups_layout.apply_to(panel_groups)
+        VLayout(spacing=10, item_expand=True, items=[
+            (HLayout(spacing=5, item_expand=True, item_weight=1, items=[
+                HBoxedLayout(self, title=page.name, item_expand=True,
+                             item_weight=1, items=[panel_groups]),
+                VLayout(spacing=5, item_expand=True, item_weight=1, items=[
+                    self.bmp_item, self.text_item
+                ]),
+            ]), LayoutOptions(weight=1)),
+        ]).apply_to(self)
         self.Layout()
 
     # fixme XXX: hover doesn't work on disabled buttons
@@ -370,9 +298,8 @@ class PageSelect(PageInstaller):
         button = event.GetEventObject()
         option = button.option_object
         self._enableForward(True)
-
         self.bmp_item.Freeze()
-        img = self.parent.archive_path.join(option.image)
+        img = self._page_parent.archive_path.join(option.image)
         try:
             image = self._img_cache[img]
         except KeyError:
@@ -380,45 +307,36 @@ class PageSelect(PageInstaller):
                     img.isfile() and balt.Image(img.s).GetBitmap()) or None)
         self.bmp_item.SetBitmap(image)
         self.bmp_item.Thaw()
-        self.text_item.SetValue(
-            self._option_type_string[option.type] + option.description)
+        self.text_item.text_content = (self._option_type_string[option.type]
+                                       + option.description)
 
     def on_error(self, msg):
-        msg += (
-            "\nPlease ensure the fomod files are correct and "
-            "contact the Wrye Bash Dev Team."
-        )
-        balt.showWarning(self, msg, title="Warning", do_center=True)
+        msg += _(u'\nPlease ensure the FOMOD files are correct and contact '
+                 u'the Wrye Bash Dev Team.')
+        balt.showWarning(self, msg, do_center=True)
 
     def on_next(self):
         selection = []
-        for group_sizer, option_buttons in self.group_option_map.iteritems():
-            group = group_sizer.group_object
-            group_selected = [a.option_object for a in option_buttons if a.GetValue()]
+        for group, option_buttons in self.group_option_map.iteritems():
+            group_selected = [a.option_object for a in option_buttons
+                              if GetComponentValue_(a)]
             option_len = len(group_selected)
-            if group.type == "SelectExactlyOne" and option_len != 1:
-                msg = (
-                    'Group "{}" should have exactly 1 option selected '
-                    "but has {}.".format(group.name, option_len)
-                )
+            if group.type == u'SelectExactlyOne' and option_len != 1:
+                msg = _(u'Group "{}" should have exactly 1 option selected '
+                        u'but has {}.').format(group.name, option_len)
                 self.on_error(msg)
-            elif group.type == "SelectAtMostOne" and option_len > 1:
-                msg = (
-                    'Group "{}" should have at most 1 option selected '
-                    "but has {}.".format(group.name, option_len)
-                )
+            elif group.type == u'SelectAtMostOne' and option_len > 1:
+                msg = _(u'Group "{}" should have at most 1 option selected '
+                        u'but has {}.').format(group.name, option_len)
                 self.on_error(msg)
-            elif group.type == "SelectAtLeast" and option_len < 1:
-                msg = (
-                    'Group "{}" should have at least 1 option selected '
-                    "but has {}.".format(group.name, option_len)
-                )
+            elif group.type == u'SelectAtLeast' and option_len < 1:
+                msg = _(u'Group "{}" should have at least 1 option selected '
+                        u'but has {}.').format(group.name, option_len)
                 self.on_error(msg)
-            elif group.type == "SelectAll" and option_len != len(option_buttons):
-                msg = (
-                    'Group "{}" should have all options selected '
-                    "but has only {}.".format(group.name, option_len)
-                )
+            elif (group.type == u'SelectAll'
+                  and option_len != len(option_buttons)):
+                msg = _(u'Group "{}" should have all options selected but has '
+                        u'only {}.').format(group.name, option_len)
                 self.on_error(msg)
             selection.extend(group_selected)
         return selection
@@ -427,57 +345,66 @@ class PageSelect(PageInstaller):
         for button_list in self.group_option_map.itervalues():
             for button in button_list:
                 if button.option_object in selection:
-                    button.SetValue(True)
-
+                    SetComponentValue_(button, True)
 
 class PageFinish(PageInstaller):
     def __init__(self, parent):
-        PageInstaller.__init__(self, parent)
-
-        sizer_main = wx.FlexGridSizer(3, 1, 10, 10)
-        label_title = wx.StaticText(
-            self, wx.ID_ANY, "Files To Install", style=wx.ALIGN_CENTER
-        )
-        label_title.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
-        sizer_main.Add(label_title, 0, wx.EXPAND)
-        text_item = balt.RoTextCtrl(self, autotooltip=False, hscroll=True)
-        text_item.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, ""))
-        files_dict = self.parent.parser.files()
-        if files_dict:
-            text_item.SetValue(self.display_files(files_dict))
-        sizer_main.Add(text_item, 1, wx.EXPAND | wx.ALL)
-        self.check_install = balt.checkBox(
-            self,
-            "Install this package",
-            onCheck=self.on_check,
-            checked=self.parent.ret.install,
-        )
-        sizer_main.Add(self.check_install, 1, wx.EXPAND | wx.ALL)
-
-        sizer_main.AddGrowableRow(1)
-        sizer_main.AddGrowableCol(0)
-
-        self.SetSizer(sizer_main)
+        super(PageFinish, self).__init__(parent)
+        # TODO(inf) de-wx! Font API? If we do this, revert the display_files
+        #  change below
+        #label_title.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, ""))
+        #text_item.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, ""))
+        check_install = CheckBox(self, _(u'Install this package'),
+                                 checked=self._page_parent.ret.should_install)
+        check_install.on_checked.subscribe(self.on_check)
+        installer_output = self.display_files(self._page_parent.parser.files())
+        VLayout(spacing=10, item_expand=True, items=[
+            (Label(self, _(u'Files To Install')),
+             LayoutOptions(expand=False, h_align=CENTER)),
+            (TextArea(self, editable=False, auto_tooltip=False,
+                      init_text=installer_output), LayoutOptions(weight=1)),
+            check_install,
+        ]).apply_to(self)
         self.Layout()
 
-    def on_check(self):
-        self.parent.ret.install = self.check_install.IsChecked()
+    def on_check(self, is_checked):
+        self._page_parent.ret.should_install = is_checked
 
     def GetNext(self):
         return None
 
     @staticmethod
     def display_files(file_dict):
-        center_char = " -> "
-        max_key_len = len(max(file_dict.keys(), key=len))
-        max_value_len = len(max(file_dict.values(), key=len))
-        lines = []
-        for key, value in file_dict.iteritems():
-            lines.append(
-                "{0:<{1}}{2}{3:<{4}}".format(
-                    value, max_value_len, center_char, key, max_key_len
-                )
-            )
-        lines.sort(key=str.lower)
-        final_text = "\n".join(lines)
-        return final_text
+        if not file_dict: return u''
+        lines = [u'{} -> {}'.format(v, k) for k, v in file_dict.iteritems()]
+        lines.sort(key=unicode.lower)
+        return u'\n'.join(lines)
+
+# FIXME(inf) Hacks until wx.RadioButton is wrapped, ugly names are on purpose
+def EnableComponent_(component, is_enabled):
+    if isinstance(component, wx.RadioButton):
+        component.Enable(is_enabled)
+    else:
+        component.enabled = is_enabled
+
+def SetComponentValue_(component, target_value):
+    if isinstance(component, wx.RadioButton):
+        component.SetValue(target_value)
+    else:
+        component.is_checked = target_value
+
+def GetComponentValue_(component):
+    if isinstance(component, wx.RadioButton):
+        return component.GetValue()
+    else:
+        return component.is_checked
+
+def BindCallback_(component, wx_event, target_callback):
+    target = (component if isinstance(component, wx.RadioButton)
+              else component._native_widget)
+    target.Bind(wx_event, target_callback)
+
+def LinkOptionObject_(component, target_option):
+    component.option_object = target_option
+    if not isinstance(component, wx.RadioButton):
+        component._native_widget.option_object = target_option

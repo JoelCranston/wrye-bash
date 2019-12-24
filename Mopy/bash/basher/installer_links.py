@@ -181,15 +181,13 @@ class Installer_Fomod(OneItemLink, _InstallerLink):
     def Execute(self):
         with balt.BusyCursor():
             installer = self._selected_info
-            default, page_size, pos = self._get_size_and_pos()
             try:
-                wizard = InstallerFomod(self.window, installer, page_size, pos)
+                wizard = InstallerFomod(self.window, installer)
             except CancelError:
                 return
-            balt.ensureDisplayed(wizard)
+            wizard.ensureDisplayed()
         ret = wizard.run()
-        self._save_size_pos(default, ret)
-        if ret.cancelled:
+        if ret.canceled:
             return
         # Install
         ui_refresh = [False, False]
@@ -198,54 +196,16 @@ class Installer_Fomod(OneItemLink, _InstallerLink):
         idetails = self.iPanel.detailsPanel
         # FIXME(inf) And even more FOMOD hacks - deselect all subpackages, then
         #  call refresh, otherwise the result in the GUI will be confusing
+        idetails.gSubList.set_all_checkmarks(checked=False)
         for index in xrange(len(installer.subNames)):
-            idetails.gSubList.Check(index, False)
             installer.subActives[index] = False
         try:
             idetails.refreshCurrent(installer)
-            if ret.install:
+            if ret.should_install:
                 with balt.Progress(_(u'Installing...'), u'\n'+u' '*60) as progress:
                     self.idata.bain_install(self.selected, ui_refresh, progress)
         finally:
             self.iPanel.RefreshUIMods(*ui_refresh)
-
-    # XXX: shares pos and size with Wizard
-    @staticmethod
-    def _save_size_pos(default, ret):
-        # Sanity checks on returned size/position
-        if not isinstance(ret.pos, balt.wxPoint):
-            deprint(_(
-                u'Returned Wizard position (%s) was not a wx.Point (%s), '
-                u'reverting to default position.') % (ret.pos, type(ret.pos)))
-            ret.pos = balt.defPos
-        if not isinstance(ret.page_size, balt.wxSize):
-            deprint(_(u'Returned Wizard size (%s) was not a wx.Size (%s), '
-                      u'reverting to default size.') % (
-                        ret.page_size, type(ret.page_size)))
-            ret.page_size = tuple(default)
-        bass.settings['bash.wizard.size'] = (ret.page_size[0],
-                                             ret.page_size[1])
-        bass.settings['bash.wizard.pos'] = (ret.pos[0], ret.pos[1])
-
-    # XXX: shares pos and size with Wizard
-    @staticmethod
-    def _get_size_and_pos():
-        saved = bass.settings['bash.wizard.size']
-        default = settingDefaults['bash.wizard.size']
-        pos = bass.settings['bash.wizard.pos']
-        # Sanity checks on saved size/position
-        if not isinstance(pos, tuple) or len(pos) != 2:
-            deprint(_(u'Saved Wizard position (%s) was not a tuple (%s), '
-                      u'reverting to default position.') % (pos, type(pos)))
-            pos = tuple(balt.defPos)
-        if not isinstance(saved, tuple) or len(saved) != 2:
-            deprint(_(u'Saved Wizard size (%s) was not a tuple (%s), '
-                      u'reverting to default size.') % (saved, type(saved)))
-            page_size = tuple(default)
-        else:
-            page_size = (max(saved[0], default[0]), max(saved[1], default[1]))
-        return default, page_size, pos
-
 
 class Installer_EditWizard(_SingleInstallable):
     """Edit the wizard.txt associated with this project"""
