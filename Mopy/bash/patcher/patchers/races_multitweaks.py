@@ -1089,10 +1089,10 @@ class _CBashOnlyRacePatchers(SpecialPatcher, AListPatcher):
     scanRequiresChecked = True
     _read_write_records = ('RACE',)
 
-    def initData(self,group_patchers,progress):
+    def initData(self, progress):
         if not self.isActive: return
         for top_group_sig in self.getTypes():
-            group_patchers[top_group_sig].append(self)
+            self.patchFile.group_patchers[top_group_sig].append(self)
 
 class CBash_RacePatcher_Relations(_CBashOnlyRacePatchers):
     """Merges changes to race relations."""
@@ -1595,10 +1595,10 @@ class CBash_RacePatcher(CBash_MultiTweaker, CBash_ListPatcher):
         self.tweakers = [tweak_cls(p_name, p_file, p_sources) for tweak_cls in
                          self.tweakers_cls] # p_name is not really used here
 
-    def initData(self,group_patchers,progress):
+    def initData(self, progress):
         for tweaker in self.tweakers:
-            tweaker.initData(group_patchers,progress)
-        super(CBash_RacePatcher, self).initData(group_patchers, progress)
+            tweaker.initData(progress)
+        super(CBash_RacePatcher, self).initData(progress)
 
     def buildPatchLog(self,log):
         """Will write to log."""
