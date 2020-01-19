@@ -45,8 +45,15 @@ from .base import MultiTweakItem, CBash_MultiTweakItem, SpecialPatcher, \
 from ...parsers import LoadFactory, ModFile
 
 # Patchers: 40 ----------------------------------------------------------------
-class ARaceTweaker_BiggerOrcsAndNords(AMultiTweakItem):
-    tweak_read_classes = 'RACE',
+class _ARaceTweakItem(AMultiTweakItem):
+    """ABC for race tweaks."""
+    tweak_read_classes = b'RACE',
+
+    def __init__(self, key, *choices):
+        super(_ARaceTweakItem, self).__init__(key, *choices)
+        self.logMsg = u'* '+ _(u'Races Tweaked: %d')
+
+class ARaceTweaker_BiggerOrcsAndNords(_ARaceTweakItem):
     tweak_name = _(u'Bigger Nords and Orcs')
     tweak_tip = _(u'Adjusts the Orc and Nord race records to be '
                   u'taller/heavier - to be more lore friendly.')
@@ -61,7 +68,6 @@ class ARaceTweaker_BiggerOrcsAndNords(AMultiTweakItem):
             (u'MMM Resized Races',
                 ((1.08, 1.07, 1.28, 1.19), (1.09, 1.06, 1.36, 1.3))),
             (u'RBP', ((1.075,1.06,1.20,1.125),(1.06,1.045,1.275,1.18))))
-        self.logMsg = u'* '+ _(u'Races tweaked') + u': %d'
 
 class RaceTweaker_BiggerOrcsAndNords(ARaceTweaker_BiggerOrcsAndNords,
                                      MultiTweakItem):
@@ -132,10 +138,9 @@ class CBash_RaceTweaker_BiggerOrcsAndNords(ARaceTweaker_BiggerOrcsAndNords,
                 record._RecordID = override._RecordID
                 return
 
-class ARaceTweaker_MergeSimilarRaceHairs(AMultiTweakItem):
+class ARaceTweaker_MergeSimilarRaceHairs(_ARaceTweakItem):
     """Merges similar race's hairs (kinda specifically designed for SOVVM's
     bearded races)."""
-    tweak_read_classes = 'RACE',
     tweak_name = _(u'Merge Hairs from similar races')
     tweak_tip = _(u'Merges hair lists from similar races (f.e. give RBP '
                   u'khajit hair to all the other varieties of khajits in '
@@ -146,7 +151,6 @@ class ARaceTweaker_MergeSimilarRaceHairs(AMultiTweakItem):
             u'MergeSimilarRaceHairLists',
             (_(u'Merge hairs only from vanilla races'), 1),
             (_(u'Full hair merge between similar races'), 0))
-        self.logMsg = u'* '+ _(u'Races tweaked') + u': %d'
 
 class RaceTweaker_MergeSimilarRaceHairs(ARaceTweaker_MergeSimilarRaceHairs,
                                         MultiTweakItem):
@@ -256,9 +260,8 @@ class CBash_RaceTweaker_MergeSimilarRaceHairs(
                             race.UnloadRecord()
                             race._RecordID = override._RecordID
 
-class ARaceTweaker_MergeSimilarRaceEyes(AMultiTweakItem):
+class ARaceTweaker_MergeSimilarRaceEyes(_ARaceTweakItem):
     """Merges similar race's eyes."""
-    tweak_read_classes = 'RACE',
     tweak_name = _(u'Merge Eyes from similar races')
     tweak_tip = _(u'Merges eye lists from similar races (f.e. give RBP khajit '
                   u'eyes to all the other varieties of khajits in Elsweyr)')
@@ -268,7 +271,6 @@ class ARaceTweaker_MergeSimilarRaceEyes(AMultiTweakItem):
             u'MergeSimilarRaceEyeLists',
             (_(u'Merge eyes only from vanilla races'), 1),
             (_(u'Full eye merge between similar races'), 0))
-        self.logMsg = u'* '+ _(u'Races tweaked') + u': %d'
 
 class RaceTweaker_MergeSimilarRaceEyes(ARaceTweaker_MergeSimilarRaceEyes,
                                        MultiTweakItem):
@@ -381,16 +383,14 @@ class CBash_RaceTweaker_MergeSimilarRaceEyes(ARaceTweaker_MergeSimilarRaceEyes,
                             race.UnloadRecord()
                             race._RecordID = override._RecordID
 
-class ARaceTweaker_AllHairs(AMultiTweakItem):
+class ARaceTweaker_AllHairs(_ARaceTweakItem):
     """Gives all races ALL hairs."""
-    tweak_read_classes = 'RACE',
     tweak_name = _(u'Races Have All Hairs')
     tweak_tip = _(u'Gives all races every available hair.')
 
     def __init__(self):
         super(ARaceTweaker_AllHairs, self).__init__(u'hairyraces',
             (u'get down tonight',1))
-        self.logMsg = u'* '+ _(u'Races tweaked') + u': %d'
 
 class RaceTweaker_AllHairs(ARaceTweaker_AllHairs,MultiTweakItem):
 
@@ -425,16 +425,14 @@ class CBash_RaceTweaker_AllHairs(ARaceTweaker_AllHairs,CBash_MultiTweakItem):
                 record._RecordID = override._RecordID
                 return
 
-class ARaceTweaker_AllEyes(AMultiTweakItem):
+class ARaceTweaker_AllEyes(_ARaceTweakItem):
     """Gives all races ALL eyes."""
-    tweak_read_classes = 'RACE',
     tweak_name = _(u'Races Have All Eyes')
     tweak_tip = _(u'Gives all races every available eye.')
 
     def __init__(self):
         super(ARaceTweaker_AllEyes, self).__init__(u'eyeyraces',
             (u'what a lot of eyes you have dear', 1))
-        self.logMsg = u'* '+ _(u'Races tweaked') + u': %d'
 
 class RaceTweaker_AllEyes(ARaceTweaker_AllEyes,MultiTweakItem):
 
@@ -478,7 +476,7 @@ class ARaceTweaker_PlayableEyes(AMultiTweakItem):
     def __init__(self):
         super(ARaceTweaker_PlayableEyes, self).__init__(u'playableeyes',
             (u'Get it done', 1))
-        self.logMsg = u'* '+ _(u'Eyes tweaked') + u': %d'
+        self.logMsg = u'* '+ _(u'Eyes Tweaked: %d')
 
 class RaceTweaker_PlayableEyes(ARaceTweaker_PlayableEyes,MultiTweakItem):
 
@@ -524,7 +522,7 @@ class ARaceTweaker_PlayableHairs(AMultiTweakItem):
     def __init__(self):
         super(ARaceTweaker_PlayableHairs, self).__init__(u'playablehairs',
             (u'Get it done', 1))
-        self.logMsg = u'* '+ _(u'Hairs tweaked') + u': %d'
+        self.logMsg = u'* '+ _(u'Hairs Tweaked: %d')
 
 class RaceTweaker_PlayableHairs(ARaceTweaker_PlayableHairs,MultiTweakItem):
 
@@ -570,7 +568,7 @@ class ARaceTweaker_SexlessHairs(AMultiTweakItem):
     def __init__(self):
         super(ARaceTweaker_SexlessHairs, self).__init__(u'sexlesshairs',
             (u'Get it done', 1))
-        self.logMsg = u'* '+ _(u'Hairs tweaked') + u': %d'
+        self.logMsg = u'* '+ _(u'Hairs Tweaked: %d')
 
 class RaceTweaker_SexlessHairs(ARaceTweaker_SexlessHairs,MultiTweakItem):
 
@@ -1055,28 +1053,28 @@ class RacePatcher(AMultiTweaker, ListPatcher):
         #--Done
         log.setHeader(u'= ' + self._patcher_name)
         self._srcMods(log)
-        log(u'\n=== '+_(u'Merged'))
+        log(u'\n=== ' + _(u'Merged'))
         if not racesPatched:
-            log(u'. ~~%s~~'%_(u'None'))
+            log(u'. ~~%s~~' % _(u'None'))
         else:
             for eid in sorted(racesPatched):
-                log(u'* '+eid)
-        log(u'\n=== '+_(u'Eyes/Hair Sorted'))
+                log(u'* ' + eid)
+        log(u'\n=== ' + _(u'Eyes/Hair Sorted'))
         if not racesSorted:
-            log(u'. ~~%s~~'%_(u'None'))
+            log(u'. ~~%s~~' % _(u'None'))
         else:
             for eid in sorted(racesSorted):
-                log(u'* '+eid)
-        log(u'\n=== '+_(u'Eye Meshes Filtered'))
+                log(u'* ' + eid)
+        log(u'\n=== ' + _(u'Eye Meshes Filtered'))
         if not racesFiltered:
-            log(u'. ~~%s~~'%_(u'None'))
+            log(u'. ~~%s~~' % _(u'None'))
         else:
             log(_(u"In order to prevent 'googly eyes', incompatible eyes have "
                   u"been removed from the following races."))
             for eid in sorted(racesFiltered):
-                log(u'* '+eid)
+                log(u'* ' + eid)
         if mod_npcsFixed:
-            log(u'\n=== '+_(u'Eyes/Hair Assigned for NPCs'))
+            log(u'\n=== ' + _(u'Eyes/Hair Assigned for NPCs'))
             for srcMod in sorted(mod_npcsFixed):
                 log(u'* %s: %d' % (srcMod.s,len(mod_npcsFixed[srcMod])))
         for tweak in self.enabled_tweaks:
@@ -1617,28 +1615,28 @@ class CBash_RacePatcher(CBash_MultiTweaker, CBash_ListPatcher):
         #--Done
         log.setHeader(u'= ' + self._patcher_name)
         self._srcMods(log)
-        log(u'\n=== '+_(u'Merged'))
+        log(u'\n=== ' + _(u'Merged'))
         if not racesPatched:
-            log(u'. ~~%s~~'%_(u'None'))
+            log(u'. ~~%s~~' % _(u'None'))
         else:
             for eid in sorted(racesPatched):
-                log(u'* '+eid)
-        log(u'\n=== '+_(u'Eyes/Hair Sorted'))
+                log(u'* ' + eid)
+        log(u'\n=== ' + _(u'Eyes/Hair Sorted'))
         if not racesSorted:
-            log(u'. ~~%s~~'%_(u'None'))
+            log(u'. ~~%s~~' % _(u'None'))
         else:
             for eid in sorted(racesSorted):
-                log(u'* '+eid)
-        log(u'\n=== '+_(u'Eye Meshes Filtered'))
+                log(u'* ' + eid)
+        log(u'\n=== ' + _(u'Eye Meshes Filtered'))
         if not racesFiltered:
-            log(u'. ~~%s~~'%_(u'None'))
+            log(u'. ~~%s~~' % _(u'None'))
         else:
             log(_(u"In order to prevent 'googly eyes', incompatible eyes have "
                   u"been removed from the following races."))
             for eid in sorted(racesFiltered):
-                log(u'* '+eid)
+                log(u'* ' + eid)
         if mod_npcsFixed:
-            log(u'\n=== '+_(u'Eyes/Hair Assigned for NPCs'))
+            log(u'\n=== ' + _(u'Eyes/Hair Assigned for NPCs'))
             for srcMod in sorted(mod_npcsFixed):
                 log(u'* %s: %d' % (
                     (srcMod.sbody if srcMod.cext == u'.tmp' else srcMod.s),
