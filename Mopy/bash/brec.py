@@ -156,7 +156,7 @@ class RecordHeader(object):
         rec_type = args[0]
         if rec_type not in RecordHeader.recordTypes:
             raise exception.ModError(ins.inName,
-                                     u'Bad header type: ' + repr(rec_type))
+                                     u'Bad header type: %r' % rec_type)
         #--Record
         if rec_type != 'GRUP':
             pass
@@ -168,7 +168,7 @@ class RecordHeader(object):
                 args[2] = str0
             else:
                 raise exception.ModError(ins.inName,
-                                         u'Bad Top GRUP type: ' + repr(str0))
+                                         u'Bad Top GRUP type: %r' % str0)
         return RecordHeader(*args)
 
     def pack(self):
@@ -1850,8 +1850,8 @@ class MelSet(object):
                 })
                 for attr in record.__slots__:
                     if hasattr(record, attr):
-                        bolt.deprint(u'> %s: %s' % (
-                            attr, repr(getattr(record, attr))))
+                        bolt.deprint(u'> %s: %r' % (
+                            attr, getattr(record, attr)))
                 raise
 
     def mapFids(self,record,mapper,save=False):
