@@ -58,12 +58,11 @@ class _SimpleImporter(ImportPatcher):
         #--Needs Longs
         self.longTypes = set(self.__class__.long_types or self.rec_attrs)
 
-    def _init_data_loop(self, mapper, recClass, srcFile, srcMod, temp_id_data):
+    def _init_data_loop(self, recClass, srcFile, srcMod, temp_id_data):
         recAttrs = self.recAttrs_class[recClass]
         for record in srcFile.tops[recClass.classType].getActiveRecords():
-            fid = mapper(record.fid)
-            temp_id_data[fid] = dict(
-                (attr, record.__getattribute__(attr)) for attr in recAttrs)
+            temp_id_data[record.fid] = {attr: record.__getattribute__(attr)
+                                        for attr in recAttrs}
 
     def initData(self, progress):
         """Common initData pattern.
@@ -74,8 +73,7 @@ class _SimpleImporter(ImportPatcher):
         if not self.isActive: return
         id_data = self.id_data
         loadFactory = LoadFactory(False, *self.recAttrs_class.keys())
-        longTypes = self.longTypes & set(
-            x.classType for x in self.recAttrs_class)
+        longTypes = self.longTypes & {x.classType for x in self.recAttrs_class}
         progress.setFull(len(self.srcs))
         cachedMasters = {}
         for index,srcMod in enumerate(self.srcs):
@@ -86,37 +84,33 @@ class _SimpleImporter(ImportPatcher):
             masters = srcInfo.get_masters()
             srcFile.load(True)
             srcFile.convertToLongFids(longTypes)
-            mapper = srcFile.getLongMapper()
             for recClass in self.recAttrs_class:
                 if recClass.classType not in srcFile.tops: continue
                 self.srcClasses.add(recClass)
                 self.classestemp.add(recClass)
-                self._init_data_loop(mapper, recClass, srcFile, srcMod,
-                                     temp_id_data)
+                self._init_data_loop(recClass, srcFile, srcMod, temp_id_data)
             for master in masters:
                 if master not in bosh.modInfos: continue # or break filter mods
                 if master in cachedMasters:
                     masterFile = cachedMasters[master]
                 else:
-                    masterInfo = bosh.modInfos[master]
-                    masterFile = ModFile(masterInfo,loadFactory)
+                    masterFile = ModFile(bosh.modInfos[master], loadFactory)
                     masterFile.load(True)
                     masterFile.convertToLongFids(longTypes)
                     cachedMasters[master] = masterFile
-                mapper = masterFile.getLongMapper()
                 for recClass in self.recAttrs_class:
                     if recClass.classType not in masterFile.tops: continue
                     if recClass not in self.classestemp: continue
                     for record in masterFile.tops[
                         recClass.classType].getActiveRecords():
-                        fid = mapper(record.fid)
+                        fid = record.fid
                         if fid not in temp_id_data: continue
                         for attr, value in temp_id_data[fid].iteritems():
                             if value == record.__getattribute__(attr): continue
                             else:
                                 id_data[fid][attr] = value
             progress.plus()
-        self.longTypes &= set(x.classType for x in self.srcClasses)
+        self.longTypes &= {x.classType for x in self.srcClasses}
         self.isActive = bool(self.srcClasses)
 
     def scanModFile(self, modFile, progress):
@@ -345,8 +339,7 @@ class CellImporter(ImportPatcher):
                 if master in cachedMasters:
                     masterFile = cachedMasters[master]
                 else:
-                    masterInfo = bosh.modInfos[master]
-                    masterFile = ModFile(masterInfo,loadFactory)
+                    masterFile = ModFile(bosh.modInfos[master], loadFactory)
                     masterFile.load(True)
                     masterFile.convertToLongFids(('CELL','WRLD'))
                     cachedMasters[master] = masterFile
@@ -493,8 +486,8 @@ class CBash_CellImporter(CBash_ImportPatcher):
         recordId = record.fid
         prev_attr_value = self.fid_attr_value.get(recordId,None)
         if prev_attr_value:
-            cur_attr_value = dict(
-                (attr, getattr(record, attr)) for attr in prev_attr_value)
+            cur_attr_value = {attr: getattr(record, attr) for attr
+                              in prev_attr_value}
             if cur_attr_value != prev_attr_value:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
@@ -563,18 +556,17 @@ class GraphicsPatcher(_SimpleImporter):
         # Why does Graphics have a seperate entry for Fids when SoundPatcher does not?
         # for recClass in (MreRecord.type_class[x] for x in ('MGEF',)):
         #     recFidAttrs_class[recClass] = bush.game.graphicsMgefFidAttrs
-        self.recFidAttrs_class = {MreRecord.type_class[recType]: attrs for
-                        recType, attrs in bush.game.graphicsFidTypes.iteritems()}
+        self.recFidAttrs_class = {
+            MreRecord.type_class[recType]: attrs for recType, attrs
+            in bush.game.graphicsFidTypes.iteritems()}
 
-    def _init_data_loop(self, mapper, recClass, srcFile, srcMod, temp_id_data):
+    def _init_data_loop(self, recClass, srcFile, srcMod, temp_id_data):
         recAttrs = self.recAttrs_class[recClass]
         recFidAttrs = self.recFidAttrs_class.get(recClass, None)
         for record in srcFile.tops[recClass.classType].getActiveRecords():
-            fid = mapper(record.fid)
             if recFidAttrs:
-                attr_fidvalue = dict(
-                    (attr, record.__getattribute__(attr)) for attr in
-                    recFidAttrs)
+                attr_fidvalue = {attr: record.__getattribute__(attr) for attr
+                                 in recFidAttrs}
                 for fidvalue in attr_fidvalue.values():
                     if fidvalue and (fidvalue[0] is None or fidvalue[
                         0] not in self.patchFile.loadSet):
@@ -584,13 +576,12 @@ class GraphicsPatcher(_SimpleImporter):
                             self._patcher_name][srcMod] += 1
                         break
                 else:
-                    temp_id_data[fid] = dict(
-                        (attr, record.__getattribute__(attr)) for attr in
-                        recAttrs)
-                    temp_id_data[fid].update(attr_fidvalue)
+                    temp_id_data[record.fid] = {attr: record.__getattribute__(
+                        attr) for attr in recAttrs}
+                    temp_id_data[record.fid].update(attr_fidvalue)
             else:
-                temp_id_data[fid] = dict(
-                    (attr, record.__getattribute__(attr)) for attr in recAttrs)
+                temp_id_data[record.fid] = {attr: record.__getattribute__(
+                    attr) for attr in recAttrs}
 
     def _inner_loop(self, keep, records, top_mod_rec, type_count):
         id_data = self.id_data
@@ -661,8 +652,8 @@ class CBash_GraphicsPatcher(_RecTypeModLogging):
         self.scan_more(modFile,record,bashTags)
         prev_attr_value = self.fid_attr_value.get(record.fid,None)
         if prev_attr_value:
-            cur_attr_value = dict(
-                (attr, getattr(record, attr)) for attr in prev_attr_value)
+            cur_attr_value = {attr: getattr(record, attr) for attr
+                              in prev_attr_value}
             if cur_attr_value != prev_attr_value:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
@@ -682,8 +673,7 @@ class ActorImporter(_SimpleImporter):
         if not self.isActive: return
         id_data = self.id_data
         loadFactory = LoadFactory(False, *self.recAttrs_class.keys())
-        longTypes = self.longTypes & set(
-            x.classType for x in self.recAttrs_class)
+        longTypes = self.longTypes & {x.classType for x in self.recAttrs_class}
         progress.setFull(len(self.srcs))
         cachedMasters = {}
         for index,srcMod in enumerate(self.srcs):
@@ -699,15 +689,13 @@ class ActorImporter(_SimpleImporter):
                 if recClass.classType not in srcFile.tops: continue
                 self.srcClasses.add(recClass)
                 self.classestemp.add(recClass)
-                self._init_data_loop(mapper, recClass, srcFile, srcMod,
-                                     temp_id_data)
+                self._init_data_loop(recClass, srcFile, srcMod, temp_id_data)
             for master in masters:
                 if master not in bosh.modInfos: continue # or break filter mods
                 if master in cachedMasters:
                     masterFile = cachedMasters[master]
                 else:
-                    masterInfo = bosh.modInfos[master]
-                    masterFile = ModFile(masterInfo,loadFactory)
+                    masterFile = ModFile(bosh.modInfos[master], loadFactory)
                     masterFile.load(True)
                     masterFile.convertToLongFids(longTypes)
                     cachedMasters[master] = masterFile
@@ -737,25 +725,25 @@ class ActorImporter(_SimpleImporter):
                                 if keep:
                                     id_data[fid].update(temp_values)
             progress.plus()
-        self.longTypes &= set(x.classType for x in self.srcClasses)
+        self.longTypes &= {x.classType for x in self.srcClasses}
         self.isActive = bool(self.srcClasses)
 
-    def _init_data_loop(self, mapper, recClass, srcFile, srcMod, temp_id_data):
+    def _init_data_loop(self, recClass, srcFile, srcMod, temp_id_data):
         mod_tags = srcFile.fileInfo.getBashTags()
         common_tags = set(self.recAttrs_class[recClass]) & mod_tags
         attrs = set(chain.from_iterable(
             self.recAttrs_class[recClass][tag] for tag in common_tags))
         for record in srcFile.tops[recClass.classType].getActiveRecords():
-            fid = mapper(record.fid)
-            temp_id_data[fid] = dict()
+            record_fid = record.fid
+            temp_id_data[record_fid] = {}
             for attr in attrs:
                 if isinstance(attr, basestring):
-                    temp_id_data[fid][attr] = reduce(getattr, attr.split('.'),
-                                                     record)
+                    temp_id_data[record_fid][attr] = reduce(
+                        getattr, attr.split('.'), record)
                 elif isinstance(attr, (list, tuple, set)):
-                    temp_id_data[fid][attr] = dict(
-                        (subattr, reduce(getattr, subattr.split('.'), record))
-                        for subattr in attr)
+                    temp_id_data[record_fid][attr] = {
+                        subattr: reduce(getattr, subattr.split('.'), record)
+                        for subattr in attr}
 
     scanModFile = _SimpleImporter.scanModFile2
 
@@ -843,7 +831,8 @@ class CBash_ActorImporter(_RecTypeModLogging):
         recordId = record.fid
         prev_attr_value = self.fid_attr_value.get(recordId,None)
         if prev_attr_value:
-            cur_attr_value = dict((attr,getattr(record,attr)) for attr in prev_attr_value)
+            cur_attr_value = {attr: getattr(record, attr) for attr
+                              in prev_attr_value}
             if cur_attr_value != prev_attr_value:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
@@ -948,8 +937,7 @@ class NPCAIPackagePatcher(ImportPatcher):
                 if master in cachedMasters:
                     masterFile = cachedMasters[master]
                 else:
-                    masterInfo = bosh.modInfos[master]
-                    masterFile = ModFile(masterInfo,loadFactory)
+                    masterFile = ModFile(bosh.modInfos[master], loadFactory)
                     masterFile.load(True)
                     masterFile.convertToLongFids(target_rec_types)
                     cachedMasters[master] = masterFile
@@ -1207,18 +1195,18 @@ class CBash_ImportFactions(_RecTypeModLogging):
         if factions:
             masterRecord = self.patchFile.Current.LookupRecords(record.fid)[-1]
             masterFactions = masterRecord.factions_list
-            masterDict = dict((x[0],x[1]) for x in masterFactions)
+            masterDict = {x[0]: x[1] for x in masterFactions}
             # Initialize the factions list with what's in the master record
             self.id_factions.setdefault(record.fid, masterDict)
             # Only add/remove records if different than the master record
             thisFactions = factions['factions_list']
-            masterFids = set([x[0] for x in masterFactions])
-            thisFids = set([x[0] for x in thisFactions])
+            masterFids = {x[0] for x in masterFactions}
+            thisFids = {x[0] for x in thisFactions}
             removedFids = masterFids - thisFids
             addedFids = thisFids - masterFids
             # Add new factions
             self.id_factions[record.fid].update(
-                dict((x[0], x[1]) for x in thisFactions if x[0] in addedFids))
+                {x[0]: x[1] for x in thisFactions if x[0] in addedFids})
             # Remove deleted factions
             for fid in removedFids:
                 self.id_factions[record.fid].pop(fid,None)
@@ -1228,18 +1216,18 @@ class CBash_ImportFactions(_RecTypeModLogging):
         self.scan_more(modFile,record,bashTags)
         fid = record.fid
         if fid in self.csvId_factions:
-            newFactions = set(
-                [(faction, rank) for faction, rank in self.csvId_factions[fid]
-                 if faction.ValidateFormID(self.patchFile)])
+            newFactions = {(faction, rank) for faction, rank
+                           in self.csvId_factions[fid]
+                           if faction.ValidateFormID(self.patchFile)}
         elif fid in self.id_factions:
-            newFactions = set([(faction, rank) for faction, rank in
-                               self.id_factions[fid].iteritems() if
-                               faction.ValidateFormID(self.patchFile)])
+            newFactions = {(faction, rank) for faction, rank
+                           in self.id_factions[fid].iteritems()
+                           if faction.ValidateFormID(self.patchFile)}
         else:
             return
-        curFactions = set(
-            [(faction[0], faction[1]) for faction in record.factions_list if
-             faction[0].ValidateFormID(self.patchFile)])
+        curFactions = {(faction[0], faction[1]) for faction
+                       in record.factions_list
+                       if faction[0].ValidateFormID(self.patchFile)}
         changed = newFactions - curFactions
         removed = curFactions - newFactions
         if changed or removed:
@@ -1319,13 +1307,13 @@ class ImportRelations(_SimpleImporter):
         for record in records:
             fid = record.fid
             if fid in set_id_data:
-                newRelations = set(id_data[fid])
-                curRelations = set(tuple(getattr(r, a) for a in rel_attrs)
-                                   for r in record.relations)
+                new_relations = set(id_data[fid])
+                cur_relations = {tuple(getattr(r, a) for a in rel_attrs)
+                                for r in record.relations}
                 doKeep = False
                 # Preserve changed relations and create new relations for the
                 # added ones that have been merged
-                for changed_attrs in newRelations - curRelations:
+                for changed_attrs in new_relations - cur_relations:
                     # The target faction is always first, for all games
                     faction = changed_attrs[0]
                     for entry in record.relations:
@@ -1397,13 +1385,13 @@ class CBash_ImportRelations(CBash_ImportPatcher):
         self.scan_more(modFile,record,bashTags)
         fid = record.fid
         if fid in self.csvFid_faction_mod:
-            newRelations = set((faction, mod) for faction, mod in
-                               self.csvFid_faction_mod[fid].iteritems() if
-                               faction.ValidateFormID(self.patchFile))
+            newRelations = {(faction, mod) for faction, mod
+                            in self.csvFid_faction_mod[fid].iteritems()
+                            if faction.ValidateFormID(self.patchFile)}
         elif fid in self.fid_faction_mod:
-            newRelations = set((faction, mod) for faction, mod in
-                               self.fid_faction_mod[fid].iteritems() if
-                               faction.ValidateFormID(self.patchFile))
+            newRelations = {(faction, mod) for faction, mod
+                            in self.fid_faction_mod[fid].iteritems()
+                            if faction.ValidateFormID(self.patchFile)}
         else:
             return
         curRelations = set(record.relations_list)
@@ -1480,9 +1468,9 @@ class _AImportInventory(AListPatcher):  # next clas that has ___init__
         #should be redundant since this patcher doesn't allow unloaded
         #self.srcs = [x for x in self.srcs if (x in modInfos and x in
         # patchFile.allMods)]
-        self.inventOnlyMods = set(x for x in self.srcs if (
+        self.inventOnlyMods = {x for x in self.srcs if (
                 x in p_file.mergeSet and {u'InventOnly', u'IIM'} &
-                bosh.modInfos[x].getBashTags()))
+                bosh.modInfos[x].getBashTags())}
 
 class ImportInventory(_AImportInventory, ImportPatcher):
     logMsg = u'\n=== ' + _(u'Inventories Changed: %d')
@@ -1546,8 +1534,8 @@ class ImportInventory(_AImportInventory, ImportPatcher):
             for fid,entries in mod_id_entries[modName].iteritems():
                 masterEntries = id_entries.get(fid)
                 if masterEntries is None: continue
-                masterItems = set(x.item for x in masterEntries)
-                modItems = set(x.item for x in entries)
+                masterItems = {x.item for x in masterEntries}
+                modItems = {x.item for x in entries}
                 removeItems = masterItems - modItems
                 addItems = modItems - masterItems
                 addEntries = [x for x in entries if x.item in addItems]
@@ -1575,7 +1563,7 @@ class ImportInventory(_AImportInventory, ImportPatcher):
                 changed = False
                 deltas = id_deltas.get(record.fid)
                 if not deltas: continue
-                removable = set(x.item for x in record.items)
+                removable = {x.item for x in record.items}
                 for removeItems,addEntries in reversed(deltas):
                     if removeItems:
                         #--Skip if some items to be removed have already
@@ -1586,7 +1574,7 @@ class ImportInventory(_AImportInventory, ImportPatcher):
                         removable -= removeItems
                         changed = True
                     if addEntries:
-                        current = set(x.item for x in record.items)
+                        current = {x.item for x in record.items}
                         for entry in addEntries:
                             if entry.item not in current:
                                 record.items.append(entry)
@@ -1611,22 +1599,21 @@ class CBash_ImportInventory(_AImportInventory, _RecTypeModLogging):
         masters = record.History()
         if not masters: return
         entries = record.items_list
-        modItems = set((item, count) for item, count in entries if
-                       item.ValidateFormID(self.patchFile))
+        modItems = {(item, count) for item, count in entries if
+                    item.ValidateFormID(self.patchFile)}
         masterEntries = []
         id_deltas = self.id_deltas
         fid = record.fid
         for masterEntry in masters:
-            masterItems = set(
-                (item, count) for item, count in masterEntry.items_list if
-                item.ValidateFormID(self.patchFile))
+            masterItems = {(item, count) for item, count
+                           in masterEntry.items_list
+                           if item.ValidateFormID(self.patchFile)}
             removeItems = masterItems - modItems
             addItems = modItems - masterItems
             if len(removeItems) or len(addItems):
                 deltas = id_deltas.get(fid)
                 if deltas is None: deltas = id_deltas[fid] = []
-                deltas.append(
-                    (set((item for item, count in removeItems)), addItems))
+                deltas.append(({item for item, count in removeItems},addItems))
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired."""
@@ -1646,8 +1633,7 @@ class CBash_ImportInventory(_AImportInventory, _RecTypeModLogging):
                 #Otherwise, use the previous one.
                 else:
                     record = conflicts[1]
-
-        removable = set(entry.item for entry in record.items)
+        removable = {entry.item for entry in record.items}
         items = record.items_list
         for removeItems,addEntries in reversed(deltas):
             if removeItems:
@@ -1657,14 +1643,13 @@ class CBash_ImportInventory(_AImportInventory, _RecTypeModLogging):
                          item not in removeItems]
                 removable -= removeItems
             if addEntries:
-                current = set(item for item,count in items)
+                current = {item for item, count in items}
                 for item,count in addEntries:
                     if item not in current:
                         items.append((item,count))
-
-        if len(items) != len(record.items_list) or set(
-                (item, count) for item, count in record.items_list) != set(
-                (item, count) for item, count in items):
+        if len(items) != len(record.items_list) or {
+            (item, count) for item, count in record.items_list} != {
+            (item, count) for item, count in items}:
             override = record.CopyAsOverride(self.patchFile)
             if override:
                 override.items_list = items
@@ -1711,8 +1696,7 @@ class ImportActorsSpells(ImportPatcher):
                 if master in cachedMasters:
                     masterFile = cachedMasters[master]
                 else:
-                    masterInfo = bosh.modInfos[master]
-                    masterFile = ModFile(masterInfo,loadFactory)
+                    masterFile = ModFile(bosh.modInfos[master], loadFactory)
                     masterFile.load(True)
                     masterFile.convertToLongFids(target_rec_types)
                     cachedMasters[master] = masterFile
@@ -2075,28 +2059,19 @@ class NpcFacePatcher(_ANpcFacePatcher,ImportPatcher):
                         attrs = ['hairLength','hairRed','hairBlue','hairGreen']
                     if u'Npc.EyesOnly' in bashTags:
                         fidattrs += ['eye']
-                    if fidattrs:
-                        attr_fidvalue = dict(
-                            (attr, npc.__getattribute__(attr)) for attr in
-                            fidattrs)
-                    else:
-                        attr_fidvalue = dict(
-                            (attr, npc.__getattribute__(attr)) for attr in
-                            ('eye', 'hair'))
+                    if not fidattrs: # if neither tag is set, default to this
+                        fidattrs = ['eye', 'hair']
+                        attrs = ['fggs_p', 'fgga_p', 'fgts_p', 'hairLength',
+                                 'hairRed', 'hairBlue', 'hairGreen']
+                    attr_fidvalue = {attr: npc.__getattribute__(attr)
+                                     for attr in fidattrs}
                     for fidvalue in attr_fidvalue.values():
                         if fidvalue and (fidvalue[0] is None or fidvalue[0] not in self.patchFile.loadSet):
                             self._ignore_record(faceMod)
                             break
                     else:
-                        if not fidattrs:
-                            temp_faceData[npc.fid] = dict(
-                                (attr, npc.__getattribute__(attr)) for attr in
-                                ('fggs_p', 'fgga_p', 'fgts_p', 'hairLength',
-                                 'hairRed', 'hairBlue', 'hairGreen'))
-                        else:
-                            temp_faceData[npc.fid] = dict(
-                                (attr, npc.__getattribute__(attr)) for attr in
-                                attrs)
+                        temp_faceData[npc.fid] = {
+                            attr: npc.__getattribute__(attr) for attr in attrs}
                         temp_faceData[npc.fid].update(attr_fidvalue)
             if u'NpcFacesForceFullImport' in bashTags:
                 for fid in temp_faceData:
@@ -2107,8 +2082,7 @@ class NpcFacePatcher(_ANpcFacePatcher,ImportPatcher):
                     if master in cachedMasters:
                         masterFile = cachedMasters[master]
                     else:
-                        masterInfo = bosh.modInfos[master]
-                        masterFile = ModFile(masterInfo,loadFactory)
+                        masterFile = ModFile(bosh.modInfos[master], loadFactory)
                         masterFile.load(True)
                         masterFile.convertToLongFids(('NPC_',))
                         cachedMasters[master] = masterFile
@@ -2117,11 +2091,10 @@ class NpcFacePatcher(_ANpcFacePatcher,ImportPatcher):
                         if npc.fid not in temp_faceData: continue
                         for attr, value in temp_faceData[npc.fid].iteritems():
                             if value == npc.__getattribute__(attr): continue
-                            if npc.fid not in faceData: faceData[
-                                npc.fid] = dict()
+                            if npc.fid not in faceData: faceData[npc.fid] = {}
                             try:
-                                faceData[npc.fid][attr] = \
-                                temp_faceData[npc.fid][attr]
+                                faceData[npc.fid][attr] = temp_faceData[
+                                    npc.fid][attr]
                             except KeyError:
                                 faceData[npc.fid].setdefault(attr,value)
             progress.plus()
@@ -2181,7 +2154,7 @@ class CBash_NpcFacePatcher(_ANpcFacePatcher,CBash_ImportPatcher):
         """Records information needed to apply the patch."""
         attrs = []
         if u'NpcFacesForceFullImport' in bashTags:
-            face = dict((attr,getattr(record,attr)) for attr in self.faceData)
+            face = {attr: getattr(record, attr) for attr in self.faceData}
             if ValidateDict(face, self.patchFile):
                 self.id_face[record.fid] = face
             else:
@@ -2221,8 +2194,8 @@ class CBash_NpcFacePatcher(_ANpcFacePatcher,CBash_ImportPatcher):
         recordId = record.fid
         prev_face_value = self.id_face.get(recordId,None)
         if prev_face_value:
-            cur_face_value = dict(
-                (attr, getattr(record, attr)) for attr in prev_face_value)
+            cur_face_value = {attr: getattr(record, attr) for attr
+                              in prev_face_value}
             if cur_face_value != prev_face_value:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
@@ -2266,8 +2239,8 @@ class CBash_SoundPatcher(_RecTypeModLogging):
         recordId = record.fid
         prev_attr_value = self.fid_attr_value.get(recordId,None)
         if prev_attr_value:
-            cur_attr_value = dict(
-                (attr, getattr(record, attr)) for attr in prev_attr_value)
+            cur_attr_value = {attr: getattr(record, attr) for attr
+                              in prev_attr_value}
             if cur_attr_value != prev_attr_value:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
@@ -2392,7 +2365,8 @@ class CBash_StatsPatcher(_AStatsPatcher, _RecTypeModLogging):
         if csv_attr_value and ValidateDict(csv_attr_value, self.patchFile):
             prev_attr_value = csv_attr_value
         if prev_attr_value:
-            cur_attr_value = dict((attr,getattr(record,attr)) for attr in prev_attr_value)
+            cur_attr_value = {attr: getattr(record, attr) for attr
+                              in prev_attr_value}
             if cur_attr_value != prev_attr_value:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
@@ -2516,8 +2490,7 @@ class CBash_SpellsPatcher(CBash_ImportPatcher, _ASpellsPatcher):
         if csv_values and ValidateDict(csv_values, self.patchFile):
             prev_values = csv_values
         if prev_values:
-            rec_values = dict(
-                (attr, getattr(record, attr)) for attr in prev_values)
+            rec_values = {attr: getattr(record, attr) for attr in prev_values}
             if rec_values != prev_values:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
@@ -2546,8 +2519,7 @@ class WeaponModsPatcher(_SimpleImporter):
         if not self.isActive: return
         id_data = self.id_data
         loadFactory = LoadFactory(False, *self.recAttrs_class.keys())
-        longTypes = self.longTypes & set(
-            x.classType for x in self.recAttrs_class)
+        longTypes = self.longTypes & {x.classType for x in self.recAttrs_class}
         progress.setFull(len(self.srcs))
         cachedMasters = {}
         for index,srcMod in enumerate(self.srcs):
@@ -2563,15 +2535,13 @@ class WeaponModsPatcher(_SimpleImporter):
                 if recClass.classType not in srcFile.tops: continue
                 self.srcClasses.add(recClass)
                 self.classestemp.add(recClass)
-                self._init_data_loop(mapper, recClass, srcFile, srcMod,
-                                     temp_id_data)
+                self._init_data_loop(recClass, srcFile, srcMod, temp_id_data)
             for master in masters:
                 if master not in bosh.modInfos: continue # or break filter mods
                 if master in cachedMasters:
                     masterFile = cachedMasters[master]
                 else:
-                    masterInfo = bosh.modInfos[master]
-                    masterFile = ModFile(masterInfo,loadFactory)
+                    masterFile = ModFile(bosh.modInfos[master], loadFactory)
                     masterFile.load(True)
                     masterFile.convertToLongFids(longTypes)
                     cachedMasters[master] = masterFile
@@ -2589,18 +2559,14 @@ class WeaponModsPatcher(_SimpleImporter):
                             else:
                                 id_data[fid][attr] = value
             progress.plus()
-        self.longTypes &= set(x.classType for x in self.srcClasses)
+        self.longTypes &= {x.classType for x in self.srcClasses}
         self.isActive = bool(self.srcClasses)
 
-    def _init_data_loop(self, mapper, recClass, srcFile, srcMod, temp_id_data):
+    def _init_data_loop(self, recClass, srcFile, srcMod, temp_id_data):
         recAttrs = self.recAttrs_class[recClass]
         for record in srcFile.tops[recClass.classType].getActiveRecords():
-            fid = mapper(record.fid)
-            #temp_id_data[fid] = dict((attr,record.__getattribute__(attr))
-            # for attr in recAttrs)
-            temp_id_data[fid] = dict(
-                (attr, reduce(getattr, attr.split('.'), record)) for attr in
-                recAttrs)
+            temp_id_data[record.fid] = {attr: reduce(
+                getattr, attr.split('.'), record) for attr in recAttrs}
 
     scanModFile = _SimpleImporter.scanModFile2
 
