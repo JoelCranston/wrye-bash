@@ -150,9 +150,10 @@ class MobBase(object):
         converting to short format."""
         raise AbstractError
 
-    def updateRecords(self,block,mapper,toLong):
+    def updateRecords(self, block, mergeIds):
         """Looks through all of the records in 'block', and updates any
-        records in self that exist with the data in 'block'."""
+        records in self that exist with the data in 'block'. 'block' must be in
+        long fids format."""
         raise AbstractError
 
 #------------------------------------------------------------------------------
@@ -280,14 +281,13 @@ class MobObjects(MobBase):
         self.id_records.clear()
         self.setChanged()
 
-    def updateRecords(self,srcBlock,mapper,mergeIds):
+    def updateRecords(self, srcBlock, mergeIds):
         """Looks through all of the records in 'srcBlock', and updates any
         records in self that exist within the data in 'block'."""
-        fids = set([record.fid for record in self.records])
+        fids = {record.fid for record in self.records}
         for record in srcBlock.getActiveRecords():
-            if mapper(record.fid) in fids:
-                record = record.getTypeCopy(mapper)
-                self.setRecord(record)
+            if record.fid in fids:
+                self.setRecord(record.getTypeCopy())
                 mergeIds.discard(record.fid)
 
     def __repr__(self):
@@ -391,6 +391,7 @@ class MobCell(MobBase):
         tempAppend = temp.append
         distantAppend = distant.append
         insSeek = ins.seek
+        groupType = None # guaranteed to compare False to any of them
         while not insAtEnd(endPos,'Cell Block'):
             subgroupLoaded = [False,False,False]
             header = insRecHeader()
@@ -543,31 +544,29 @@ class MobCell(MobBase):
         if self.pgrd:
             self.pgrd.updateMasters(masters)
 
-    def updateRecords(self,srcBlock,mapper,mergeIds):
+    def updateRecords(self, srcBlock, mergeIds):
         """Updates any records in 'self' that exist in 'srcBlock'."""
         mergeDiscard = mergeIds.discard
         selfGetter = self.__getattribute__
         srcGetter = srcBlock.__getattribute__
         selfSetter = self.__setattr__
-        for attr in ('cell','pgrd','land'):
+        for attr in (u'cell', u'pgrd', u'land'):
             myRecord = selfGetter(attr)
             record = srcGetter(attr)
             if myRecord and record:
-                if myRecord.fid != mapper(record.fid):
-                    raise ArgumentError(u"Fids don't match! %08x, %08x" % (
+                if myRecord.fid != record.fid:
+                    raise ArgumentError(u"Fids don't match! %r, %r" % (
                         myRecord.fid,record.fid))
                 if not record.flags1.ignored:
-                    record = record.getTypeCopy(mapper)
-                    selfSetter(attr,record)
+                    selfSetter(attr, record.getTypeCopy())
                     mergeDiscard(record.fid)
-        for attr in ('persistent','temp','distant'):
+        for attr in (u'persistent', u'temp', u'distant'):
             recordList = selfGetter(attr)
-            fids = dict(
-                (record.fid,index) for index,record in enumerate(recordList))
+            fids = {record.fid: index for index, record
+                    in enumerate(recordList)}
             for record in srcGetter(attr):
-                if not record.flags1.ignored and mapper(record.fid) in fids:
-                    record = record.getTypeCopy(mapper)
-                    recordList[fids[record.fid]] = record
+                if not record.flags1.ignored and record.fid in fids:
+                    recordList[fids[record.fid]] = record.getTypeCopy()
                     mergeDiscard(record.fid)
 
     def keepRecords(self,keepIds):
@@ -602,7 +601,7 @@ class MobCells(MobBase):
 
     def indexRecords(self):
         """Indexes records by fid."""
-        self.id_cellBlock = dict((x.cell.fid,x) for x in self.cellBlocks)
+        self.id_cellBlock = {x.cell.fid: x for x in self.cellBlocks}
 
     def setCell(self,cell):
         """Adds record to record list and indexed."""
@@ -620,11 +619,11 @@ class MobCells(MobBase):
 
     def getUsedBlocks(self):
         """Returns a set of blocks that exist in this group."""
-        return set(x.getBsb()[0] for x in self.cellBlocks)
+        return {x.getBsb()[0] for x in self.cellBlocks}
 
     def getUsedSubblocks(self):
         """Returns a set of block/sub-blocks that exist in this group."""
-        return set(x.getBsb() for x in self.cellBlocks)
+        return {x.getBsb() for x in self.cellBlocks}
 
     def getBsbSizes(self):
         """Returns the total size of the block, but also returns a
@@ -694,17 +693,16 @@ class MobCells(MobBase):
         for cellBlock in self.cellBlocks:
             cellBlock.convertFids(mapper,toLong)
 
-    def updateRecords(self,srcBlock,mapper,mergeIds):
+    def updateRecords(self, srcBlock, mergeIds):
         """Updates any records in 'self' that exist in 'srcBlock'."""
         if self.cellBlocks and not self.id_cellBlock:
             self.indexRecords()
         id_cellBlock = self.id_cellBlock
         id_Get = id_cellBlock.get
         for srcCellBlock in srcBlock.cellBlocks:
-            fid = mapper(srcCellBlock.cell.fid)
-            cellBlock = id_Get(fid)
+            cellBlock = id_Get(srcCellBlock.cell.fid)
             if cellBlock:
-                cellBlock.updateRecords(srcCellBlock,mapper,mergeIds)
+                cellBlock.updateRecords(srcCellBlock, mergeIds)
 
     def updateMasters(self,masters):
         """Updates set of master names according to masters actually used."""
@@ -975,27 +973,25 @@ class MobWorld(MobCells):
             self.worldCellBlock.updateMasters(masters)
         MobCells.updateMasters(self,masters)
 
-    def updateRecords(self,srcBlock,mapper,mergeIds):
+    def updateRecords(self, srcBlock, mergeIds):
         """Updates any records in 'self' that exist in 'srcBlock'."""
         selfGetter = self.__getattribute__
         srcGetter = srcBlock.__getattribute__
         selfSetter = self.__setattr__
         mergeDiscard = mergeIds.discard
-        for attr in ('world','road'):
+        for attr in (u'world', u'road'):
             myRecord = selfGetter(attr)
             record = srcGetter(attr)
             if myRecord and record:
-                if myRecord.fid != mapper(record.fid):
-                    raise ArgumentError(u"Fids don't match! %08x, %08x" % (
+                if myRecord.fid != record.fid:
+                    raise ArgumentError(u"Fids don't match! %r, %r" % (
                         myRecord.fid,record.fid))
                 if not record.flags1.ignored:
-                    record = record.getTypeCopy(mapper)
-                    selfSetter(attr,record)
+                    selfSetter(attr, record.getTypeCopy())
                     mergeDiscard(record.fid)
         if self.worldCellBlock and srcBlock.worldCellBlock:
-            self.worldCellBlock.updateRecords(srcBlock.worldCellBlock,mapper,
-                                              mergeIds)
-        MobCells.updateRecords(self,srcBlock,mapper,mergeIds)
+            self.worldCellBlock.updateRecords(srcBlock.worldCellBlock,mergeIds)
+        MobCells.updateRecords(self, srcBlock, mergeIds)
 
     def keepRecords(self,keepIds):
         """Keeps records with fid in set keepIds. Discards the rest."""
@@ -1103,23 +1099,23 @@ class MobWorlds(MobBase):
 
     def indexRecords(self):
         """Indexes records by fid."""
-        self.id_worldBlocks = dict((x.world.fid,x) for x in self.worldBlocks)
+        self.id_worldBlocks = {x.world.fid: x for x in self.worldBlocks}
 
     def updateMasters(self,masters):
         """Updates set of master names according to masters actually used."""
         for worldBlock in self.worldBlocks:
             worldBlock.updateMasters(masters)
 
-    def updateRecords(self,srcBlock,mapper,mergeIds):
+    def updateRecords(self, srcBlock, mergeIds):
         """Updates any records in 'self' that exist in 'srcBlock'."""
         if self.worldBlocks and not self.id_worldBlocks:
             self.indexRecords()
         id_worldBlocks = self.id_worldBlocks
         idGet = id_worldBlocks.get
         for srcWorldBlock in srcBlock.worldBlocks:
-            worldBlock = idGet(mapper(srcWorldBlock.world.fid))
+            worldBlock = idGet(srcWorldBlock.world.fid)
             if worldBlock:
-                worldBlock.updateRecords(srcWorldBlock,mapper,mergeIds)
+                worldBlock.updateRecords(srcWorldBlock, mergeIds)
 
     def setWorld(self, world, worldcellblock=None):
         """Adds record to record list and indexed."""

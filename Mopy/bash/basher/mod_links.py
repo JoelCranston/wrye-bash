@@ -1567,6 +1567,7 @@ class Mod_DecompileAll(EnabledLink):
             loadFactory = parsers.LoadFactory(True, bosh.MreRecord.type_class['SCPT'])
             modFile = parsers.ModFile(fileInfo, loadFactory)
             modFile.load(True)
+            modFile.convertToLongFids((b'SCPT',))
             badGenericLore = False
             removed = []
             id_text = {}
@@ -1575,13 +1576,12 @@ class Mod_DecompileAll(EnabledLink):
                 for master in modFile.tes4.masters:
                     masterFile = parsers.ModFile(bosh.modInfos[master], loadFactory)
                     masterFile.load(True)
-                    mapper = masterFile.getLongMapper()
+                    masterFile.convertToLongFids((b'SCPT',))
                     for record in masterFile.SCPT.getActiveRecords():
-                        id_text[mapper(record.fid)] = record.script_source
-                mapper = modFile.getLongMapper()
+                        id_text[record.fid] = record.script_source
                 newRecords = []
                 for record in modFile.SCPT.records:
-                    fid = mapper(record.fid)
+                    fid = record.fid
                     #--Special handling for genericLoreScript
                     if (fid in id_text and record.fid == 0x00025811 and
                         record.compiled_size == 4 and record.last_index == 0):
