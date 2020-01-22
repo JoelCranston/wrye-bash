@@ -80,18 +80,18 @@ class MobBase(object):
                                  type(self))
         #--Analyze ins.
         elif ins is not None:
-            self.loadData(ins, ins.tell() +
-                          self.size - RecordHeader.rec_header_size)
+            self.load_rec_group(ins,
+                ins.tell() + self.size - RecordHeader.rec_header_size)
         #--Analyze internal buffer.
         else:
             with self.getReader() as reader:
-                self.loadData(reader,reader.size)
+                self.load_rec_group(reader, reader.size)
         #--Discard raw data?
         if do_unpack:
             self.data = None
             self.setChanged()
 
-    def loadData(self,ins,endPos):
+    def load_rec_group(self, ins, endPos):
         """Loads data from input stream. Called by load()."""
         raise AbstractError
 
@@ -166,7 +166,7 @@ class MobObjects(MobBase):
         self.id_records = {}
         MobBase.__init__(self, header, loadFactory, ins, do_unpack)
 
-    def loadData(self,ins,endPos):
+    def load_rec_group(self, ins, endPos):
         """Loads data from input stream. Called by load()."""
         expType = self.label
         recClass = self.loadFactory.getRecClass(expType)
@@ -298,7 +298,7 @@ class MobObjects(MobBase):
 class MobDials(MobObjects):
     """DIAL top block of mod file."""
 
-    def loadData(self,ins,endPos):
+    def load_rec_group(self, ins, endPos):
         """Loads data from input stream. Called by load()."""
         expType = self.label
         recClass = self.loadFactory.getRecClass(expType)
@@ -381,7 +381,7 @@ class MobCell(MobBase):
         self.pgrd = None
         MobBase.__init__(self, header, loadFactory, ins, do_unpack)
 
-    def loadData(self,ins,endPos):
+    def load_rec_group(self, ins, endPos):
         """Loads data from input stream. Called by load()."""
         cellType_class = self.loadFactory.getCellTypeClass()
         persistent,temp,distant = self.persistent,self.temp,self.distant
@@ -716,7 +716,7 @@ class MobCells(MobBase):
 class MobICells(MobCells):
     """Tes4 top block for interior cell records."""
 
-    def loadData(self,ins,endPos):
+    def load_rec_group(self, ins, endPos):
         """Loads data from input stream. Called by load()."""
         expType = self.label
         recCellClass = self.loadFactory.getRecClass(expType)
@@ -800,7 +800,7 @@ class MobWorld(MobCells):
         self.road = None
         MobCells.__init__(self, header, loadFactory, ins, do_unpack)
 
-    def loadData(self,ins,endPos):
+    def load_rec_group(self, ins, endPos):
         """Loads data from input stream. Called by load()."""
         cellType_class = self.loadFactory.getCellTypeClass()
         errLabel = u'World Block'
@@ -1021,7 +1021,7 @@ class MobWorlds(MobBase):
         self.orphansSkipped = 0
         MobBase.__init__(self, header, loadFactory, ins, do_unpack)
 
-    def loadData(self,ins,endPos):
+    def load_rec_group(self, ins, endPos):
         """Loads data from input stream. Called by load()."""
         expType = self.label
         recWrldClass = self.loadFactory.getRecClass(expType)
