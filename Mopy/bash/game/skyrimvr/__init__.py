@@ -91,7 +91,7 @@ class SkyrimVRGameInfo(SkyrimSEGameInfo):
             MreDebr, MreDial, MreDlbr, MreDlvw, MreDobj, MreDoor, MreDual, \
             MreEczn, MreEfsh, MreEnch, MreEqup, MreExpl, MreEyes, MreFact, \
             MreFlor, MreFlst, MreFstp, MreFsts, MreFurn, MreGmst, MreGras, \
-            MreHazd, MreHdpt, MreHeader, MreIdle, MreIdlm, MreImad, MreImgs, \
+            MreHazd, MreHdpt, MreTes4, MreIdle, MreIdlm, MreImad, MreImgs, \
             MreInfo, MreIngr, MreIpct, MreIpds, MreKeym, MreKywd, MreLcrt, \
             MreLctn, MreLgtm, MreLigh, MreLscr, MreLvli, MreLvln, MreLvsp, \
             MreMatt, MreMesg, MreMgef, MreMisc, MreMovt, MreMstt, MreMusc, \
@@ -159,7 +159,7 @@ class SkyrimVRGameInfo(SkyrimSEGameInfo):
             MreRfct, MreScrl, MreShou, MreSlgm, MreSmbn, MreSmen, MreSmqn,
             MreSnct, MreSndr, MreSopm, MreSoun, MreSpel, MreSpgd, MreStat,
             MreTact, MreTree, MreTxst, MreVtyp, MreWatr, MreWeap, MreWoop,
-            MreWthr, MreCell, MreWrld, MreVoli, MreLens, MreQust, MreHeader,
+            MreWthr, MreCell, MreWrld, MreVoli, MreLens, MreQust, MreTes4,
             MrePack,
             # MreNavm, MreNavi
         ))
