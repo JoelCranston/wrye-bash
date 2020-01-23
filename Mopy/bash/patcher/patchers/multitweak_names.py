@@ -473,9 +473,9 @@ class CBash_NamesTweak_Spells(ANamesTweak_Spells,CBash_MultiTweakItem):
     def save_tweak_config(self, configs):
         """Save config to configs dictionary."""
         super(CBash_NamesTweak_Spells, self).save_tweak_config(configs)
-        self.format = self.choiceValues[self.chosen][0]
-        self.removeTags = u'%s' not in self.format
-        self.showLevel = u'%d' in self.format
+        self.spell_fmt = self.choiceValues[self.chosen][0]
+        self.removeTags = u'%s' not in self.spell_fmt
+        self.showLevel = u'%d' in self.spell_fmt
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
@@ -494,10 +494,10 @@ class CBash_NamesTweak_Spells(ANamesTweak_Spells,CBash_MultiTweakItem):
             # existing label
             if not self.removeTags:
                 if self.showLevel:
-                    newFull = self.format % (
+                    newFull = self.spell_fmt % (
                         u'ACDIMRU'[schoolType], record.levelType) + newFull
                 else:
-                    newFull = self.format % u'ACDIMRU'[schoolType] + newFull
+                    newFull = self.spell_fmt % u'ACDIMRU'[schoolType] + newFull
 
             if record.full != newFull:
                 override = record.CopyAsOverride(self.patchFile)
@@ -575,8 +575,8 @@ class CBash_NamesTweak_Weapons(ANamesTweak_Weapons,CBash_MultiTweakItem):
     def save_tweak_config(self, configs):
         """Save config to configs dictionary."""
         super(CBash_NamesTweak_Weapons, self).save_tweak_config(configs)
-        self.format = self.choiceValues[self.chosen][0]
-        self.showStat = u'%02d' in self.format
+        self.weap_fmt = self.choiceValues[self.chosen][0]
+        self.showStat = u'%02d' in self.weap_fmt
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
@@ -588,10 +588,10 @@ class CBash_NamesTweak_Weapons(ANamesTweak_Weapons,CBash_MultiTweakItem):
             else:
                 type_ = record.weaponType
             if self.showStat:
-                newFull = self.format % (
+                newFull = self.weap_fmt % (
                     u'CDEFGBA'[type_], record.damage) + newFull
             else:
-                newFull = self.format % u'CDEFGBA'[type_] + newFull
+                newFull = self.weap_fmt % u'CDEFGBA'[type_] + newFull
             if record.full != newFull:
                 override = record.CopyAsOverride(self.patchFile)
                 if override:
@@ -758,8 +758,8 @@ class CBash_TextReplacer(ATextReplacer,CBash_MultiTweakItem):
     def save_tweak_config(self, configs):
         """Save config to configs dictionary."""
         super(CBash_TextReplacer, self).save_tweak_config(configs)
-        self.format = self.choiceValues[self.chosen][0]
-        self.showStat = u'%02d' in self.format
+        self.txt_repl_fmt = self.choiceValues[self.chosen][0]
+        self.showStat = u'%02d' in self.txt_repl_fmt
 
     def apply(self,modFile,record,bashTags):
         """Edits patch file as desired. """
