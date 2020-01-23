@@ -31,6 +31,7 @@ import os
 import re
 import struct
 import zlib
+from itertools import product
 from operator import attrgetter
 
 from . import bolt
@@ -98,8 +99,12 @@ class RecordHeader(object):
     rec_pack_format = ['=4s', 'I', 'I', 'I', 'I', 'I']
     # rec_pack_format as a format string. Use for pack / unpack calls.
     rec_pack_format_str = ''.join(rec_pack_format)
+    # precompiled unpacker for record headers
+    header_unpack = struct.Struct(rec_pack_format_str).unpack
     # Format used by sub-record headers. Morrowind uses a different one.
     sub_header_fmt = '=4sH'
+    # precompiled unpacker for sub-record headers
+    sub_header_unpack = struct.Struct(sub_header_fmt).unpack
     # Size of sub-record headers. Morrowind has a different one.
     sub_header_size = 6
     # http://en.uesp.net/wiki/Tes5Mod:Mod_File_Format#Groups
@@ -150,7 +155,7 @@ class RecordHeader(object):
     def unpack(ins):
         """Return a RecordHeader object by reading the input stream."""
         # args = rec_type, size, uint0, uint1, uint2[, uint3]
-        args = ins.unpack(RecordHeader.rec_pack_format_str,
+        args = ins.unpack(RecordHeader.header_unpack,
                           RecordHeader.rec_header_size, 'REC_HEADER')
         #--Bad type?
         rec_type = args[0]
@@ -213,6 +218,8 @@ class RecordHeader(object):
                                                   self.form_version)
 
 #------------------------------------------------------------------------------
+# precompiled struct unpackers
+_int_unpacker = struct.Struct(u'I').unpack
 class ModReader(object):
     """Wrapper around a plugin file in read mode.
     Will throw a ModReaderror if read operation fails to return correct size.
@@ -277,23 +284,23 @@ class ModReader(object):
                                          self.size)
         return self.ins.read(size)
 
-    def readLString(self,size,recType='----'):
-        """Read translatible string.  If the mod has STRINGS file, this is a
+    def readLString(self, size, recType='----', __unpacker=_int_unpacker):
+        """Read translatable string.  If the mod has STRINGS file, this is a
         uint32 to lookup the string in the string table.  Otherwise, this is a
         zero-terminated string."""
         if self.hasStrings:
             if size != 4:
                 endPos = self.ins.tell() + size
                 raise exception.ModReadError(self.inName, recType, endPos, self.size)
-            id_, = self.unpack('I',4,recType)
+            id_, = self.unpack(__unpacker, 4, recType)
             if id_ == 0: return u''
             else: return self.strings.get(id_,u'LOOKUP FAILED!') #--Same as Skyrim
         else:
             return self.readString(size,recType)
 
-    def readString32(self, recType='----'):
+    def readString32(self, recType='----', __unpacker=_int_unpacker):
         """Read wide pascal string: uint32 is used to indicate length."""
-        strLen, = self.unpack('I',4,recType)
+        strLen, = self.unpack(__unpacker, 4, recType)
         return self.readString(strLen,recType)
 
     def readString(self,size,recType='----'):
@@ -306,33 +313,34 @@ class ModReader(object):
         return [decode(x,bolt.pluginEncoding,avoidEncodings=('utf8','utf-8')) for x in
                 self.read(size,recType).rstrip(null1).split(null1)]
 
-    def unpack(self,format,size,recType='----'):
-        """Read file and unpack according to struct format."""
+    def unpack(self, struct_unpacker, size, recType='----'):
+        """Read size bytes from the file and unpack according to format of
+        struct_unpacker."""
         endPos = self.ins.tell() + size
         if endPos > self.size:
             raise exception.ModReadError(self.inName, recType, endPos, self.size)
-        return struct_unpack(format, self.ins.read(size))
+        return struct_unpacker(self.ins.read(size))
 
-    def unpackRef(self):
+    def unpackRef(self, __unpacker=_int_unpacker):
         """Read a ref (fid)."""
-        return self.unpack('I',4)[0]
+        return self.unpack(__unpacker, 4)[0]
 
     def unpackRecHeader(self): return RecordHeader.unpack(self)
 
-    def unpackSubHeader(self,recType='----',expType=None,expSize=0):
+    def unpackSubHeader(self, recType='----', expType=None, expSize=0,
+                        __unpacker=_int_unpacker):
         """Unpack a subrecord header.  Optionally checks for match with expected
         type and size."""
         selfUnpack = self.unpack
-        (rec_type, size) = selfUnpack(RecordHeader.sub_header_fmt,
+        (rec_type, size) = selfUnpack(RecordHeader.sub_header_unpack,
                                       RecordHeader.sub_header_size,
                                       recType + '.SUB_HEAD')
         #--Extended storage?
         while rec_type == 'XXXX':
-            size = selfUnpack('I',4,recType+'.XXXX.SIZE.')[0]
+            size = selfUnpack(__unpacker, 4, recType + '.XXXX.SIZE.')[0]
             # Throw away size here (always == 0)
-            rec_type = selfUnpack(RecordHeader.sub_header_fmt,
-                                  RecordHeader.sub_header_size,
-                                  recType + '.XXXX.TYPE')[0]
+            rec_type = selfUnpack(RecordHeader.sub_header_unpack,
+                RecordHeader.sub_header_size, recType + '.XXXX.TYPE')[0]
         #--Match expected name?
         if expType and expType != rec_type:
             raise exception.ModError(self.inName, u'%s: Expected %s subrecord, but '
@@ -715,7 +723,8 @@ class MelFidList(MelFids):
 
     def loadData(self, record, ins, sub_type, size_, readId):
         if not size_: return
-        fids = ins.unpack(repr(size_ // 4) + 'I', size_, readId)
+        fids = ins.unpack(struct.Struct(u'%dI' % (size_ // 4)).unpack, size_,
+                          readId)
         record.__setattr__(self.attr,list(fids))
 
     def dumpData(self,record,out):
@@ -1320,6 +1329,7 @@ class MelStruct(MelBase):
     def __init__(self, subType, format, *elements):
         self.subType, self.format = subType, format
         self.attrs,self.defaults,self.actions,self.formAttrs = MelBase.parseElements(*elements)
+        self._unpacker = struct.Struct(self.format).unpack
 
     def getSlotsUsed(self):
         return self.attrs
@@ -1334,7 +1344,7 @@ class MelStruct(MelBase):
             setter(attr,value)
 
     def loadData(self, record, ins, sub_type, size_, readId):
-        unpacked = ins.unpack(self.format, size_, readId)
+        unpacked = ins.unpack(self._unpacker, size_, readId)
         setter = record.__setattr__
         for attr,value,action in zip(self.attrs,unpacked,self.actions):
             if action: value = action(value)
@@ -1360,6 +1370,20 @@ class MelStruct(MelBase):
     @property
     def static_size(self):
         return struct.calcsize(self.format)
+
+def mel_cdta_unpackers(sizes_list):
+    """Return compiled structure objects for each combination of size and
+    condition value (?).
+
+    :rtype: dict[unicode, struct.Struct]
+    """
+    sizes_list = sorted(sizes_list)
+    _formats = {u'11': u'II', u'10': u'Ii', u'01': u'iI', u'00': u'ii'}
+    _formats = {u'%s%d' % (k, s): u'%s%s' % (
+        f, u''.join([u'I'] * ((s - sizes_list[0]) // 4))) for (k, f), s in
+                product(_formats.items(), sizes_list)}
+    _formats = {k: struct.Struct(v) for (k, v) in _formats.items()}
+    return _formats
 
 #------------------------------------------------------------------------------
 class MelArray(MelBase):
@@ -1494,21 +1518,23 @@ class MelTruncatedStruct(MelStruct):
                               u'set')
         self._is_optional = kwargs.pop('is_optional', False)
         MelStruct.__init__(self, sub_sig, sub_fmt, *elements)
-        self._all_formats = {struct.calcsize(alt_fmt): alt_fmt for alt_fmt
-                             in old_versions}
-        self._all_formats[struct.calcsize(sub_fmt)] = sub_fmt
+        self._all_unpackers = {
+            struct.calcsize(alt_fmt): struct.Struct(alt_fmt).unpack for
+            alt_fmt in old_versions}
+        self._all_unpackers[struct.calcsize(sub_fmt)] = struct.Struct(
+            sub_fmt).unpack
 
     def loadData(self, record, ins, sub_type, size_, readId):
         # Try retrieving the format - if not possible, wrap the error to make
         # it more informative
         try:
-            target_fmt = self._all_formats[size_]
+            target_unpacker = self._all_unpackers[size_]
         except KeyError:
             raise exception.ModSizeError(
-                ins.inName, readId, tuple(self._all_formats.keys()), size_)
+                ins.inName, readId, tuple(self._all_unpackers.keys()), size_)
         # Actually unpack the struct and pad it with defaults if it's an older,
         # truncated version
-        unpacked_val = ins.unpack(target_fmt, size_, readId)
+        unpacked_val = ins.unpack(target_unpacker, size_, readId)
         unpacked_val = self._pre_process_unpacked(unpacked_val)
         # Apply any actions and then set the attributes according to the values
         # we just unpacked
@@ -2587,7 +2613,8 @@ class MreHeaderBase(MelRecord):
             record.masters = []
             record.master_sizes = []
 
-        def loadData(self, record, ins, sub_type, size_, readId):
+        def loadData(self, record, ins, sub_type, size_, readId,
+                     __unpacker=struct.Struct(u'Q').unpack):
             if sub_type == 'MAST':
                 # Don't use ins.readString, because it will try to use
                 # bolt.pluginEncoding for the filename. This is one case where
@@ -2597,7 +2624,8 @@ class MreHeaderBase(MelRecord):
                 record.masters.append(GPath(master_name))
             else: # sub_type == 'DATA'
                 # DATA is the size for TES3, but unknown/unused for later games
-                record.master_sizes.append(ins.unpack('Q', size_, readId)[0])
+                record.master_sizes.append(
+                    ins.unpack(__unpacker, size_, readId)[0])
 
         def dumpData(self,record,out):
             pack1 = out.packSub0
@@ -2926,9 +2954,10 @@ class MelRaceParts(MelNull):
         for element in self._indx_to_loader.itervalues():
             element.setDefault(record)
 
-    def loadData(self, record, ins, sub_type, size_, readId):
+    def loadData(self, record, ins, sub_type, size_, readId,
+                 __unpacker=_int_unpacker):
         if sub_type == 'INDX':
-            self._last_indx, = ins.unpack('I', size_, readId)
+            self._last_indx, = ins.unpack(__unpacker, size_, readId)
         else:
             self._indx_to_loader[self._last_indx].loadData(
                 record, ins, sub_type, size_, readId)
@@ -2978,16 +3007,17 @@ class MelMODS(MelBase):
     def setDefault(self,record):
         record.__setattr__(self.attr,None)
 
-    def loadData(self, record, ins, sub_type, size_, readId):
+    def loadData(self, record, ins, sub_type, size_, readId,
+                 __unpacker=_int_unpacker):
         insUnpack = ins.unpack
         insRead32 = ins.readString32
-        count, = insUnpack('I',4,readId)
+        count, = insUnpack(__unpacker, 4, readId)
         data = []
         dataAppend = data.append
         for x in xrange(count):
             string = insRead32(readId)
             fid = ins.unpackRef()
-            index, = insUnpack('I',4,readId)
+            index, = insUnpack(__unpacker, 4, readId)
             dataAppend((string,fid,index))
         record.__setattr__(self.attr,data)
 

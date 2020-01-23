@@ -22,6 +22,7 @@
 #
 # =============================================================================
 """GameInfo override for TES IV: Oblivion."""
+import struct
 
 from .. import GameInfo
 from ... import brec
@@ -273,6 +274,8 @@ class OblivionGameInfo(GameInfo):
         rec_header.rec_header_size = 20
         rec_header.rec_pack_format = ['=4s', 'I', 'I', 'I', 'I']
         rec_header.rec_pack_format_str = ''.join(rec_header.rec_pack_format)
+        rec_header.header_unpack = struct.Struct(
+            rec_header.rec_pack_format_str).unpack
         rec_header.pack_formats = {0: '=4sI4s2I'}
         rec_header.pack_formats.update(
             {x: '=4s4I' for x in {1, 6, 7, 8, 9, 10}})

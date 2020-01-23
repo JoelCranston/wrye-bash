@@ -22,6 +22,8 @@
 #
 # =============================================================================
 """This module contains the oblivion record classes."""
+import struct
+
 from .constants import condition_function_data
 from ... import brec
 from ...bolt import Flags
@@ -34,7 +36,7 @@ from ...brec import MelRecord, MelGroups, MelStruct, FID, MelGroup, \
     MelRaceParts, MelRaceVoices, null1, null2, null3, null4, MelScriptVars, \
     MelSequential, MelUnion, FlagDecider, AttrValDecider, PartialLoadDecider, \
     MelTruncatedStruct, MelCoordinates, MelIcon, MelIco2, MelEdid, MelFull, \
-    MelArray, MelWthrColors
+    MelArray, MelWthrColors, mel_cdta_unpackers
 from ...exception import BoltError, ModSizeError, StateError
 # Set brec MelModel to the one for Oblivion
 if brec.MelModel is None:
@@ -102,29 +104,30 @@ class MelConditions(MelGroups):
         def hasFids(self, formElements):
             formElements.add(self)
 
-        def loadData(self, record, ins, sub_type, size_, readId):
+        def loadData(self, record, ins, sub_type, size_, readId,
+                     __unpacker=struct.Struct(u'B3sfI').unpack,
+                     __unpackers=mel_cdta_unpackers((24, 20))):
             if sub_type == 'CTDA' and size_ != 24:
                 raise ModSizeError(ins.inName, readId, (24,), size_)
             if sub_type == 'CTDT' and size_ != 20:
                 raise ModSizeError(ins.inName, readId, (20,), size_)
-            unpacked1 = ins.unpack('B3sfI', 12, readId)
+            unpacked1 = ins.unpack(__unpacker, 12, readId)
             (record.operFlag, record.unused1, record.compValue,
              ifunc) = unpacked1
             #--Get parameters
-            if ifunc not in condition_function_data:
+            try:
+                form12 = u'%d%d%d' % (
+                    condition_function_data[ifunc][1] == 2,
+                    condition_function_data[ifunc][2] == 2, size_)
+            except KeyError:
                 raise BoltError(u'Unknown condition function: %d\nparam1: '
                                 u'%08X\nparam2: %08X' % (
                     ifunc, ins.unpackRef(), ins.unpackRef()))
-            form1 = 'iI'[condition_function_data[ifunc][1] == 2] # 2 means fid
-            form2 = 'iI'[condition_function_data[ifunc][2] == 2]
-            form12 = form1 + form2
-            unpacked2 = ins.unpack(form12,8,readId)
-            record.param1, record.param2 = unpacked2
-            if size_ == 24:
-                record.unused2 = ins.read(4)
-            else: # size == 20, verified at the start
-                record.unused2 = null4
-            record.ifunc, record.form12 = ifunc, form12
+            form12 = __unpackers[form12]
+            record.param1, record.param2, record.unused2 = \
+                ins.unpack(form12.unpack, size_ - 12, readId) + (null4,) * (
+                    (24 - size_) // 4)
+            record.ifunc, record.form12 = ifunc, form12.format
 
         def dumpData(self,record,out):
             out.packSub('CTDA','B3sfI'+ record.form12 + '4s',
@@ -1186,8 +1189,10 @@ class MreNpc(MreActor):
 
     class MelNpcData(MelStruct):
         """Convert npc stats into skills, health, attributes."""
-        def loadData(self, record, ins, sub_type, size_, readId):
-            unpacked = list(ins.unpack('=21BH2s8B', size_, readId))
+
+        def loadData(self, record, ins, sub_type, size_, readId,
+                     __unpacker=struct.Struct(u'=21BH2s8B').unpack):
+            unpacked = list(ins.unpack(__unpacker, size_, readId))
             recordSetAttr = record.__setattr__
             recordSetAttr('skills',unpacked[:21])
             recordSetAttr('health',unpacked[21])
