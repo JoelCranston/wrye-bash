@@ -1044,9 +1044,12 @@ class FlagDecider(ACommonDecider):
 
 class GameDecider(ACommonDecider):
     """Decider that returns the name of the currently managed game."""
+    def __init__(self):
+        from . import bush
+        self.game_fsName = bush.game.fsName
+
     def _decide_common(self, record):
-        import bush
-        return bush.game.fsName
+        return self.game_fsName
 
 class PartialLoadDecider(ADecider):
     """Partially loads a subrecord using a given loader, then rewinds the
