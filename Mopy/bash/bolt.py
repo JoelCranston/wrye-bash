@@ -1437,6 +1437,7 @@ class PickleDict(object):
                             self.data.update(pickle.load(ins))
                         else:
                             raise PickleDict.Mold(path)
+                    self._fixme_drop_compat_for_unicode()
                     return 1 + (path == self.backup)
                 except (EOFError, ValueError):
                     pass
@@ -1451,12 +1452,28 @@ class PickleDict(object):
         """
         if self.readOnly: return False
         #--Pickle it
+        # FIXME Drop in 308!
         self.vdata[b'boltPaths'] = True # needed so pre 307 versions don't blow
         with self.path.temp.open(u'wb') as out:
             for data in (b'VDATA2', self.vdata, self.data):
                 pickle.dump(data,out,-1)
         self.path.untemp(doBackup=True)
         return True
+
+    def _fixme_drop_compat_for_unicode(self):
+        """Automatically called while loading, converts string keys to
+        unicode and saves if any were changed."""
+        # FIXME Drop in 308!
+        def _conv(k): return unicode(k, u'utf8') if type(k) == str else k
+        converted = False
+        if any(type(k) == str for k in self.data.iterkeys()):
+            converted = True
+            self.data = {_conv(k): v for k, v in self.data.iteritems()}
+        if any(type(k) == str for k in self.vdata.iterkeys()):
+            converted = True
+            self.vdata = {_conv(k): v for k, v in self.vdata.iteritems()}
+        if converted:
+            self.save()
 
 #------------------------------------------------------------------------------
 class Settings(DataDict):
