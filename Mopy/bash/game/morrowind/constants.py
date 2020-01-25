@@ -33,6 +33,3 @@ bethDataFiles = {
     u'bloodmoon.esm',
     u'bloodmoon.bsa',
 }
-
-# xEdit menu string and key for expert setting
-xEdit_expert = (_(u'TES3Edit Expert'), u'tes3View.iKnowWhatImDoing')

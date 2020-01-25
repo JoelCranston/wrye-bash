@@ -50,8 +50,8 @@ class MorrowindGameInfo(GameInfo):
 
     using_txt_file = False
 
-    class cs(GameInfo.cs):
-        cs_abbrev = u'TESCS'
+    class ck(GameInfo.ck):
+        ck_abbrev = u'TESCS'
         long_name = u'Construction Set'
         exe = u'TES Construction Set.exe'
         se_args = None
@@ -64,6 +64,10 @@ class MorrowindGameInfo(GameInfo):
 
     class pnd(GameInfo.pnd): # Morrowind seems to have no such directories
         voice_dir = []
+
+    class xe(GameInfo.xe):
+        full_name = u'TES3Edit'
+        expert_key = u'tes3View.iKnowWhatImDoing'
 
     screenshot_enabled_key = (u'General', u'Screen Shot Enable', u'1')
     screenshot_base_key = (u'General', u'Screen Shot Base Name', u'ScreenShot')
