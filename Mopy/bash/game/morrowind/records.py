@@ -51,7 +51,7 @@ class MelMWId(MelString):
         MelString.__init__(self, b'NAME', u'mw_id')
 
 # Shared (plugins + saves) record classes
-class MreHeader(MreHeaderBase):
+class MreTes3(MreHeaderBase):
     """TES3 Record. File header."""
     classType = b'TES3'
 

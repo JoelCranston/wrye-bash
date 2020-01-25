@@ -88,19 +88,20 @@ class MorrowindGameInfo(GameInfo):
     class esp(GameInfo.esp):
         validHeaderVersions = (1.2, 1.3)
         stringsFiles = []
+        plugin_header_sig = b'TES3'
 
     @classmethod
     def init(cls):
         cls._dynamic_import_modules(__name__)
-        from .records import MreHeader
+        from .records import MreTes3
         # Setting RecordHeader class variables - Morrowind is special
-        __rec_type = brec.RecordHeader
-        __rec_type.rec_header_size = 16
-        __rec_type.rec_pack_format = [u'=4s', u'I', u'I', u'I']
-        __rec_type.rec_pack_format_str = u''.join(__rec_type.rec_pack_format)
-        __rec_type.sub_header_fmt = u'=4sI'
-        __rec_type.sub_header_size = 8
-        __rec_type.topTypes = [
+        rec_header = brec.RecordHeader
+        rec_header.rec_header_size = 16
+        rec_header.rec_pack_format = [u'=4s', u'I', u'I', u'I']
+        rec_header.rec_pack_format_str = u''.join(rec_header.rec_pack_format)
+        rec_header.sub_header_fmt = u'=4sI'
+        rec_header.sub_header_size = 8
+        rec_header.topTypes = [
             b'GMST', b'GLOB', b'CLAS', b'FACT', b'RACE', b'SOUN', b'SKIL',
             b'MGEF', b'SCPT', b'REGN', b'SSCR', b'BSGN', b'LTEX', b'STAT',
             b'DOOR', b'MISC', b'WEAP', b'CONT', b'SPEL', b'CREA', b'BODY',
@@ -109,15 +110,13 @@ class MorrowindGameInfo(GameInfo):
             b'LEVC', b'CELL', b'LAND', b'PGRD', b'SNDG', b'DIAL', b'INFO']
             # +SSCR? in xEdit: to be confirmed
         # TODO(inf) Everything up to this TODO correct, the rest may not be yet
-        __rec_type.pack_formats = {0: u'=4sI4s2I'}
-        __rec_type.pack_formats.update(
+        rec_header.pack_formats = {0: u'=4sI4s2I'}
+        rec_header.pack_formats.update(
             {x: u'=4s4I' for x in {1, 6, 7, 8, 9, 10}})
-        __rec_type.pack_formats.update({x: u'=4sIi2I' for x in {2, 3}})
-        __rec_type.pack_formats.update({x: u'=4sIhh2I' for x in {4, 5}})
-        __rec_type.recordTypes = set(
-            __rec_type.topTypes + [b'TES3'])
-        brec.MreRecord.type_class = dict((x.classType, x) for x in (
-            MreHeader,))
+        rec_header.pack_formats.update({x: u'=4sIi2I' for x in {2, 3}})
+        rec_header.pack_formats.update({x: u'=4sIhh2I' for x in {4, 5}})
+        rec_header.recordTypes = set(rec_header.topTypes + [b'TES3'])
+        brec.MreRecord.type_class = dict((x.classType, x) for x in (MreTes3,))
         brec.MreRecord.simpleTypes = (
             set(brec.MreRecord.type_class) - {b'TES3'})
 
