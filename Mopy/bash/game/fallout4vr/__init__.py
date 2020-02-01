@@ -64,6 +64,9 @@ class Fallout4VRGameInfo(Fallout4GameInfo):
 
     SkipBAINRefresh = {u'fo4vredit backups', u'fo4vredit cache'}
 
+    class esp(Fallout4GameInfo.esp):
+        expanded_plugin_range = False
+
     # ---------------------------------------------------------------------
     # --Imported - MreGlob is special import, not in records.py
     # ---------------------------------------------------------------------
