@@ -1039,8 +1039,7 @@ class PartialLoadDecider(ADecider):
         :param decider: The decider to use after loading.
         :type decider: ADecider"""
         self._loader = loader
-        # A bit hacky, but we need MelStruct to assign the attributes
-        self._load_size = struct.calcsize(loader.format)
+        self._load_size = loader.static_size
         self._decider = decider
         # This works because MelUnion._get_element_from_record does not use
         # self.__class__ to access can_decide_at_dump
@@ -1322,17 +1321,9 @@ class MelStrings(MelString):
 class MelStruct(MelBase):
     """Represents a structure record."""
 
-    def __init__(self, subType, format, *elements, **kwdargs):
-        dumpExtra = kwdargs.get('dumpExtra', None)
+    def __init__(self, subType, format, *elements):
         self.subType, self.format = subType, format
         self.attrs,self.defaults,self.actions,self.formAttrs = MelBase.parseElements(*elements)
-        if dumpExtra:
-            self.attrs += (dumpExtra,)
-            self.defaults += ('',)
-            self.actions += (None,)
-            self.formatLen = struct.calcsize(format)
-        else:
-            self.formatLen = -1
 
     def getSlotsUsed(self):
         return self.attrs
@@ -1347,15 +1338,11 @@ class MelStruct(MelBase):
             setter(attr,value)
 
     def loadData(self, record, ins, sub_type, size_, readId):
-        readsize = self.formatLen if self.formatLen >= 0 else size_
-        unpacked = ins.unpack(self.format,readsize,readId)
+        unpacked = ins.unpack(self.format, size_, readId)
         setter = record.__setattr__
         for attr,value,action in zip(self.attrs,unpacked,self.actions):
             if action: value = action(value)
             setter(attr, value)
-        if self.formatLen >= 0:
-            # Dump remaining subrecord data into an attribute
-            setter(self.attrs[-1], ins.read(size_ - self.formatLen))
 
     def dumpData(self,record,out):
         values = []
@@ -1365,17 +1352,7 @@ class MelStruct(MelBase):
             value = getter(attr)
             if action: value = value.dump()
             valuesAppend(value)
-        if self.formatLen >= 0:
-            extraLen = len(values[-1])
-            format = self.format + repr(extraLen) + 's'
-        else:
-            format = self.format
-        try:
-            out.packSub(self.subType,format,*values)
-        except struct.error:
-            bolt.deprint(u'Failed to dump struct: %s (%r)' % (
-                self.subType, self))
-            raise
+        out.packSub(self.subType, self.format, *values)
 
     def mapFids(self,record,function,save=False):
         getter = record.__getattribute__
@@ -1386,10 +1363,7 @@ class MelStruct(MelBase):
 
     @property
     def static_size(self):
-        # dumpExtra means we can't know the size
-        if self.formatLen == -1:
-            return struct.calcsize(self.format)
-        raise exception.AbstractError()
+        return struct.calcsize(self.format)
 
 #------------------------------------------------------------------------------
 class MelArray(MelBase):
@@ -1399,14 +1373,17 @@ class MelArray(MelBase):
     and resolve to only a single signature, can be used."""
     ##: MelFidList could be replaced with MelArray(MelFid), but that changes
     # the format of the generated attribute - rewriting usages is likely tough
-    def __init__(self, array_attr, element):
+    def __init__(self, array_attr, element, prelude=None):
         """Creates a new MelArray with the specified attribute and element.
 
         :param array_attr: The attribute name to give the entire array.
         :type array_attr: str
         :param element: The element that each entry in this array will be
             loaded and dumped by.
-        :type element: MelBase"""
+        :type element: MelBase
+        :param prelude: An optional element that will be loaded and dumped once
+            before the repeating element.
+        :type prelude: MelBase"""
         try:
             self._element_size = element.static_size
         except exception.AbstractError:
@@ -1421,6 +1398,14 @@ class MelArray(MelBase):
         # Underscore means internal usage only - e.g. distributor state
         self._element_attrs = [s for s in element.getSlotsUsed()
                               if not s.startswith('_')]
+        if prelude and prelude.subType != element.subType:
+            raise SyntaxError(u'MelArray preludes must have the same '
+                              u'signature as the main element')
+        self._prelude = prelude
+        try:
+            self._prelude_size = prelude.static_size if prelude else 0
+        except exception.AbstractError:
+            raise SyntaxError(u'MelArray preludes must have a static size')
 
     class _DirectModWriter(ModWriter):
         """ModWriter that does not write out any subrecord headers."""
@@ -1436,15 +1421,25 @@ class MelArray(MelBase):
         def packRef(self, sub_rec_type, fid):
             if fid is not None: self.pack('I', fid)
 
+    def getSlotsUsed(self):
+        slots_ret = self._prelude.getSlotsUsed() if self._prelude else ()
+        return super(MelArray, self).getSlotsUsed() + slots_ret
+
     def hasFids(self, formElements):
         temp_elements = set()
+        if self._prelude:
+            self._prelude.hasFids(temp_elements)
         self._element.hasFids(temp_elements)
         if temp_elements: formElements.add(self)
 
     def setDefault(self, record):
+        if self._prelude:
+            self._prelude.setDefault(record)
         setattr(record, self.attr, [])
 
     def mapFids(self,record,function,save=False):
+        if self._prelude:
+            self._prelude.mapFids(record, function, save)
         array_val = getattr(record, self.attr)
         if array_val:
             map_entry = self._element.mapFids
@@ -1456,6 +1451,10 @@ class MelArray(MelBase):
         entry_slots = self._element_attrs
         entry_size = self._element_size
         load_entry = self._element.loadData
+        if self._prelude:
+            self._prelude.loadData(record, ins, sub_type, self._prelude_size,
+                                   readId)
+            size_ -= self._prelude_size
         for x in xrange(size_ // entry_size):
             arr_entry = MelObject()
             append_entry(arr_entry)
@@ -1463,9 +1462,11 @@ class MelArray(MelBase):
             load_entry(arr_entry, ins, sub_type, entry_size, readId)
 
     def dumpData(self, record, out):
+        array_data = MelArray._DirectModWriter(sio())
+        if self._prelude:
+            self._prelude.dumpData(record, array_data)
         array_val = getattr(record, self.attr)
         if not array_val: return # don't dump out empty arrays
-        array_data = MelArray._DirectModWriter(sio())
         dump_entry = self._element.dumpData
         for arr_entry in array_val:
             dump_entry(arr_entry, array_data)
@@ -1496,7 +1497,7 @@ class MelTruncatedStruct(MelStruct):
             raise SyntaxError(u'MelTruncatedStruct: old_versions must be a '
                               u'set')
         self._is_optional = kwargs.pop('is_optional', False)
-        MelStruct.__init__(self, sub_sig, sub_fmt, *elements, **kwargs)
+        MelStruct.__init__(self, sub_sig, sub_fmt, *elements)
         self._all_formats = {struct.calcsize(alt_fmt): alt_fmt for alt_fmt
                              in old_versions}
         self._all_formats[struct.calcsize(sub_fmt)] = sub_fmt
