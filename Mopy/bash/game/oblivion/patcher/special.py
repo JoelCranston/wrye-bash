@@ -24,13 +24,13 @@
 import os
 import re
 from collections import Counter, defaultdict
+from .... import bosh, bush, load_order
 from ....bolt import GPath, sio, SubProgress, CsvReader
-from ....patcher import getPatchesPath
-from ....parsers import LoadFactory, ModFile
-from ....brec import MreRecord, RecordHeader, null4
-from .... import brec, bosh, bush, load_order
+from ....brec import MreRecord, null4, RecHeader
 from ....cint import MGEFCode, FormID
 from ....exception import StateError
+from ....parsers import LoadFactory, ModFile
+from ....patcher import getPatchesPath
 from ....patcher.base import Patcher, CBash_Patcher
 from ....patcher.patchers.base import SpecialPatcher, ListPatcher, \
     CBash_ListPatcher
@@ -99,8 +99,7 @@ class AlchemicalCatalogs(_AAlchemicalCatalogs,Patcher):
         keep = self.patchFile.getKeeper()
         #--Book generatator
         def getBook(objectId,eid,full,value,iconPath,modelPath,modb_p):
-            book = MreRecord.type_class['BOOK'](
-                RecordHeader('BOOK', 0, 0, 0, 0))
+            book = MreRecord.type_class['BOOK'](RecHeader('BOOK', 0, 0, 0, 0))
             book.longFids = True
             book.changed = True
             book.eid = eid

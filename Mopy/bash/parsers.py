@@ -26,27 +26,26 @@
 and the Mod_Import/Export Mods menu."""
 from __future__ import division, print_function
 import ctypes
+import re
 from _ctypes import POINTER
+from collections import defaultdict, Counter
 from ctypes import cast, c_ulong
 from operator import attrgetter, itemgetter
-from collections import defaultdict, Counter
-import re
 # Internal
 from . import bolt
 from . import bush # for game
 from . import env
 from . import load_order
 from .balt import Progress
+from .bass import dirs, inisettings
 from .bolt import GPath, decode, deprint, CsvReader, csvFormat, SubProgress, \
     struct_pack, struct_unpack
-from .bass import dirs, inisettings
-from .brec import MreRecord, MelObject, _coerce, genFid, ModReader, ModWriter, \
-    RecordHeader
-from .cint import ObCollection, FormID, aggregateTypes, validTypes, \
-    MGEFCode, ActorValue, ValidateList, pickupables, ExtractExportList, \
-    ValidateDict, IUNICODE, getattr_deep, setattr_deep
-from .exception import ArgumentError, CancelError, MasterMapError, ModError, \
-    StateError
+from .brec import MreRecord, MelObject, _coerce, genFid, ModReader, \
+    ModWriter, RecordHeader, RecHeader, GrupHeader
+from .cint import ObCollection, FormID, aggregateTypes, validTypes, MGEFCode, \
+    ActorValue, ValidateList, pickupables, ExtractExportList, ValidateDict, \
+    IUNICODE, getattr_deep, setattr_deep
+from .exception import ArgumentError, MasterMapError, ModError, StateError
 from .record_groups import MobDials, MobICells, MobWorlds, MobObjects, MobBase
 
 class ActorFactions(object):
@@ -1788,7 +1787,7 @@ class ScriptText(_ScriptText):
                 newText, longid = data
                 scriptFid = genFid(len(tes4.masters),tes4.getNextObject())
                 newScript = MreRecord.type_class['SCPT'](
-                    RecordHeader('SCPT', 0, 0x40000, scriptFid, 0))
+                    RecHeader('SCPT', 0, 0x40000, scriptFid, 0))
                 newScript.eid = eid
                 newScript.script_source = newText
                 newScript.setChanged()
@@ -3941,7 +3940,7 @@ class ModFile(object):
         self.fileInfo = fileInfo
         self.loadFactory = loadFactory or LoadFactory(True)
         #--Variables to load
-        self.tes4 = bush.game.plugin_header_class(RecordHeader())
+        self.tes4 = bush.game.plugin_header_class(RecHeader())
         self.tes4.setChanged()
         self.strings = bolt.StringTable()
         self.tops = {} #--Top groups.
@@ -3952,15 +3951,15 @@ class ModFile(object):
         self.mgef_name = None
         self.hostileEffects = None
 
-    def __getattr__(self,topType):
+    def __getattr__(self, topType, __rh=RecordHeader):
         """Returns top block of specified topType, creating it, if necessary."""
         if topType in self.tops:
             return self.tops[topType]
-        elif topType in RecordHeader.topTypes:
+        elif topType in __rh.topTypes:
             topClass = self.loadFactory.getTopClass(topType)
             try:
                 self.tops[topType] = topClass(
-                    RecordHeader('GRUP', 0, topType, 0, 0), self.loadFactory)
+                    GrupHeader('GRUP', 0, topType, 0, 0), self.loadFactory)
             except TypeError:
                 raise ModError(
                     self.fileInfo.name,
