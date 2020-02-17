@@ -139,7 +139,7 @@ class MobBase(object):
             self.getNumRecords()
         if self.numRecords > 0:
             self.header.size = self.size
-            out.write(self.header.pack())
+            out.write(self.header.pack_head())
             out.write(self.data)
 
     def getReader(self):
@@ -785,12 +785,12 @@ class MobICells(MobCells):
     def dump(self,out):
         """Dumps group header and then records."""
         if not self.changed:
-            out.write(self.header.pack())
+            out.write(self.header.pack_head())
             out.write(self.data)
         elif self.cellBlocks:
             (totalSize, bsb_size, blocks) = self.getBsbSizes()
             self.header.size = totalSize
-            out.write(self.header.pack())
+            out.write(self.header.pack_head())
             self.dumpBlocks(out,blocks,bsb_size,2,3)
 
 #------------------------------------------------------------------------------
@@ -935,7 +935,7 @@ class MobWorld(MobCells):
         worldSize = self.world.getSize() + hsize
         self.world.dump(out)
         if not self.changed:
-            out.write(self.header.pack())
+            out.write(self.header.pack_head())
             out.write(self.data)
             return self.size + worldSize
         elif self.cellBlocks or self.road or self.worldCellBlock:
@@ -947,7 +947,7 @@ class MobWorld(MobCells):
             self.header.size = totalSize
             self.header.label = self.world.fid
             self.header.groupType = 1
-            out.write(self.header.pack())
+            out.write(self.header.pack_head())
             if self.road:
                 self.road.dump(out)
             if self.worldCellBlock:
@@ -1079,13 +1079,13 @@ class MobWorlds(MobBase):
     def dump(self,out):
         """Dumps group header and then records."""
         if not self.changed:
-            out.write(self.header.pack())
+            out.write(self.header.pack_head())
             out.write(self.data)
         else:
             if not self.worldBlocks: return
             worldHeaderPos = out.tell()
             header = GrupHeader('GRUP', 0, self.label, 0, self.stamp)
-            out.write(header.pack())
+            out.write(header.pack_head())
             totalSize = RecordHeader.rec_header_size + sum(
                 x.dump(out) for x in self.worldBlocks)
             out.seek(worldHeaderPos + 4)

@@ -773,7 +773,7 @@ class ModCleaner(object):
                                 }:
                                 header.flags1 = (header.flags1 & ~0x20) | 0x1000
                                 out.seek(-RecordHeader.rec_header_size, 1)
-                                out.write(header.pack())
+                                out.write(header.pack_head())
                                 changed = True
                             if doFog and rec_type == 'CELL':
                                 nextRecord = ins.tell() + rec_size

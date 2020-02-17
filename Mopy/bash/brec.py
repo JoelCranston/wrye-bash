@@ -98,7 +98,7 @@ class RecordHeader(object):
     # Given as a list here, where each string matches one subrecord in the
     # header. See rec_pack_format_str below as well.
     rec_pack_format = ['=4s', 'I', 'I', 'I', 'I', 'I']
-    # rec_pack_format as a format string. Use for pack / unpack calls.
+    # rec_pack_format as a format string. Use for pack_head / unpack calls.
     rec_pack_format_str = ''.join(rec_pack_format)
     # precompiled unpacker for record headers
     header_unpack = struct.Struct(rec_pack_format_str).unpack
@@ -109,10 +109,10 @@ class RecordHeader(object):
     # Size of sub-record headers. Morrowind has a different one.
     sub_header_size = 6
     # http://en.uesp.net/wiki/Tes5Mod:Mod_File_Format#Groups
-    pack_formats = {0: '=4sI4s3I'} # Top Type
-    pack_formats.update({x: '=4s5I' for x in {1, 6, 7, 8, 9, 10}}) # Children
-    pack_formats.update({x: '=4sIi3I' for x in {2, 3}})  # Interior Cell Blocks
-    pack_formats.update({x: '=4sIhh3I' for x in {4, 5}}) # Exterior Cell Blocks
+    pack_formats = {0: u'=4sI4s3I'} # Top Type
+    pack_formats.update({x: u'=4s5I' for x in {1, 6, 7, 8, 9, 10}}) # Children
+    pack_formats.update({x: u'=4sIi3I' for x in {2, 3}}) # Interior Cell Blocks
+    pack_formats.update({x: u'=4sIhh3I' for x in {4, 5}})# Exterior Cell Blocks
     #--Top types in order of the main ESM
     topTypes = []
     #--Record Types: all recognized record types (not just the top types)
@@ -147,7 +147,7 @@ class RecHeader(RecordHeader):
         self.flags2 = arg3
         self.extra = arg4
 
-    def pack(self, __rh=RecordHeader):
+    def pack_head(self, __rh=RecordHeader):
         """Return the record header packed into a bitstream to be written to
         file."""
         pack_args = [__rh.rec_pack_format_str, self.recType, self.size,
@@ -187,7 +187,7 @@ class GrupHeader(RecordHeader):
         self.stamp = arg3
         self.extra = arg4
 
-    def pack(self, __rh=RecordHeader):
+    def pack_head(self, __rh=RecordHeader):
         """Return the record header packed into a bitstream to be written to
         file. We decide what kind of GRUP we have based on the type of
         label, hacky but to redo this we must revisit records code."""
@@ -430,7 +430,8 @@ class ModWriter(object):
         if fid is not None:
             self.out.write(struct_pack('=4sHI', sub_rec_type, 4, fid))
 
-    def writeGroup(self,size,label,groupType,stamp):
+    def writeGroup(self,size,label,groupType,stamp): # TODO the format strings
+        # here are the Oblivion ones? use GrupHeader('GRUP',size,label,groupType,stamp).pack_head(self)?
         if type(label) is str:
             self.pack(u'=4sI4sII','GRUP',size,label,groupType,stamp)
         elif type(label) is tuple:
@@ -2507,7 +2508,7 @@ class MreRecord(object):
         if self.recType != 'GRUP':
             self.header.flags1 = self.flags1
             self.header.fid = self.fid
-        out.write(self.header.pack())
+        out.write(self.header.pack_head())
         if self.size > 0: out.write(self.data)
 
     def getReader(self):
@@ -2884,14 +2885,14 @@ class MreDial(MelRecord):
         """Dumps self., then group header and then records."""
         MreRecord.dump(self,out)
         if not self.infos: return
-        header_size = __rh.rec_header_size
-        dial_size = header_size + sum([header_size + info.getSize()
-                                       for info in self.infos])
+        hsize = __rh.rec_header_size
+        dial_size = hsize + sum([hsize + info.getSize() for info in
+                                 self.infos])
         # Not all pack targets may be needed - limit the unpacked amount to the
         # number of specified GRUP format entries
         pack_targets = ['GRUP', dial_size, self.fid, 7, self.infoStamp,
                         self.infoStamp2]
-        out.pack(__rh.rec_pack_format_str,
+        out.pack(__rh.rec_pack_format_str, # TODO use pack_head here?
                  *pack_targets[:len(__rh.rec_pack_format)])
         for info in self.infos: info.dump(out)
 
