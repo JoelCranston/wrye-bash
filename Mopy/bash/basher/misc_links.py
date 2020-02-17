@@ -22,6 +22,7 @@
 #
 # =============================================================================
 
+from collections import defaultdict
 import re
 import time
 from ..balt import EnabledLink, AppendableLink, ItemLink, RadioLink, \
@@ -57,28 +58,29 @@ class Screens_NextScreenShot(EnabledLink):
         else: return self._help
 
     def Execute(self):
-        oblivionIni = bosh.oblivionIni
-        base = oblivionIni.getSetting(u'Display', u'sScreenShotBaseName',
-                                      u'ScreenShot')
-        next_ = oblivionIni.getSetting(u'Display', u'iScreenShotIndex', u'0')
+        base_key = bush.game.screenshot_base_key
+        index_key = bush.game.screenshot_index_key
+        enabled_key = bush.game.screenshot_enabled_key
+        base = bosh.oblivionIni.getSetting(*base_key)
+        index = bosh.oblivionIni.getSetting(*index_key)
         pattern = self._askText(
-            _(u"Screenshot base name, optionally with next screenshot number.")
+            _(u'Screenshot base name, optionally with next screenshot number.')
             + u'\n' +
-            _(u"E.g. ScreenShot or ScreenShot_101 or Subdir\\ScreenShot_201."),
-            default=base + next_)
+            _(u'E.g. ScreenShot, ScreenShot_101 or Subdir\\ScreenShot_201.'),
+            default=base + index)
         if not pattern: return
         maPattern = self.__class__.rePattern.match(pattern)
-        newBase,newNext = maPattern.groups()
-        settings_screens = {u'Display': {
-            u'SScreenShotBaseName': newBase,
-            u'iScreenShotIndex': (newNext or next_),
-            u'bAllowScreenShot': u'1', }}
+        newBase, newIndex = maPattern.groups()
+        settings_screens = defaultdict(dict)
+        settings_screens[base_key[0]][base_key[1]] = newBase
+        settings_screens[index_key[0]][index_key[1]] = (newIndex or index)
+        settings_screens[enabled_key[0]][enabled_key[1]] = enabled_key[2]
         screensDir = GPath(newBase).head
         if screensDir:
             if not screensDir.isabs(): screensDir = bass.dirs['app'].join(
                 screensDir)
             screensDir.makedirs()
-        oblivionIni.saveSettings(settings_screens)
+        bosh.oblivionIni.saveSettings(settings_screens)
         bosh.screen_infos.refresh()
         self.window.RefreshUI()
 

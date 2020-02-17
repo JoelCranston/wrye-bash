@@ -133,8 +133,11 @@ def init_dirs(bashIni_, personal, localAppData, game_info):
                                                game_info.masterlist_dir)
 
     #  Personal
-    personal = getPersonalPath(bashIni_, personal)
-    dirs['saveBase'] = personal.join(u'My Games', game_info.fsName)
+    if game_info.uses_personal_folders:
+        personal = getPersonalPath(bashIni_, personal)
+        dirs['saveBase'] = personal.join(u'My Games', game_info.fsName)
+    else:
+        dirs['saveBase'] = dirs['app']
 
     #  Local Application Data
     localAppData = getLocalAppDataPath(bashIni_, localAppData)
@@ -151,7 +154,7 @@ def init_dirs(bashIni_, personal, localAppData, game_info):
     # Utumno: not sure how/if this applies to other games
     data_oblivion_ini = dirs['app'].join(game_info.iniFiles[0])
     game_ini_path = dirs['saveBase'].join(game_info.iniFiles[0])
-    dirs['mods'] = dirs['app'].join(u'Data')
+    dirs['mods'] = dirs['app'].join(game_info.mods_dir)
     if data_oblivion_ini.isfile():
         oblivionIni = ConfigParser(allow_no_value=True)
         try:
@@ -171,7 +174,7 @@ def init_dirs(bashIni_, personal, localAppData, game_info):
             dirs['saveBase'] = dirs['app']
             # Set the data folder to sLocalMasterPath
             dirs['mods'] = dirs['app'].join(get_ini_option(oblivionIni,
-                u'SLocalMasterPath') or u'Data')
+                u'SLocalMasterPath') or game_info.mods_dir)
     # these are relative to the mods path so they must be set here
     dirs['patches'] = dirs['mods'].join(u'Bash Patches')
     dirs['tag_files'] = dirs['mods'].join(u'BashTags')
@@ -180,7 +183,7 @@ def init_dirs(bashIni_, personal, localAppData, game_info):
     oblivionMods, oblivionModsSrc = getOblivionModsPath(bashIni_, game_info)
     dirs['modsBash'], modsBashSrc = getBashModDataPath(bashIni_, game_info)
     dirs['modsBash'], modsBashSrc = getLegacyPathWithSource(
-        dirs['modsBash'], dirs['app'].join(u'Data', u'Bash'),
+        dirs['modsBash'], dirs['app'].join(game_info.mods_dir, u'Bash'),
         modsBashSrc, u'Relative Path')
 
     dirs['installers'] = oblivionMods.join(u'Bash Installers')
