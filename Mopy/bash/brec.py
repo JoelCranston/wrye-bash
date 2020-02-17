@@ -369,8 +369,8 @@ class ModWriter(object):
     def close(self): self.out.close()
 
     #--Additional functions -------------------------------
-    def pack(self,format,*data):
-        self.out.write(struct_pack(format, *data))
+    def pack(self, *args):
+        self.out.write(struct_pack(*args))
 
     def packSub(self, sub_rec_type, data, *values):
         """Write subrecord header and data to output stream.
@@ -419,11 +419,11 @@ class ModWriter(object):
 
     def writeGroup(self,size,label,groupType,stamp):
         if type(label) is str:
-            self.pack('=4sI4sII','GRUP',size,label,groupType,stamp)
+            self.pack(u'=4sI4sII','GRUP',size,label,groupType,stamp)
         elif type(label) is tuple:
-            self.pack('=4sIhhII','GRUP',size,label[1],label[0],groupType,stamp)
+            self.pack(u'=4sIhhII','GRUP',size,label[1],label[0],groupType,stamp)
         else:
-            self.pack('=4s4I','GRUP',size,label,groupType,stamp)
+            self.pack(u'=4s4I','GRUP',size,label,groupType,stamp)
 
     def write_string(self, sub_type, string_val, max_size=0, min_size=0,
                      preferred_encoding=None):
@@ -1400,7 +1400,7 @@ class MelArray(MelBase):
         :type array_attr: str
         :param element: The element that each entry in this array will be
             loaded and dumped by.
-        :type element: MelBase
+        :type element: MelStruct
         :param prelude: An optional element that will be loaded and dumped once
             before the repeating element.
         :type prelude: MelBase"""
@@ -1439,7 +1439,7 @@ class MelArray(MelBase):
             self.out.write('\x00')
 
         def packRef(self, sub_rec_type, fid):
-            if fid is not None: self.pack('I', fid)
+            if fid is not None: self.pack(u'I', fid)
 
     def getSlotsUsed(self):
         slots_ret = self._prelude.getSlotsUsed() if self._prelude else ()

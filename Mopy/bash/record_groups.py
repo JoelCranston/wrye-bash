@@ -1089,7 +1089,7 @@ class MobWorlds(MobBase):
             totalSize = RecordHeader.rec_header_size + sum(
                 x.dump(out) for x in self.worldBlocks)
             out.seek(worldHeaderPos + 4)
-            out.pack('I', totalSize)
+            out.pack(u'I', totalSize)
             out.seek(worldHeaderPos + totalSize)
 
     def getNumRecords(self,includeGroups=True):
