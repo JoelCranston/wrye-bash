@@ -623,7 +623,8 @@ class Path(object):
             join = os.path.join
             getSize = os.path.getsize
             try:
-                return sum(sum(getSize(join(x, f)) for f in files) for x, _, files in _walk(self._s))
+                return sum(sum(getSize(join(x, f)) for f in files)
+                           for x, _y, files in _walk(self._s))
             except ValueError:
                 return 0
         else:
