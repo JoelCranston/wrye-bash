@@ -233,13 +233,9 @@ class ModReader(object):
     def __enter__(self): return self
     def __exit__(self, exc_type, exc_value, exc_traceback): self.ins.close()
 
-    def setStringTable(self,table={}):
-        if table is None:
-            self.hasStrings = False
-            self.strings = {}
-        else:
-            self.hasStrings = True
-            self.strings = table
+    def setStringTable(self, table):
+        self.hasStrings = bool(table)
+        self.strings = table or {} # table may be None
 
     #--I/O Stream -----------------------------------------
     def seek(self,offset,whence=os.SEEK_SET,recType='----'):
