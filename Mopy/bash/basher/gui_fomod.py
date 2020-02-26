@@ -26,7 +26,7 @@ __author__ = u'Ganda'
 
 from collections import defaultdict
 import wx
-import wx.wizard as wiz
+import wx.adv as wiz
 
 from .. import balt, bass, bolt, bosh, bush, env
 from ..gui import CENTER, CheckBox, HBoxedLayout, HLayout, Label, \
