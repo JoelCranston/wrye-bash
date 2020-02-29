@@ -348,7 +348,7 @@ class PatchFile(_PFile, ModFile):
         # Flag as ESL if the game supports them and the option is enabled
         # Note that we can always safely mark as ESL, since the BP only ever
         # contains overrides, no new records
-        if bush.game.has_esl and bass.settings['bash.mods.auto_flag_esl']:
+        if bush.game.has_esl and bass.settings[u'bash.mods.auto_flag_esl']:
             self.tes4.flags1.eslFile = True
             self.tes4.description += (u'\nThis patch has been automatically '
                                       u'ESL-flagged to save a load order '

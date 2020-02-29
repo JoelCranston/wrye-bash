@@ -416,7 +416,7 @@ class ModCleaner(object):
     def scan_Many(modInfos,what=DEFAULT,progress=bolt.Progress(),detailed=False):
         """Scan multiple mods for dirty edits"""
         if len(modInfos) == 0: return []
-        if not bass.settings['bash.CBashEnabled']:
+        if not bass.settings[u'bash.CBashEnabled']:
             return ModCleaner._scan_Python(modInfos,what,progress,detailed)
         else:
             return ModCleaner._scan_CBash(modInfos,what,progress)
@@ -435,7 +435,7 @@ class ModCleaner(object):
         if isinstance(cleaners[0],ModInfos):
             reScan = True
             cleaners = [ModCleaner(x) for x in cleaners]
-        if bass.settings['bash.CBashEnabled']:
+        if bass.settings[u'bash.CBashEnabled']:
             #--CBash
             #--Scan?
             if reScan:

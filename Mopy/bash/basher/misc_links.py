@@ -128,17 +128,17 @@ class Screens_JpgQuality(RadioLink):
         self._text = u'%i' % self.quality
 
     def _check(self):
-        return self.quality == bass.settings['bash.screens.jpgQuality']
+        return self.quality == bass.settings[u'bash.screens.jpgQuality']
 
     def Execute(self):
-        bass.settings['bash.screens.jpgQuality'] = self.quality
+        bass.settings[u'bash.screens.jpgQuality'] = self.quality
 
 #------------------------------------------------------------------------------
 class Screens_JpgQualityCustom(Screens_JpgQuality):
     """Sets a custom JPG quality."""
     def __init__(self):
         super(Screens_JpgQualityCustom, self).__init__(
-            bass.settings['bash.screens.jpgCustomQuality'])
+            bass.settings[u'bash.screens.jpgCustomQuality'])
         self._text = _(u'Custom [%i]') % self.quality
 
     def Execute(self):
@@ -146,7 +146,7 @@ class Screens_JpgQualityCustom(Screens_JpgQuality):
                                   min=0, max=100)
         if quality is None: return
         self.quality = quality
-        bass.settings['bash.screens.jpgCustomQuality'] = self.quality
+        bass.settings[u'bash.screens.jpgCustomQuality'] = self.quality
         self._text = _(u'Custom [%i]') % quality
         super(Screens_JpgQualityCustom, self).Execute()
 
@@ -187,7 +187,7 @@ class People_Export(ItemLink, People_Link):
                              defaultDir=textDir, defaultFile=u'People.txt',
                              wildcard=u'*.txt')
         if not export_path: return
-        bass.settings['bash.workDir'] = export_path.head
+        bass.settings[u'bash.workDir'] = export_path.head
         self.pdata.dumpText(export_path, self.selected)
         self._showInfo(_(u'Records exported: %d.') % len(self.selected),
                        title=self.dialogTitle)
@@ -206,7 +206,7 @@ class People_Import(ItemLink, People_Link):
                                     defaultDir=textDir, wildcard=u'*.txt',
                                     mustExist=True)
         if not import_path: return
-        bass.settings['bash.workDir'] = import_path.head
+        bass.settings[u'bash.workDir'] = import_path.head
         newNames = self.pdata.loadText(import_path)
         self._showInfo(_(u"People imported: %d") % len(newNames),
                        title=self.dialogTitle)
@@ -245,7 +245,7 @@ class Master_ClearRenames(ItemLink):
     _help = _(u'Clear internal Bash renames dictionary')
 
     def Execute(self):
-        bass.settings['bash.mods.renames'].clear()
+        bass.settings[u'bash.mods.renames'].clear()
         self.window.RefreshUI()
 
 class _Master_EditList(OneItemLink): # one item cause _singleSelect = True
@@ -312,7 +312,7 @@ class _Column(CheckLink, EnabledLink):
         """
         super(_Column, self).__init__()
         self.colName = _text
-        self._text = bass.settings['bash.colNames'][_text]
+        self._text = bass.settings[u'bash.colNames'][_text]
         self._help = _(u"Show/Hide '%(colname)s' column.") % {
             'colname': self._text}
 
@@ -372,7 +372,7 @@ class _SortBy(RadioLink):
     def __init__(self, _text='COLNAME'):
         super(_SortBy, self).__init__()
         self.sortCol = _text
-        self._text = bass.settings['bash.colNames'][_text]
+        self._text = bass.settings[u'bash.colNames'][_text]
         self._help = _(u'Sort by %s') % self._text
 
     def _check(self): return self.window.sort_column == self.sortCol

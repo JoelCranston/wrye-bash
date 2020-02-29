@@ -56,7 +56,7 @@ class Settings_BackupSettings(ItemLink):
         msg = _(u'Do you want to backup your Bash settings now?')
         if not balt.askYes(Link.Frame, msg,_(u'Backup Bash Settings?')): return
         with balt.BusyCursor(): Link.Frame.SaveSettings()
-        base_dir = bass.settings['bash.backupPath'] or bass.dirs[u'modsBash']
+        base_dir = bass.settings[u'bash.backupPath'] or bass.dirs[u'modsBash']
         settings_file = balt.askSave(Link.Frame,
                                      title=_(u'Backup Bash Settings'),
                                      defaultDir=base_dir, wildcard=u'*.7z',
@@ -87,7 +87,7 @@ class Settings_RestoreSettings(ItemLink):
               u'restored.')]), _(u'Restore Bash Settings?')):
             return
         # former may be None
-        base_dir = bass.settings['bash.backupPath'] or bass.dirs[u'modsBash']
+        base_dir = bass.settings[u'bash.backupPath'] or bass.dirs[u'modsBash']
         settings_file = balt.askOpen(Link.Frame, _(u'Restore Bash Settings'),
                                      base_dir, u'', u'*.7z')
         if not settings_file: return
@@ -156,17 +156,17 @@ class Settings_ExportDllInfo(AppendableLink, ItemLink):
         if not textPath: return
         with textPath.open('w',encoding='utf-8-sig') as out:
             out.write(u'goodDlls '+_(u'(those dlls that you have chosen to allow to be installed)')+u'\r\n')
-            if bass.settings['bash.installers.goodDlls']:
-                for dll in bass.settings['bash.installers.goodDlls']:
+            if bass.settings[u'bash.installers.goodDlls']:
+                for dll in bass.settings[u'bash.installers.goodDlls']:
                     out.write(u'dll:'+dll+u':\r\n')
-                    for index, version in enumerate(bass.settings['bash.installers.goodDlls'][dll]):
+                    for index, version in enumerate(bass.settings[u'bash.installers.goodDlls'][dll]):
                         out.write(u'version %02d: %s\r\n' % (index, version))
             else: out.write(u'None\r\n')
             out.write(u'badDlls '+_(u'(those dlls that you have chosen to NOT allow to be installed)')+u'\r\n')
-            if bass.settings['bash.installers.badDlls']:
-                for dll in bass.settings['bash.installers.badDlls']:
+            if bass.settings[u'bash.installers.badDlls']:
+                for dll in bass.settings[u'bash.installers.badDlls']:
                     out.write(u'dll:'+dll+u':\r\n')
-                    for index, version in enumerate(bass.settings['bash.installers.badDlls'][dll]):
+                    for index, version in enumerate(bass.settings[u'bash.installers.badDlls'][dll]):
                         out.write(u'version %02d: %s\r\n' % (index, version))
             else: out.write(u'None\r\n')
 
@@ -216,10 +216,10 @@ class Settings_ImportDllInfo(AppendableLink, ItemLink):
                         current[dll].append(ver)
                         print(dll,':',ver)
             if not replace:
-                bass.settings['bash.installers.goodDlls'].update(Dlls['goodDlls'])
-                bass.settings['bash.installers.badDlls'].update(Dlls['badDlls'])
+                bass.settings[u'bash.installers.goodDlls'].update(Dlls['goodDlls'])
+                bass.settings[u'bash.installers.badDlls'].update(Dlls['badDlls'])
             else:
-                bass.settings['bash.installers.goodDlls'], bass.settings['bash.installers.badDlls'] = Dlls['goodDlls'], Dlls['badDlls']
+                bass.settings[u'bash.installers.goodDlls'], bass.settings[u'bash.installers.badDlls'] = Dlls['goodDlls'], Dlls['badDlls']
         except UnicodeError:
             self._showError(_(u'Wrye Bash could not load %s, because it is not'
                               u' saved in UTF-8 format.  Please resave it in '
@@ -248,10 +248,10 @@ class Settings_IconSize(RadioLink):
             {'sb_icon_size': unicode(sb_icon_size)})
 
     def _check(self):
-        return self.sb_icon_size == bass.settings['bash.statusbar.iconSize']
+        return self.sb_icon_size == bass.settings[u'bash.statusbar.iconSize']
 
     def Execute(self):
-        bass.settings['bash.statusbar.iconSize'] = self.sb_icon_size
+        bass.settings[u'bash.statusbar.iconSize'] = self.sb_icon_size
         Link.Frame.statusBar.UpdateIconSizes()
 
 #------------------------------------------------------------------------------
@@ -260,10 +260,10 @@ class Settings_StatusBar_ShowVersions(CheckLink):
     _text = _(u'Show App Version')
     _help = _(u"Show/hide version numbers for buttons on the status bar.")
 
-    def _check(self): return bass.settings['bash.statusbar.showversion']
+    def _check(self): return bass.settings[u'bash.statusbar.showversion']
 
     def Execute(self):
-        bass.settings['bash.statusbar.showversion'] ^= True
+        bass.settings[u'bash.statusbar.showversion'] ^= True
         for button in BashStatusBar.buttons:
             button.set_sb_button_tooltip()
         if BashStatusBar.obseButton.button_state:
@@ -363,7 +363,7 @@ class Settings_PluginEncoding(RadioLink):
         'bash.pluginEncoding']
 
     def Execute(self):
-        bass.settings['bash.pluginEncoding'] = self.encoding
+        bass.settings[u'bash.pluginEncoding'] = self.encoding
         bolt.pluginEncoding = self.encoding
 
 #------------------------------------------------------------------------------
@@ -401,7 +401,7 @@ class Settings_UnHideButtons(TransLink):
     """Menu to unhide a StatusBar button."""
 
     def _decide(self, window, selection):
-        hide = bass.settings['bash.statusbar.hide']
+        hide = bass.settings[u'bash.statusbar.hide']
         hidden = []
         for link in BashStatusBar.buttons:
             if link.uid in hide:

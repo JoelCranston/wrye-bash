@@ -734,7 +734,7 @@ class Save_ReweighPotions(OneItemLink):
         except ValueError:
             self._showOk(_(u'Invalid weight: %s') % newWeight)
             return
-        bass.settings['bash.reweighPotions.newWeight'] = newWeight
+        bass.settings[u'bash.reweighPotions.newWeight'] = newWeight
         #--Do it
         with balt.Progress(_(u"Reweigh Potions")) as progress:
             saveFile = bosh._saves.SaveFile(self._selected_info)

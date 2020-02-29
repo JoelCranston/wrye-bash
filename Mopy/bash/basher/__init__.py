@@ -457,7 +457,7 @@ class MasterList(_ModsUIList):
             item_format.back_key = u'mods.bkgd.size_mismatch'
             mouseText += _(u'Stored size does not match the one on disk. ')
         if self.allowEdit:
-            if masterInfo.old_name in settings['bash.mods.renames']:
+            if masterInfo.old_name in settings[u'bash.mods.renames']:
                 item_format.strong = True
         #--Image
         status = self.GetMasterStatus(mi)
@@ -487,7 +487,7 @@ class MasterList(_ModsUIList):
         #--Pre-clean
         edited = False
         for mi, masterInfo in self.data_store.items():
-            newName = settings['bash.mods.renames'].get(masterInfo.curr_name,
+            newName = settings[u'bash.mods.renames'].get(masterInfo.curr_name,
                                                         None)
             #--Rename?
             if newName and newName in bosh.modInfos:
@@ -550,7 +550,7 @@ class INIList(balt.UIList):
                      a, 'installer', u''),
                  }
     def _sortValidFirst(self, items):
-        if settings['bash.ini.sortValid']:
+        if settings[u'bash.ini.sortValid']:
             items.sort(key=lambda a: self.data_store[a].tweak_status < 0)
     _extra_sortings = [_sortValidFirst]
     #--Labels
@@ -956,7 +956,7 @@ class ModList(_ModsUIList):
               and mod_info.has_master_size_mismatch()):
             item_format.back_key = u'mods.bkgd.size_mismatch'
             mouseText += _(u'Has one or more size-mismatched masters. ')
-        if settings['bash.mods.scanDirty']:
+        if settings[u'bash.mods.scanDirty']:
             message = bosh.modInfos.getDirtyMessage(mod_name)
             mouseText += message[1]
             if message[0]: item_format.underline = True
@@ -977,7 +977,7 @@ class ModList(_ModsUIList):
         if not Link.Frame.docBrowser:
             from .frames import DocBrowser
             DocBrowser().show_frame()
-            settings['bash.modDocs.show'] = True
+            settings[u'bash.modDocs.show'] = True
         Link.Frame.docBrowser.SetMod(modInfo.name)
         Link.Frame.docBrowser.raise_frame()
 
@@ -1726,23 +1726,23 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
             (self.tweakContents, LayoutOptions(weight=1))
         ]).apply_to(left)
 
-    # Read only wrappers around bass.settings['bash.ini.choices']
+    # Read only wrappers around bass.settings[u'bash.ini.choices']
     @property
     def current_ini_path(self):
         """Return path of currently chosen ini."""
-        return self.target_inis.values()[settings['bash.ini.choice']]
+        return self.target_inis.values()[settings[u'bash.ini.choice']]
 
     @property
     def target_inis(self):
-        """Return settings['bash.ini.choices'], set in IniInfos#__init__.
+        """Return settings[u'bash.ini.choices'], set in IniInfos#__init__.
         :rtype: OrderedDict[unicode, bolt.Path]"""
-        return settings['bash.ini.choices']
+        return settings[u'bash.ini.choices']
 
     @property
-    def _ini_keys(self): return settings['bash.ini.choices'].keys()
+    def _ini_keys(self): return settings[u'bash.ini.choices'].keys()
 
     @property
-    def ini_name(self): return self._ini_keys[settings['bash.ini.choice']]
+    def ini_name(self): return self._ini_keys[settings[u'bash.ini.choice']]
 
     def _resetDetails(self): pass
 
@@ -1775,11 +1775,11 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
 
     def __remove(self, ini_str_name): # does NOT change sorting
         del self.target_inis[ini_str_name]
-        settings['bash.ini.choice'] -= 1
+        settings[u'bash.ini.choice'] -= 1
 
     def set_choice(self, ini_str_name, reset_choices=True):
         if reset_choices: self._combo_reset()
-        settings['bash.ini.choice'] = self._ini_keys.index(ini_str_name)
+        settings[u'bash.ini.choice'] = self._ini_keys.index(ini_str_name)
 
     def _on_select_drop_down(self, selection):
         """Called when the user selects a new target INI from the drop down."""
@@ -1796,7 +1796,7 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
             if not full_path or ( # reselected the current target ini
                 full_path.stail in self.target_inis and settings[
                   'bash.ini.choice'] == self._ini_keys.index(full_path.stail)):
-                self._inis_combo_box.set_selection(settings['bash.ini.choice'])
+                self._inis_combo_box.set_selection(settings[u'bash.ini.choice'])
                 return
         # new file or selected an existing one different from current choice
         self.set_choice(full_path.stail, bool(bosh.INIInfos.update_targets(
@@ -1817,11 +1817,11 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
         if new_target or target_changed:
             self.iniContents.RefreshIniContents(new_target)
             Link.Frame.warn_game_ini()
-        self._inis_combo_box.set_selection(settings['bash.ini.choice'])
+        self._inis_combo_box.set_selection(settings[u'bash.ini.choice'])
 
     def ClosePanel(self, destroy=False):
         super(INIDetailsPanel, self).ClosePanel(destroy)
-        settings['bash.ini.lastDir'] = self.lastDir
+        settings[u'bash.ini.lastDir'] = self.lastDir
         if destroy: self._inis_combo_box.unsubscribe_handler_()
 
 class INIPanel(BashTab):
@@ -2184,13 +2184,13 @@ class InstallersList(balt.UIList):
     }
     #--Special sorters
     def _sortStructure(self, items):
-        if settings['bash.installers.sortStructure']:
+        if settings[u'bash.installers.sortStructure']:
             items.sort(key=lambda self, x: self.data_store[x].type)
     def _sortActive(self, items):
-        if settings['bash.installers.sortActive']:
+        if settings[u'bash.installers.sortActive']:
             items.sort(key=lambda x: not self.data_store[x].is_active)
     def _sortProjects(self, items):
-        if settings['bash.installers.sortProjects']:
+        if settings[u'bash.installers.sortProjects']:
             items.sort(key=lambda x: not isinstance(self.data_store[x],
                                                     bosh.InstallerProject))
     _extra_sortings = [_sortStructure, _sortActive, _sortProjects]
@@ -2235,7 +2235,7 @@ class InstallersList(balt.UIList):
         item_format.icon_key += '.' + self._status_color[installer.status]
         if installer.type < 0: item_format.icon_key = 'corrupt'
         elif isinstance(installer, bosh.InstallerProject): item_format.icon_key += '.dir'
-        if settings['bash.installers.wizardOverlay'] and installer.hasWizard:
+        if settings[u'bash.installers.wizardOverlay'] and installer.hasWizard:
             item_format.icon_key += '.wiz'
         #if textKey == 'installers.text.invalid': # I need a 'text.markers'
         #    text += _(u'Marker Package. Use for grouping installers together')
@@ -2423,7 +2423,7 @@ class InstallersList(balt.UIList):
             self.RefreshUI()
 
     def _askCopyOrMove(self, filenames):
-        action = settings['bash.installers.onDropFiles.action']
+        action = settings[u'bash.installers.onDropFiles.action']
         if action not in ['COPY','MOVE']:
             if len(filenames):
                 message = _(u'You have dragged the following files into Wrye '
@@ -2454,7 +2454,7 @@ class InstallersList(balt.UIList):
                 if result == 1: action = 'MOVE'
                 elif result == 2: action = 'COPY'
                 if gCheckBox.is_checked:
-                    settings['bash.installers.onDropFiles.action'] = action
+                    settings[u'bash.installers.onDropFiles.action'] = action
         return action
 
     @balt.conversation
@@ -2670,7 +2670,7 @@ class InstallersDetails(_SashDetailsPanel):
             gPage.component_name = cmp_name
             self.gNotebook.nb_add_page(gPage, page_title)
             self.infoPages.append([gPage,False])
-        self.gNotebook.nb_set_selected_index(settings['bash.installers.page'])
+        self.gNotebook.nb_set_selected_index(settings[u'bash.installers.page'])
         self.gNotebook.on_nb_page_change.subscribe(self.OnShowInfoPage)
         subPackagesPanel, espmsPanel = self.checkListSplitter.make_panes(
             vertically=True)
@@ -2721,7 +2721,7 @@ class InstallersDetails(_SashDetailsPanel):
         """Saves details if they need saving."""
         if not self._firstShow and destroy: # save subsplitters
             super(InstallersDetails, self).ClosePanel(destroy)
-            settings['bash.installers.page'] = \
+            settings[u'bash.installers.page'] = \
                 self.gNotebook.nb_get_selected_index()
         self._save_comments()
 
@@ -2969,14 +2969,14 @@ class InstallersPanel(BashTab):
     @balt.conversation
     def _first_run_set_enabled(self):
         if settings.get('bash.installers.isFirstRun',True):
-            settings['bash.installers.isFirstRun'] = False
+            settings[u'bash.installers.isFirstRun'] = False
             message = _(u'Do you want to enable Installers?') + u'\n\n\t' + _(
                 u'If you do, Bash will first need to initialize some data. '
                 u'This can take on the order of five minutes if there are '
                 u'many mods installed.') + u'\n\n\t' + _(
                 u"If not, you can enable it at any time by right-clicking "
                 u"the column header menu and selecting 'Enabled'.")
-            settings['bash.installers.enabled'] = balt.askYes(self, message,
+            settings[u'bash.installers.enabled'] = balt.askYes(self, message,
                                                               _(u'Installers'))
 
     @balt.conversation
@@ -2984,7 +2984,7 @@ class InstallersPanel(BashTab):
                   **kwargs):
         """Panel is shown. Update self.data."""
         self._first_run_set_enabled() # must run _before_ if below
-        if not settings['bash.installers.enabled'] or self.refreshing or self._user_cancelled:
+        if not settings[u'bash.installers.enabled'] or self.refreshing or self._user_cancelled:
             self._user_cancelled = False
             return
         try:
@@ -3000,7 +3000,7 @@ class InstallersPanel(BashTab):
     def _refresh_installers_if_needed(self, canCancel, fullRefresh,
                                       scan_data_dir):
         if settings.get('bash.installers.updatedCRCs',True): #only checked here
-            settings['bash.installers.updatedCRCs'] = False
+            settings[u'bash.installers.updatedCRCs'] = False
             self._data_dir_scanned = False
         installers_paths = bass.dirs[
             'installers'].list() if self.frameActivated else ()
@@ -3465,10 +3465,10 @@ class _Tab_Link(AppendableLink, CheckLink, EnabledLink):
 
     def _enable(self): return self.enabled
 
-    def _check(self): return bass.settings['bash.tabs.order'][self.tabKey]
+    def _check(self): return bass.settings[u'bash.tabs.order'][self.tabKey]
 
     def Execute(self):
-        if bass.settings['bash.tabs.order'][self.tabKey]:
+        if bass.settings[u'bash.tabs.order'][self.tabKey]:
             # It was enabled, disable it.
             iMods = None
             iInstallers = None
@@ -3496,7 +3496,7 @@ class _Tab_Link(AppendableLink, CheckLink, EnabledLink):
         else:
             # It was disabled, enable it
             insertAt = 0
-            for key, is_enabled in bass.settings['bash.tabs.order'].items():
+            for key, is_enabled in bass.settings[u'bash.tabs.order'].items():
                 if key == self.tabKey: break
                 insertAt += is_enabled
             className,title,panel = tabInfo[self.tabKey]
@@ -3508,7 +3508,7 @@ class _Tab_Link(AppendableLink, CheckLink, EnabledLink):
                 Link.Frame.notebook.AddPage(panel._native_widget,title)
             else:
                 Link.Frame.notebook.InsertPage(insertAt,panel._native_widget,title)
-        bass.settings['bash.tabs.order'][self.tabKey] ^= True
+        bass.settings[u'bash.tabs.order'][self.tabKey] ^= True
 
 class BashNotebook(wx.Notebook, balt.TabDragMixin):
 
@@ -3542,7 +3542,7 @@ class BashNotebook(wx.Notebook, balt.TabDragMixin):
         for d in deleted: del newOrder[d]
         # Ensure the 'Mods' tab is always shown
         if 'Mods' not in newOrder: newOrder['Mods'] = True # inserts last
-        settings['bash.tabs.order'] = newOrder
+        settings[u'bash.tabs.order'] = newOrder
         return newOrder
 
     def __init__(self, parent):
@@ -3569,10 +3569,10 @@ class BashNotebook(wx.Notebook, balt.TabDragMixin):
                     deprint(_(u"Fatal error constructing '%s' panel.") % title)
                     raise
                 deprint(_(u"Error constructing '%s' panel.") % title,traceback=True)
-                settings['bash.tabs.order'][page] = False
+                settings[u'bash.tabs.order'][page] = False
         #--Selection
-        pageIndex = max(min(settings['bash.page'], self.GetPageCount() - 1), 0)
-        if settings['bash.installers.fastStart'] and pageIndex == iInstallers:
+        pageIndex = max(min(settings[u'bash.page'], self.GetPageCount() - 1), 0)
+        if settings[u'bash.installers.fastStart'] and pageIndex == iInstallers:
             pageIndex = iMods
         self.SetSelection(pageIndex)
         self.currentPage = _widget_to_panel[
@@ -3585,19 +3585,19 @@ class BashNotebook(wx.Notebook, balt.TabDragMixin):
     @staticmethod
     def tabLinks(menu):
         for key in BashNotebook._tabOrder(): # use tabOrder here - it is used in
-            # InitLinks which runs _before_ settings['bash.tabs.order'] is set!
+            # InitLinks which runs _before_ settings[u'bash.tabs.order'] is set!
             canDisable = bool(key != 'Mods')
             menu.append(_Tab_Link(key, canDisable))
         return menu
 
     def SelectPage(self, page_title, item):
         ind = 0
-        for title, enabled in settings['bash.tabs.order'].iteritems():
+        for title, enabled in settings[u'bash.tabs.order'].iteritems():
             if title == page_title:
                 if not enabled: return
                 break
             ind += enabled
-        else: raise BoltError('Invalid page: %s' % page_title)
+        else: raise BoltError(u'Invalid page: %s' % page_title)
         self.SetSelection(ind)
         tabInfo[page_title][2].SelectUIListItem(item, deselectOthers=True)
 
@@ -3615,7 +3615,7 @@ class BashNotebook(wx.Notebook, balt.TabDragMixin):
         newPos = event.toIndex
         # Find the key
         removeTitle = self.GetPageText(newPos)
-        oldOrder = settings['bash.tabs.order'].keys()
+        oldOrder = settings[u'bash.tabs.order'].keys()
         for removeKey in oldOrder:
             if tabInfo[removeKey][1] == removeTitle:
                 break
@@ -3631,8 +3631,8 @@ class BashNotebook(wx.Notebook, balt.TabDragMixin):
                     break
             nextTabIndex = oldOrder.index(nextTabKey)
             newOrder = oldOrder[:nextTabIndex]+[removeKey]+oldOrder[nextTabIndex:]
-        settings['bash.tabs.order'] = OrderedDict(
-            (k, settings['bash.tabs.order'][k]) for k in newOrder)
+        settings[u'bash.tabs.order'] = OrderedDict(
+            (k, settings[u'bash.tabs.order'][k]) for k in newOrder)
         event.Skip()
 
     def OnShowPage(self,event):
@@ -3654,9 +3654,9 @@ class BashStatusBar(DnDStatusBar):
 
     def UpdateIconSizes(self):
         self.buttons = [] # will be populated with _displayed_ gButtons - g ?
-        order = settings['bash.statusbar.order']
+        order = settings[u'bash.statusbar.order']
         orderChanged = False
-        hide = settings['bash.statusbar.hide']
+        hide = settings[u'bash.statusbar.hide']
         hideChanged = False
         # Add buttons in order that is saved - on first run order = [] !
         for uid in order[:]:
@@ -3702,16 +3702,16 @@ class BashStatusBar(DnDStatusBar):
             if link:
                 button.visible = False
                 self.buttons.remove(button)
-                settings['bash.statusbar.hide'].add(link.uid)
+                settings[u'bash.statusbar.hide'].add(link.uid)
                 settings.setChanged('bash.statusbar.hide')
                 self._do_refresh()
 
     def UnhideButton(self,link):
         uid = link.uid
-        settings['bash.statusbar.hide'].discard(uid)
+        settings[u'bash.statusbar.hide'].discard(uid)
         settings.setChanged('bash.statusbar.hide')
         # Find the position to insert it at
-        order = settings['bash.statusbar.order']
+        order = settings[u'bash.statusbar.order']
         if uid not in order:
             # Not specified, put it at the end
             order.append(uid)
@@ -3809,7 +3809,7 @@ class BashFrame(WindowFrame):
         if not bass.inisettings['WarnTooManyFiles']: return
         if not len(bosh.bsaInfos): bosh.bsaInfos.refresh()
         if len(bosh.bsaInfos) + len(bosh.modInfos) >= 325 and not \
-                settings['bash.mods.autoGhost']:
+                settings[u'bash.mods.autoGhost']:
             message = _(u"It appears that you have more than 325 mods and bsas"
                 u" in your data directory and auto-ghosting is disabled. This "
                 u"may cause problems in %s; see the readme under auto-ghost "
@@ -3850,7 +3850,7 @@ class BashFrame(WindowFrame):
 
     def set_bash_frame_title(self):
         """Set title. Set to default if no title supplied."""
-        if bush.game.altName and settings['bash.useAltName']:
+        if bush.game.altName and settings[u'bash.useAltName']:
             title = bush.game.altName + u' %s%s'
         else:
             title = u'Wrye Bash %s%s '+_(u'for')+u' '+bush.game.displayName
@@ -4066,8 +4066,8 @@ class BashFrame(WindowFrame):
         # Clean out unneeded settings
         self.CleanSettings()
         if Link.Frame.docBrowser: Link.Frame.docBrowser.DoSave()
-        settings['bash.frameMax'] = self.is_maximized
-        settings['bash.page'] = self.notebook.GetSelection()
+        settings[u'bash.frameMax'] = self.is_maximized
+        settings[u'bash.page'] = self.notebook.GetSelection()
         # use tabInfo below so we save settings of panels that the user closed
         for _k, (_cname, tab_name, panel) in tabInfo.iteritems():
             if panel is None: continue
@@ -4089,16 +4089,16 @@ class BashFrame(WindowFrame):
             if value not in modNames:
                 del renames[key]
         #--Clean colors dictionary
-        currentColors = set(settings['bash.colors'].keys())
+        currentColors = set(settings[u'bash.colors'].keys())
         defaultColors = set(settingDefaults['bash.colors'].keys())
         invalidColors = currentColors - defaultColors
         missingColors = defaultColors - currentColors
         if invalidColors:
             for key in invalidColors:
-                del settings['bash.colors'][key]
+                del settings[u'bash.colors'][key]
         if missingColors:
             for key in missingColors:
-                settings['bash.colors'][key] = settingDefaults['bash.colors'][key]
+                settings[u'bash.colors'][key] = settingDefaults['bash.colors'][key]
         if invalidColors or missingColors:
             settings.setChanged('bash.colors')
         #--Clean backup
@@ -4155,7 +4155,7 @@ class BashApp(wx.App):
             splashScreen.Hide() # wont be hidden if warnTooManyModsBsas warns..
         self.SetTopWindow(frame._native_widget)
         frame.show_frame()
-        frame._native_widget.Maximize(settings['bash.frameMax'])
+        frame._native_widget.Maximize(settings[u'bash.frameMax'])
         frame.RefreshData(booting=True) # used to bind RefreshData
         # Moved notebook.Bind() callback here as OnShowPage() is explicitly
         # called in RefreshData
@@ -4201,14 +4201,14 @@ class BashApp(wx.App):
     def InitVersion():
         """Perform any version to version conversion. Called by Init()."""
         #--Renames dictionary: Strings to Paths.
-        bash_version = settings['bash.version']
+        bash_version = settings[u'bash.version']
         if isinstance(bash_version, int):
             if bash_version < 40:
                 #--Renames array
                 newRenames = {}
-                for key,value in settings['bash.mods.renames'].iteritems():
+                for key,value in settings[u'bash.mods.renames'].iteritems():
                     newRenames[GPath(key)] = GPath(value)
-                settings['bash.mods.renames'] = newRenames
+                settings[u'bash.mods.renames'] = newRenames
                 #--Mod table data
                 modTableData = bosh.modInfos.table.data
                 for key in modTableData.keys():
@@ -4222,11 +4222,11 @@ class BashApp(wx.App):
                         balt.sizes[key.__name__] = value
                         del balt.sizes[key]
         #--Current Version
-        if settings['bash.version'] != bass.AppVersion:
-            settings['bash.version'] = bass.AppVersion
+        if settings[u'bash.version'] != bass.AppVersion:
+            settings[u'bash.version'] = bass.AppVersion
             # rescan mergeability on version upgrade to detect new mergeable
             bosh.modInfos.rescanMergeable(bosh.modInfos.data, bolt.Progress())
-        settings['bash.CBashEnabled'] = CBashApi.Enabled
+        settings[u'bash.CBashEnabled'] = CBashApi.Enabled
 
 # Initialization --------------------------------------------------------------
 from .gui_patchers import initPatchers
@@ -4241,12 +4241,12 @@ def InitSettings(): # this must run first !
     bosh.bain.Installer.init_global_skips() # must be after loadDefaults - grr #178
     bosh.bain.Installer.init_attributes_process()
     # Plugin encoding used to decode mod string fields
-    bolt.pluginEncoding = bass.settings['bash.pluginEncoding']
+    bolt.pluginEncoding = bass.settings[u'bash.pluginEncoding']
     #--Wrye Balt
-    settings['balt.WryeLog.temp'] = bass.dirs[u'saveBase'].join(u'WryeLogTemp.html')
-    settings['balt.WryeLog.cssDir'] = bass.dirs[u'mopy'].join(u'Docs')
+    settings[u'balt.WryeLog.temp'] = bass.dirs[u'saveBase'].join(u'WryeLogTemp.html')
+    settings[u'balt.WryeLog.cssDir'] = bass.dirs[u'mopy'].join(u'Docs')
     #--StandAlone version?
-    settings['bash.standalone'] = hasattr(sys,'frozen')
+    settings[u'bash.standalone'] = hasattr(sys,'frozen')
     initPatchers()
 
 def InitImages():
@@ -4260,10 +4260,10 @@ def InitImages():
         b'WHITE': (255, 255, 255),
     }
     # Setup the colors dictionary
-    for key, value in settings['bash.colors'].iteritems():
+    for key, value in settings[u'bash.colors'].iteritems():
         # Convert any colors that were stored as bytestrings into tuples
         if isinstance(value, str):
-            value = settings['bash.colors'][key] = _conv_dict[value]
+            value = settings[u'bash.colors'][key] = _conv_dict[value]
         colors[key] = value
     #--Images
     imgDirJn = bass.dirs[u'images'].join

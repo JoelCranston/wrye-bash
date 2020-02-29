@@ -56,7 +56,7 @@ class PatchDialog(DialogWindow):
                  mods_to_reselect):
         self.mods_to_reselect = mods_to_reselect
         self.parent = parent
-        if (doCBash or doCBash is None) and bass.settings['bash.CBashEnabled']:
+        if (doCBash or doCBash is None) and bass.settings[u'bash.CBashEnabled']:
             doCBash = True
         else:
             doCBash = False

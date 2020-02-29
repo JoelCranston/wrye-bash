@@ -156,7 +156,7 @@ class ColorDialog(DialogWindow):
         color_key = self.GetColorKey()
         newColor = self.changes[color_key]
         #--Update settings and colors
-        bass.settings['bash.colors'][color_key] = newColor.to_rgb_tuple()
+        bass.settings[u'bash.colors'][color_key] = newColor.to_rgb_tuple()
         bass.settings.setChanged('bash.colors')
         colors[color_key] = newColor
         self.UpdateUIButtons()
@@ -164,7 +164,7 @@ class ColorDialog(DialogWindow):
 
     def OnApplyAll(self):
         for key,newColor in self.changes.iteritems():
-            bass.settings['bash.colors'][key] = newColor.to_rgb_tuple()
+            bass.settings[u'bash.colors'][key] = newColor.to_rgb_tuple()
             colors[key] = newColor
         bass.settings.setChanged('bash.colors')
         self.UpdateUIButtons()
@@ -335,7 +335,7 @@ class ImportFaceDialog(DialogWindow):
         pc_flags.stats = self.statsCheck.is_checked
         pc_flags.iclass = self.classCheck.is_checked
         #deprint(flags.getTrueAttrs())
-        bass.settings['bash.faceImport.flags'] = int(pc_flags)
+        bass.settings[u'bash.faceImport.flags'] = int(pc_flags)
         bosh.faces.PCFaces.save_setFace(self.fileInfo,self.data[item],pc_flags)
         balt.showOk(self, _(u'Face imported.'), self.fileInfo.name.s)
         self.accept_modal()

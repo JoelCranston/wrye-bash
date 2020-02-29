@@ -846,7 +846,7 @@ class INIInfo(IniFile):
     def is_applicable(self, stat=None):
         stat = stat or self.tweak_status
         return stat != -20 and (
-            bass.settings['bash.ini.allowNewLines'] or stat != -10)
+            bass.settings[u'bash.ini.allowNewLines'] or stat != -10)
 
     def getStatus(self, target_ini=None):
         """Returns status of the ini tweak:
@@ -1479,8 +1479,8 @@ class INIInfos(TableFileInfos):
         self._ini = None
         # Check the list of target INIs, remove any that don't exist
         # if _target_inis is not an OrderedDict choice won't be set correctly
-        _target_inis = bass.settings['bash.ini.choices'] # type: OrderedDict
-        choice = bass.settings['bash.ini.choice'] # type: int
+        _target_inis = bass.settings[u'bash.ini.choices'] # type: OrderedDict
+        choice = bass.settings[u'bash.ini.choice'] # type: int
         if isinstance(_target_inis, OrderedDict):
             try:
                 previous_ini = _target_inis.keys()[choice]
@@ -1517,11 +1517,11 @@ class INIInfos(TableFileInfos):
             _target_inis[_(u'Browse...')] = None
         self.__sort_target_inis()
         if previous_ini:
-            choice = bass.settings['bash.ini.choices'].keys().index(
+            choice = bass.settings[u'bash.ini.choices'].keys().index(
                 previous_ini)
-        bass.settings['bash.ini.choice'] = choice if choice >= 0 else 0
-        self.ini = bass.settings['bash.ini.choices'].values()[
-            bass.settings['bash.ini.choice']]
+        bass.settings[u'bash.ini.choice'] = choice if choice >= 0 else 0
+        self.ini = bass.settings[u'bash.ini.choices'].values()[
+            bass.settings[u'bash.ini.choice']]
 
     @property
     def ini(self):
@@ -1538,17 +1538,17 @@ class INIInfos(TableFileInfos):
     def update_targets(targets_dict):
         """Update 'bash.ini.choices' with targets_dict then re-sort the dict
         of target INIs"""
-        for existing_ini in bass.settings['bash.ini.choices']:
+        for existing_ini in bass.settings[u'bash.ini.choices']:
             targets_dict.pop(existing_ini, None)
         if targets_dict:
-            bass.settings['bash.ini.choices'].update(targets_dict)
+            bass.settings[u'bash.ini.choices'].update(targets_dict)
             # now resort
             INIInfos.__sort_target_inis()
         return targets_dict
 
     @staticmethod
     def __sort_target_inis():
-        keys = bass.settings['bash.ini.choices'].keys()
+        keys = bass.settings[u'bash.ini.choices'].keys()
         # Sort alphabetically
         keys.sort()
         # Sort Oblivion.ini to the top, and 'Browse...' to the bottom
@@ -1556,9 +1556,9 @@ class INIInfos(TableFileInfos):
         len_inis = len(game_inis)
         keys.sort(key=lambda a: game_inis.index(a) if a in game_inis else (
                       len_inis + 1 if a == _(u'Browse...') else len_inis))
-        bass.settings['bash.ini.choices'] = collections.OrderedDict(
+        bass.settings[u'bash.ini.choices'] = collections.OrderedDict(
             # convert stray Path instances back to unicode
-            [(u'%s' % k, bass.settings['bash.ini.choices'][k]) for k in keys])
+            [(u'%s' % k, bass.settings[u'bash.ini.choices'][k]) for k in keys])
 
     def _refresh_ini_tweaks(self):
         """Refresh from file directory."""
