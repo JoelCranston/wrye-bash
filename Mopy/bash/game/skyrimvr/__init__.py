@@ -40,19 +40,6 @@ class SkyrimVRGameInfo(SkyrimSEGameInfo):
         u'Installed Path'
     )
 
-    vanilla_string_bsas = {
-        u'skyrim.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-        u'update.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-        u'dawnguard.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-        u'hearthfires.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-        u'dragonborn.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],
-        u'skyrimvr.esm': [
-            u'Skyrim - Patch.bsa',
-            u'Skyrim - Interface.bsa',
-            u'Skyrim_VR - Main.bsa'
-        ],
-    }
-
     espm_extensions = SkyrimSEGameInfo.espm_extensions - {u'.esl'}
     check_esl = False
 
@@ -71,6 +58,13 @@ class SkyrimVRGameInfo(SkyrimSEGameInfo):
         long_name = u'Skyrim VR Script Extender'
         exe = u'sksevr_loader.exe'
         ver_files = [u'sksevr_loader.exe', u'sksevr_steam_loader.dll']
+
+    class bsa(SkyrimSEGameInfo.bsa):
+        vanilla_string_bsas = SkyrimSEGameInfo.bsa.vanilla_string_bsas.copy()
+        vanilla_string_bsas.update({
+            u'skyrimvr.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa',
+                              u'Skyrim_VR - Main.bsa'],
+        })
 
     class xe(SkyrimSEGameInfo.xe):
         full_name = u'TES5VREdit'

@@ -44,11 +44,6 @@ class Fallout4VRGameInfo(Fallout4GameInfo):
     ]
     regInstallKeys = (u'Bethesda Softworks\\Fallout 4 VR', u'Installed Path')
 
-    vanilla_string_bsas = Fallout4GameInfo.vanilla_string_bsas.copy()
-    vanilla_string_bsas.update({
-        u'fallout4_vr.esm': [u'Fallout4_VR - Main.ba2'],
-    })
-
     espm_extensions = Fallout4GameInfo.espm_extensions - {u'.esl'}
     check_esl = False
 
@@ -57,6 +52,12 @@ class Fallout4VRGameInfo(Fallout4GameInfo):
         long_name = u'Fallout 4 VR Script Extender'
         exe = u'f4sevr_loader.exe'
         ver_files = [u'f4sevr_loader.exe', u'f4sevr_steam_loader.dll']
+
+    class bsa(Fallout4GameInfo.bsa):
+        vanilla_string_bsas = Fallout4GameInfo.bsa.vanilla_string_bsas.copy()
+        vanilla_string_bsas.update({
+            u'fallout4_vr.esm': [u'Fallout4_VR - Main.ba2'],
+        })
 
     class xe(Fallout4GameInfo.xe):
         full_name = u'FO4VREdit'

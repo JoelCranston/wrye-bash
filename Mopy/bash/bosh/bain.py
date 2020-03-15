@@ -90,7 +90,7 @@ class Installer(object):
     # even ones we'll end up skipping, since this is for the detection of
     # archive 'types' - not actually deciding which get installed
     _top_files_extensions = bush.game.espm_extensions | {
-        bush.game.bsa_extension, u'.ini', u'.modgroups', u'.bsl', u'.ckm'}
+        bush.game.bsa.bsa_extension, u'.ini', u'.modgroups', u'.bsl', u'.ckm'}
     _re_top_extensions = re.compile(u'(?:' + u'|'.join(
         re.escape(ext) for ext in _top_files_extensions) + u')$', re.I)
 
@@ -1049,7 +1049,7 @@ class Installer(object):
         installer_plugins = self.espms
         is_ini_tweak = InstallersData._is_ini_tweak
         join_data_dir = bass.dirs['mods'].join
-        bsa_ext = bush.game.bsa_extension
+        bsa_ext = bush.game.bsa.bsa_extension
         for dest, src in dest_src.iteritems():
             size,crc = data_sizeCrc[dest]
             # Check the destination, since plugins may have been renamed

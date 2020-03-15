@@ -1433,14 +1433,14 @@ class ModDetails(_ModsSavesDetails):
             self.SetEdited()
 
     bsaAndBlocking = _(u'This mod has an associated archive (%s' +
-                       bush.game.bsa_extension + u') and an '
+                       bush.game.bsa.bsa_extension + u') and an '
         u'associated plugin-name-specific directory (e.g. Sound\\Voice\\%s),'
         u' which will become detached when the mod is renamed.') + u'\n\n' + \
         _(u'Note that the BSA archive may also contain a plugin-name-specific '
         u'directory, which would remain detached even if the archive name is '
         u'adjusted.')
     bsa = _(u'This mod has an associated archive (%s' +
-                    bush.game.bsa_extension + u'), which will become '
+                    bush.game.bsa.bsa_extension + u'), which will become '
         u'detached when the mod is renamed.') + u'\n\n' + _(u'Note that this '
         u'BSA archive may contain a plugin-name-specific directory (e.g. '
         u'Sound\\Voice\\%s), which would remain detached even if the archive '
@@ -3773,7 +3773,8 @@ class BashFrame(WindowFrame):
         else:
             title += u': '
         # chop off save prefix - +1 for the path separator
-        maProfile = bosh.saveInfos.localSave[len(bush.game.save_prefix) + 1:]
+        maProfile = bosh.saveInfos.localSave[len(
+            bush.game.ini.save_prefix) + 1:]
         if maProfile:
             title += maProfile
         else:

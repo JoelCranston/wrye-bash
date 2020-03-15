@@ -375,7 +375,7 @@ class Installers_BsaRedirection(AppendableLink, BoolLink, EnabledLink):
         else: return self._help
 
     def _append(self, window):
-        section,key = bush.game.ini.bsaRedirection
+        section, key = bush.game.ini.bsa_redirection_key
         return bool(section) and bool(key)
 
     def _enable(self): return bosh.oblivionIni.abs_path.exists()
@@ -511,7 +511,7 @@ class _Installers_SkipLandscapeLODNormals(_Installers_Skip):
 class _Installers_SkipBsl(AppendableLink, _Installers_Skip):
     """Toggle skipTESVBsl setting and update."""
     _text, key = _(u'Skip BSL Files'), 'bash.installers.skipTESVBsl'
-    def _append(self, window): return bush.game.has_bsl
+    def _append(self, window): return bush.game.bsa.has_bsl
 
 class Installers_GlobalSkips(balt.MenuLink):
     """Global Skips submenu."""

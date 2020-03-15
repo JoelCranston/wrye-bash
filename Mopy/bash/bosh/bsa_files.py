@@ -129,7 +129,6 @@ class _Header(object):
     __slots__ = (u'file_id', u'version')
     formats = [(f, struct.calcsize(f)) for f in (u'4s', u'I')]
     bsa_magic = b'BSA\x00'
-    bsa_version = int(u'0x67', 16)
 
     def load_header(self, ins):
         for fmt, attr in zip(_Header.formats, _Header.__slots__):
@@ -173,7 +172,6 @@ class Ba2Header(_Header):
     formats = [(f, struct.calcsize(f)) for f in (u'4s', u'I', u'Q')]
     bsa_magic = b'BTDX'
     file_types = {b'GNRL', b'DX10'} # GNRL=General, DX10=Textures
-    bsa_version = int(u'0x01', 16)
     header_size = 24
 
     def load_header(self, ins):
@@ -189,7 +187,6 @@ class MorrowindBsaHeader(_Header):
     __slots__ = (u'file_id', u'hash_offset', u'file_count')
     formats = [(f, struct.calcsize(f)) for f in (u'4s', u'I', u'I')]
     bsa_magic = b'\x00\x01\x00\x00'
-    bsa_version = None # Morrowind BSAs have no version
 
     def load_header(self, ins):
         for fmt, attr in zip(MorrowindBsaHeader.formats,
@@ -205,14 +202,6 @@ class OblivionBsaHeader(BsaHeader):
     __slots__ = ()
 
     def embed_filenames(self): return False
-
-class SkyrimBsaHeader(BsaHeader):
-    __slots__ = ()
-    bsa_version = int(u'0x68', 16)
-
-class SkyrimSeBsaHeader(BsaHeader):
-    __slots__ = ()
-    bsa_version = int(u'0x69', 16)
 
 # Records ---------------------------------------------------------------------
 class _HashedRecord(object):
@@ -900,12 +889,7 @@ class OblivionBsa(BSA):
                          folder_name)
         return reset_count
 
-# Note: what we call 'SkyrimBsa', BSArch calls 'baFO3'
-class SkyrimBsa(BSA):
-    header_type = SkyrimBsaHeader
-
 class SkyrimSeBsa(BSA):
-    header_type = SkyrimSeBsaHeader
     folder_record_type = BSASkyrimSEFolderRecord
     _compression_type = _Bsa_lz4
 
@@ -917,7 +901,7 @@ def get_bsa_type(game_fsName):
     elif game_fsName == u'Oblivion':
         return OblivionBsa
     elif game_fsName in (u'Enderal', u'Fallout3', u'FalloutNV', u'Skyrim'):
-        return SkyrimBsa
+        return BSA
     elif game_fsName in (u'Skyrim Special Edition', u'Skyrim VR'):
         return SkyrimSeBsa
     elif game_fsName in (u'Fallout4', u'Fallout4VR'):
