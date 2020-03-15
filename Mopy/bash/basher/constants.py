@@ -323,7 +323,7 @@ settingDefaults = { ##: (178) belongs to bosh (or better to a settings package)
         },
     'bash.ini.choices': {},
     'bash.ini.choice': 0,
-    'bash.ini.allowNewLines': bush.game.ini.allowNewLines,
+    'bash.ini.allowNewLines': bush.game.ini.allow_new_lines,
     #--Wrye Bash: Mods
     'bash.mods.autoGhost': False,
     'bash.mods.auto_flag_esl': True,

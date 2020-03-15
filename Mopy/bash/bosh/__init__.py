@@ -650,7 +650,7 @@ class ModInfo(FileInfo):
         # games other than skyrim accept more general bsa names
         if bush.game.fsName not in (u'Enderal', u'Skyrim'):
             pattern +=  r'(?: \- \w+)?'
-        pattern += re.escape(bush.game.bsa_extension)
+        pattern += re.escape(bush.game.bsa.bsa_extension)
         reg = re.compile(pattern, re.I | re.U)
         # bsaInfos must be updated and contain all existing bsas
         if bsa_infos is None: bsa_infos = bsaInfos
@@ -731,15 +731,17 @@ class ModInfo(FileInfo):
         """Return a list of bsas to get assets from.
         :rtype: list[BSAInfo]
         """
-        if self.name.cs in bush.game.vanilla_string_bsas: # lowercase !
-            bsa_infos = [bsaInfos[b] for b in map(GPath,
-                bush.game.vanilla_string_bsas[self.name.cs]) if b in bsaInfos]
+        if self.name.cs in bush.game.bsa.vanilla_string_bsas: # lowercase !
+            string_bsas = bush.game.bsa.vanilla_string_bsas[self.name.cs]
+            bsa_infos = [bsaInfos[b] for b in (GPath(s) for s in string_bsas) if b in bsaInfos]
         else:
             bsa_infos = self.mod_bsas() # first check bsa with same name
             for iniFile in modInfos.ini_files():
-                for key in bush.game.resource_archives_keys:
-                    extraBsas = map(GPath, (x.strip() for x in (
-                        iniFile.getSetting(u'Archive', key, u'').split(u','))))
+                for key in bush.game.ini.resource_archives_keys:
+                    extraBsas = (
+                        GPath(x.strip())
+                        for x in iniFile.getSetting(u'Archive', key, u'').split(u',')
+                    )
                     bsa_infos.extend(
                         bsaInfos[bsa] for bsa in extraBsas if bsa in bsaInfos)
         return bsa_infos
@@ -1956,7 +1958,7 @@ class ModInfos(FileInfos):
 
     _plugin_inis = OrderedDict() # cache active mod inis in active mods order
     def _refresh_mod_inis(self):
-        if not bush.game.supports_mod_inis: return
+        if not bush.game.ini.supports_mod_inis: return
         iniPaths = (self[m].getIniPath() for m in load_order.cached_active_tuple())
         iniPaths = [p for p in iniPaths if p.isfile()]
         # delete non existent inis from cache
@@ -2728,8 +2730,9 @@ class SaveInfos(FileInfos):
         """Read the current save profile from the oblivion.ini file and set
         local save attribute to that value."""
         # saveInfos singleton is constructed in InitData after bosh.oblivionIni
-        self.localSave = oblivionIni.getSetting(*bush.game.saveProfilesKey,
-                                                default=bush.game.save_prefix)
+        self.localSave = oblivionIni.getSetting(
+            *bush.game.ini.save_profiles_key,
+            default=bush.game.ini.save_prefix)
         if self.localSave.endswith(u'\\'): self.localSave = self.localSave[:-1]
         # Hopefully will solve issues with unicode usernames # TODO(ut) test
         self.localSave = decode(self.localSave) # encoding = 'cp1252' ?
@@ -2738,7 +2741,7 @@ class SaveInfos(FileInfos):
         _ext = re.escape(bush.game.ess.ext)
         patt = u'(%s|%sr)(f?)$' % (_ext, _ext[:-1]) # enabled/disabled save
         self.__class__.file_pattern = re.compile(patt, re.I | re.U)
-        self.localSave = bush.game.save_prefix
+        self.localSave = bush.game.ini.save_prefix
         self._setLocalSaveFromIni()
         super(SaveInfos, self).__init__(dirs['saveBase'].join(self.localSave),
                                         factory=SaveInfo)
@@ -2844,7 +2847,7 @@ class SaveInfos(FileInfos):
         self.localSave = localSave
         ##: not sure if appending the slash is needed for the game to parse
         # the setting correctly, kept previous behavior
-        oblivionIni.saveSetting(*bush.game.saveProfilesKey,
+        oblivionIni.saveSetting(*bush.game.ini.save_profiles_key,
                                 value=localSave + u'\\')
         self._initDB(dirs['saveBase'].join(self.localSave))
         if refreshSaveInfos: self.refresh()
@@ -2877,7 +2880,7 @@ class BSAInfos(FileInfos):
 
     def __init__(self):
         self.__class__.file_pattern = re.compile(
-            re.escape(bush.game.bsa_extension) + u'$', re.I | re.U)
+            re.escape(bush.game.bsa.bsa_extension) + u'$', re.I | re.U)
         _bsa_type = bsa_files.get_bsa_type(bush.game.fsName)
 
         class BSAInfo(FileInfo, _bsa_type):
@@ -2907,7 +2910,7 @@ class BSAInfos(FileInfos):
                 self._assets = self.__class__._assets
 
             def _reset_bsa_mtime(self):
-                if bush.game.allow_reset_bsa_timestamps and inisettings[
+                if bush.game.bsa.allow_reset_timestamps and inisettings[
                     'ResetBSATimestamps']:
                     if self._file_mod_time != self._default_mtime:
                         self.setmtime(self._default_mtime)
