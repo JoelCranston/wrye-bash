@@ -2877,6 +2877,8 @@ from . import bsa_files
 
 class BSAInfos(FileInfos):
     """BSAInfo collection. Represents bsa files in game's Data directory."""
+    # BSAs that have versions other than the one expected for the current game
+    mismatched_versions = set()
 
     def __init__(self):
         self.__class__.file_pattern = re.compile(
@@ -2917,6 +2919,16 @@ class BSAInfos(FileInfos):
 
         super(BSAInfos, self).__init__(dirs['mods'], factory=BSAInfo)
 
+    def new_info(self, fileName, _in_refresh=False, owner=None,
+                 notify_bain=False):
+        new_bsa = super(BSAInfos, self).new_info(fileName, _in_refresh, owner,
+                                                 notify_bain)
+        # Check if the BSA has a mismatched version - if so, schedule a warning
+        if bush.game.bsa.valid_versions: # If empty, skip checks for this game
+            if new_bsa.inspect_version() not in bush.game.bsa.valid_versions:
+                self.mismatched_versions.add(new_bsa.name)
+        return new_bsa
+
     @property
     def bash_dir(self): return dirs['modsBash'].join(u'BSA Data')
 
@@ -2929,6 +2941,8 @@ class BSAInfos(FileInfos):
 
     @staticmethod
     def reset_oblivion_mtimes():
+        # TODO(inf) Should probably make this game-agnostic instead and add it
+        #  to FO3/FNV as well?
         """Resets the mtimes of all Oblivion BSAs to a series of dates in 2006.
 
         This is done to make sure they load in the correct order (that's why

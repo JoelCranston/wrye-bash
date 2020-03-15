@@ -3769,6 +3769,7 @@ class BashFrame(WindowFrame):
         self.knownCorrupted = set()
         self.knownInvalidVerions = set()
         self.known_sse_form43_mods = set()
+        self.known_mismatched_version_bsas = set()
         self.incompleteInstallError = False
 
     @balt.conversation
@@ -3931,8 +3932,10 @@ class BashFrame(WindowFrame):
            warn(_(u'Files have been removed from load list:'), msg)
            bosh.modInfos.selectedExtra = set()
 
+    # WIP maybe move to ShowPanel()
+    # TODO(inf) When should warn_bsas be False?
     def warn_corrupted(self, warn_mods=True, warn_saves=True,
-                       warn_strings=True): # WIP maybe move to ShowPanel()
+                       warn_strings=True, warn_bsas=True):
         #--Any new corrupted files?
         message = []
         corruptMods = set(bosh.modInfos.corrupted.keys())
@@ -3969,6 +3972,16 @@ class BashFrame(WindowFrame):
             m.extend(sorted(bosh.modInfos.missing_strings))
             message.append(m)
             bosh.modInfos.new_missing_strings.clear()
+        bsa_mvers = bosh.bsaInfos.mismatched_versions
+        if warn_bsas and not bsa_mvers <= self.known_mismatched_version_bsas:
+            m = [_(u'Mismatched BSA Versions'),
+                 _(u'The following BSAs have a version other than the one '
+                   u'this game expects. This can lead to CTDs, please extract '
+                   u'and repack them using the %s-provided tool: ') %
+                 bush.game.ck.long_name]
+            m.extend(sorted(bsa_mvers - self.known_mismatched_version_bsas))
+            message.append(m)
+            self.known_mismatched_version_bsas |= bsa_mvers
         if message:
             ListBoxes.display_dialog(
               self, _(u'Warnings'), _(u'The following warnings were found:'),
