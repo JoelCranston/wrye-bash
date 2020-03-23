@@ -2617,7 +2617,7 @@ class MreGlob(MelRecord):
     """Global record.  Rather stupidly all values, despite their designation
        (short,long,float), are stored as floats -- which means that very large
        integers lose precision."""
-    classType = 'GLOB'
+    classType = b'GLOB'
     melSet = MelSet(
         MelEdid(),
         MelStruct('FNAM','s',('format','s')),
@@ -2630,7 +2630,7 @@ class MreGmstBase(MelRecord):
     """Game Setting record.  Base class, each game should derive from this
     class."""
     Ids = None
-    classType = 'GMST'
+    classType = b'GMST'
 
     melSet = MelSet(
         MelEdid(),
@@ -2670,7 +2670,7 @@ class MreGmstBase(MelRecord):
 # and adding this to mergeClasses would slow us down quite a bit.
 class MreLand(MelRecord):
     """Land structure. Part of exterior cells."""
-    classType = 'LAND'
+    classType = b'LAND'
 
     melSet = MelSet(
         MelBase('DATA', 'unknown'),
@@ -2823,7 +2823,7 @@ class MreLeveledListBase(MelRecord):
 #------------------------------------------------------------------------------
 class MreDial(MelRecord):
     """Dialog record."""
-    classType = 'DIAL'
+    classType = b'DIAL'
     __slots__ = ['infoStamp', 'infoStamp2', 'infos']
 
     def __init__(self, header, ins=None, do_unpack=False):

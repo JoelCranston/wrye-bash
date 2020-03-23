@@ -342,7 +342,7 @@ class MelRaceHeadPart(MelGroup):
 #------------------------------------------------------------------------------
 class MreTes4(MreHeaderBase):
     """TES4 Record.  File header."""
-    classType = 'TES4'
+    classType = b'TES4'
 
     melSet = MelSet(
         MelStruct('HEDR', 'f2I', ('version', 0.94), 'numRecords',
@@ -361,7 +361,7 @@ class MreTes4(MreHeaderBase):
 #------------------------------------------------------------------------------
 class MreAchr(MelRecord):
     """Placed NPC."""
-    classType = 'ACHR'
+    classType = b'ACHR'
 
     _flags = Flags(0, Flags.getNames('oppositeParent','popIn'))
 
@@ -407,7 +407,7 @@ class MreAchr(MelRecord):
 #------------------------------------------------------------------------------
 class MreAcre(MelRecord):
     """Placed Creature."""
-    classType = 'ACRE'
+    classType = b'ACRE'
 
     _flags = Flags(0, Flags.getNames('oppositeParent','popIn'))
 
@@ -454,7 +454,7 @@ class MreAcre(MelRecord):
 #------------------------------------------------------------------------------
 class MreActi(MelRecord):
     """Activator."""
-    classType = 'ACTI'
+    classType = b'ACTI'
 
     melSet = MelSet(
         MelEdid(),
@@ -473,7 +473,7 @@ class MreActi(MelRecord):
 #------------------------------------------------------------------------------
 class MreAddn(MelRecord):
     """Addon Node."""
-    classType = 'ADDN'
+    classType = b'ADDN'
 
     melSet = MelSet(
         MelEdid(),
@@ -488,7 +488,7 @@ class MreAddn(MelRecord):
 #------------------------------------------------------------------------------
 class MreAlch(MelRecord,MreHasEffects):
     """Ingestible."""
-    classType = 'ALCH'
+    classType = b'ALCH'
 
     _flags = Flags(0, Flags.getNames('autoCalc','isFood','medicine',))
 
@@ -513,7 +513,7 @@ class MreAlch(MelRecord,MreHasEffects):
 #------------------------------------------------------------------------------
 class MreAmmo(MelRecord):
     """Ammunition."""
-    classType = 'AMMO'
+    classType = b'AMMO'
 
     _flags = Flags(0, Flags.getNames('notNormalWeapon','nonPlayable'))
 
@@ -536,7 +536,7 @@ class MreAmmo(MelRecord):
 class MreAnio(MelRecord):
     """Animation Object."""
 
-    classType = 'ANIO'
+    classType = b'ANIO'
 
     melSet = MelSet(
         MelEdid(),
@@ -548,7 +548,7 @@ class MreAnio(MelRecord):
 #------------------------------------------------------------------------------
 class MreArma(MelRecord):
     """Armor Addon."""
-    classType = 'ARMA'
+    classType = b'ARMA'
 
     _flags = MelBipedFlags(0)
     _dnamFlags = Flags(0, Flags.getNames(
@@ -580,7 +580,7 @@ class MreArma(MelRecord):
 #------------------------------------------------------------------------------
 class MreArmo(MelRecord):
     """Armor."""
-    classType = 'ARMO'
+    classType = b'ARMO'
 
     _flags = MelBipedFlags(0, Flags.getNames())
 
@@ -622,7 +622,7 @@ class MreArmo(MelRecord):
 #------------------------------------------------------------------------------
 class MreAspc(MelRecord):
     """Acoustic Space."""
-    classType = 'ASPC'
+    classType = b'ASPC'
 
     melSet = MelSet(
         MelEdid(),
@@ -636,7 +636,7 @@ class MreAspc(MelRecord):
 #------------------------------------------------------------------------------
 class MreAvif(MelRecord):
     """Actor Value Information."""
-    classType = 'AVIF'
+    classType = b'AVIF'
 
     melSet = MelSet(
         MelEdid(),
@@ -650,7 +650,7 @@ class MreAvif(MelRecord):
 #------------------------------------------------------------------------------
 class MreBook(MelRecord):
     """BOOK record."""
-    classType = 'BOOK'
+    classType = b'BOOK'
 
     _flags = Flags(0,Flags.getNames('isScroll','isFixed'))
 
@@ -672,7 +672,7 @@ class MreBook(MelRecord):
 #------------------------------------------------------------------------------
 class MreBptd(MelRecord):
     """Body Part Data."""
-    classType = 'BPTD'
+    classType = b'BPTD'
 
     _flags = Flags(0, Flags.getNames('severable','ikData','ikBipedData',
         'explodable','ikIsHead','ikHeadtracking','toHitChanceAbsolute'))
@@ -712,7 +712,7 @@ class MreBptd(MelRecord):
 #------------------------------------------------------------------------------
 class MreCams(MelRecord):
     """Camera Shot."""
-    classType = 'CAMS'
+    classType = b'CAMS'
 
     CamsFlagsFlags = Flags(0, Flags.getNames(
             (0, 'positionFollowsLocation'),
@@ -738,7 +738,7 @@ class MreCams(MelRecord):
 #------------------------------------------------------------------------------
 class MreCell(MelRecord):
     """Cell."""
-    classType = 'CELL'
+    classType = b'CELL'
 
     cellFlags = Flags(0, Flags.getNames(
         (0, 'isInterior'),
@@ -810,7 +810,7 @@ class MreCell(MelRecord):
 #------------------------------------------------------------------------------
 class MreClas(MelRecord):
     """Class."""
-    classType = 'CLAS'
+    classType = b'CLAS'
 
     _flags = Flags(0, Flags.getNames(
         ( 0,'Playable'),
@@ -847,7 +847,7 @@ class MreClas(MelRecord):
 #------------------------------------------------------------------------------
 class MreClmt(MelRecord):
     """Climate."""
-    classType = 'CLMT'
+    classType = b'CLMT'
 
     melSet = MelSet(
         MelEdid(),
@@ -866,7 +866,7 @@ class MreClmt(MelRecord):
 #------------------------------------------------------------------------------
 class MreCobj(MelRecord):
     """Constructible Object (Recipes)."""
-    classType = 'COBJ'
+    classType = b'COBJ'
 
     melSet = MelSet(
         MelEdid(),
@@ -884,7 +884,7 @@ class MreCobj(MelRecord):
 #------------------------------------------------------------------------------
 class MreCont(MelRecord):
     """Container."""
-    classType = 'CONT'
+    classType = b'CONT'
 
     _flags = Flags(0,Flags.getNames(None,'respawns'))
 
@@ -908,7 +908,7 @@ class MreCont(MelRecord):
 #------------------------------------------------------------------------------
 class MreCpth(MelRecord):
     """Camera Path."""
-    classType = 'CPTH'
+    classType = b'CPTH'
 
     melSet = MelSet(
         MelEdid(),
@@ -922,7 +922,7 @@ class MreCpth(MelRecord):
 #------------------------------------------------------------------------------
 class MreCrea(MreActor):
     """Creature."""
-    classType = 'CREA'
+    classType = b'CREA'
 
     _flags = Flags(0, Flags.getNames(
         ( 0,'biped'),
@@ -1030,7 +1030,7 @@ class MreCrea(MreActor):
 #------------------------------------------------------------------------------
 class MreCsty(MelRecord):
     """Combat Style."""
-    classType = 'CSTY'
+    classType = b'CSTY'
 
     _flagsA = Flags(0, Flags.getNames(
         ( 0,'advanced'),
@@ -1072,7 +1072,7 @@ class MreCsty(MelRecord):
 #------------------------------------------------------------------------------
 class MreDebr(MelRecord):
     """Debris."""
-    classType = 'DEBR'
+    classType = b'DEBR'
 
     dataFlags = Flags(0, Flags.getNames('hasCollissionData'))
 
@@ -1126,7 +1126,7 @@ class MreDial(brec.MreDial):
 #------------------------------------------------------------------------------
 class MreDobj(MelRecord):
     """Default Object Manager."""
-    classType = 'DOBJ'
+    classType = b'DOBJ'
 
     melSet = MelSet(
         MelEdid(),
@@ -1142,7 +1142,7 @@ class MreDobj(MelRecord):
 #------------------------------------------------------------------------------
 class MreDoor(MelRecord):
     """Door."""
-    classType = 'DOOR'
+    classType = b'DOOR'
 
     _flags = Flags(0,Flags.getNames(
         ( 1,'automatic'),
@@ -1168,7 +1168,7 @@ class MreDoor(MelRecord):
 #------------------------------------------------------------------------------
 class MreEczn(MelRecord):
     """Encounter Zone."""
-    classType = 'ECZN'
+    classType = b'ECZN'
 
     _flags = Flags(0, Flags.getNames('neverResets','matchPCBelowMinimumLevel'))
 
@@ -1182,7 +1182,7 @@ class MreEczn(MelRecord):
 #------------------------------------------------------------------------------
 class MreEfsh(MelRecord):
     """Effect Shader."""
-    classType = 'EFSH'
+    classType = b'EFSH'
 
     _flags = Flags(0, Flags.getNames(
         ( 0,'noMemShader'),
@@ -1239,7 +1239,7 @@ class MreEfsh(MelRecord):
 #------------------------------------------------------------------------------
 class MreEnch(MelRecord,MreHasEffects):
     """Object Effect."""
-    classType = 'ENCH'
+    classType = b'ENCH'
 
     _flags = Flags(0, Flags.getNames('noAutoCalc',None,'hideEffect'))
 
@@ -1255,7 +1255,7 @@ class MreEnch(MelRecord,MreHasEffects):
 #------------------------------------------------------------------------------
 class MreExpl(MelRecord):
     """Explosion."""
-    classType = 'EXPL'
+    classType = b'EXPL'
 
     _flags = Flags(0,Flags.getNames(
         (1, 'alwaysUsesWorldOrientation'),
@@ -1283,7 +1283,7 @@ class MreExpl(MelRecord):
 #------------------------------------------------------------------------------
 class MreEyes(MelRecord):
     """Eyes."""
-    classType = 'EYES'
+    classType = b'EYES'
 
     _flags = Flags(0, Flags.getNames(
             (0, 'playable'),
@@ -1302,7 +1302,7 @@ class MreEyes(MelRecord):
 #------------------------------------------------------------------------------
 class MreFact(MelRecord):
     """Faction."""
-    classType = 'FACT'
+    classType = b'FACT'
 
     _flags = Flags(0, Flags.getNames('hiddenFromPC','evil','specialCombat'))
     _flags2 = Flags(0, Flags.getNames('trackCrime','allowSell',))
@@ -1329,7 +1329,7 @@ class MreFact(MelRecord):
 #------------------------------------------------------------------------------
 class MreFlst(MelRecord):
     """FormID List."""
-    classType = 'FLST'
+    classType = b'FLST'
 
     melSet = MelSet(
         MelEdid(),
@@ -1391,7 +1391,7 @@ class MreFlst(MelRecord):
 #------------------------------------------------------------------------------
 class MreFurn(MelRecord):
     """Furniture."""
-    classType = 'FURN'
+    classType = b'FURN'
 
     _flags = Flags() #--Governs type of furniture and which anims are available
     #--E.g., whether it's a bed, and which of the bed entry/exit animations are available
@@ -1419,7 +1419,7 @@ class MreGmst(MreGmstBase):
 #------------------------------------------------------------------------------
 class MreGras(MelRecord):
     """Grass."""
-    classType = 'GRAS'
+    classType = b'GRAS'
 
     _flags = Flags(0,Flags.getNames('vLighting','uScaling','fitSlope'))
 
@@ -1437,7 +1437,7 @@ class MreGras(MelRecord):
 #------------------------------------------------------------------------------
 class MreHair(MelRecord):
     """Hair."""
-    classType = 'HAIR'
+    classType = b'HAIR'
 
     _flags = Flags(0, Flags.getNames('playable','notMale','notFemale','fixed'))
 
@@ -1453,7 +1453,7 @@ class MreHair(MelRecord):
 #------------------------------------------------------------------------------
 class MreHdpt(MelRecord):
     """Head Part."""
-    classType = 'HDPT'
+    classType = b'HDPT'
 
     _flags = Flags(0, Flags.getNames('playable',))
 
@@ -1469,7 +1469,7 @@ class MreHdpt(MelRecord):
 #------------------------------------------------------------------------------
 class MreIdle(MelRecord):
     """Idle Animation."""
-    classType = 'IDLE'
+    classType = b'IDLE'
 
     melSet = MelSet(
         MelEdid(),
@@ -1485,7 +1485,7 @@ class MreIdle(MelRecord):
 #------------------------------------------------------------------------------
 class MreIdlm(MelRecord):
     """Idle Marker."""
-    classType = 'IDLM'
+    classType = b'IDLM'
 
     _flags = Flags(0, Flags.getNames('runInSequence',None,'doOnce'))
 
@@ -1505,7 +1505,7 @@ class MreIdlm(MelRecord):
 #------------------------------------------------------------------------------
 class MreImad(MelRecord):
     """Image Space Adapter."""
-    classType = 'IMAD'
+    classType = b'IMAD'
 
     _ImadDofFlags = Flags(0, Flags.getNames(
         (0, 'useTarget'),
@@ -1603,7 +1603,7 @@ class MreImad(MelRecord):
 #------------------------------------------------------------------------------
 class MreImgs(MelRecord):
     """Image Space."""
-    classType = 'IMGS'
+    classType = b'IMGS'
 
     _dnam_flags = Flags(0, Flags.getNames(
         'saturation',
@@ -1651,7 +1651,7 @@ class MreImgs(MelRecord):
 #------------------------------------------------------------------------------
 class MreInfo(MelRecord):
     """Dialog Response."""
-    classType = 'INFO'
+    classType = b'INFO'
 
     _flags = Flags(0,Flags.getNames(
         'goodbye','random','sayOnce','runImmediately','infoRefusal','randomEnd',
@@ -1697,7 +1697,7 @@ class MreInfo(MelRecord):
 #------------------------------------------------------------------------------
 class MreIngr(MelRecord,MreHasEffects):
     """Ingredient."""
-    classType = 'INGR'
+    classType = b'INGR'
 
     _flags = Flags(0, Flags.getNames('noAutoCalc','isFood'))
 
@@ -1718,7 +1718,7 @@ class MreIngr(MelRecord,MreHasEffects):
 #------------------------------------------------------------------------------
 class MreIpct(MelRecord):
     """Impact."""
-    classType = 'IPCT'
+    classType = b'IPCT'
 
     DecalDataFlags = Flags(0, Flags.getNames(
             (0, 'parallax'),
@@ -1744,7 +1744,7 @@ class MreIpct(MelRecord):
 #------------------------------------------------------------------------------
 class MreIpds(MelRecord):
     """Impact Dataset."""
-    classType = 'IPDS'
+    classType = b'IPDS'
 
     melSet = MelSet(
         MelEdid(),
@@ -1760,7 +1760,7 @@ class MreIpds(MelRecord):
 #------------------------------------------------------------------------------
 class MreKeym(MelRecord):
     """Key."""
-    classType = 'KEYM'
+    classType = b'KEYM'
 
     melSet = MelSet(
         MelEdid(),
@@ -1779,7 +1779,7 @@ class MreKeym(MelRecord):
 #------------------------------------------------------------------------------
 class MreLgtm(MelRecord):
     """Lighting Template."""
-    classType = 'LGTM'
+    classType = b'LGTM'
 
     melSet = MelSet(
         MelEdid(),
@@ -1796,7 +1796,7 @@ class MreLgtm(MelRecord):
 #------------------------------------------------------------------------------
 class MreLigh(MelRecord):
     """Light."""
-    classType = 'LIGH'
+    classType = b'LIGH'
 
     _flags = Flags(0, Flags.getNames('dynamic','canTake','negative','flickers',
         'unk1','offByDefault','flickerSlow','pulse','pulseSlow','spotLight','spotShadow'))
@@ -1820,7 +1820,7 @@ class MreLigh(MelRecord):
 #------------------------------------------------------------------------------
 class MreLscr(MelRecord):
     """Load Screen."""
-    classType = 'LSCR'
+    classType = b'LSCR'
 
     melSet = MelSet(
         MelEdid(),
@@ -1836,7 +1836,7 @@ class MreLscr(MelRecord):
 #------------------------------------------------------------------------------
 class MreLtex(MelRecord):
     """Landscape Texture."""
-    classType = 'LTEX'
+    classType = b'LTEX'
 
     melSet = MelSet(
         MelEdid(),
@@ -1851,25 +1851,25 @@ class MreLtex(MelRecord):
 #------------------------------------------------------------------------------
 class MreLvlc(MreLeveledList):
     """Leveled Creature."""
-    classType = 'LVLC'
+    classType = b'LVLC'
     __slots__ = []
 
 #------------------------------------------------------------------------------
 class MreLvli(MreLeveledList):
     """Leveled Item."""
-    classType = 'LVLI'
+    classType = b'LVLI'
     __slots__ = []
 
 #------------------------------------------------------------------------------
 class MreLvln(MreLeveledList):
     """Leveled NPC."""
-    classType = 'LVLN'
+    classType = b'LVLN'
     __slots__ = []
 
 #------------------------------------------------------------------------------
 class MreMesg(MelRecord):
     """Message."""
-    classType = 'MESG'
+    classType = b'MESG'
 
     MesgTypeFlags = Flags(0, Flags.getNames(
             (0, 'messageBox'),
@@ -1903,7 +1903,7 @@ class MreMesg(MelRecord):
 #------------------------------------------------------------------------------
 class MreMgef(MelRecord):
     """Magic Effect."""
-    classType = 'MGEF'
+    classType = b'MGEF'
 
     _flags = Flags(0, Flags.getNames(
         ( 0,'hostile'),
@@ -1955,7 +1955,7 @@ class MreMgef(MelRecord):
 #------------------------------------------------------------------------------
 class MreMicn(MelRecord):
     """Menu Icon."""
-    classType = 'MICN'
+    classType = b'MICN'
     melSet = MelSet(
         MelEdid(),
         MelIcons(),
@@ -1965,7 +1965,7 @@ class MreMicn(MelRecord):
 #------------------------------------------------------------------------------
 class MreMisc(MelRecord):
     """Misc. Item."""
-    classType = 'MISC'
+    classType = b'MISC'
 
     melSet = MelSet(
         MelEdid(),
@@ -1984,7 +1984,7 @@ class MreMisc(MelRecord):
 #------------------------------------------------------------------------------
 class MreMstt(MelRecord):
     """Moveable Static."""
-    classType = 'MSTT'
+    classType = b'MSTT'
 
     melSet = MelSet(
         MelEdid(),
@@ -2000,7 +2000,7 @@ class MreMstt(MelRecord):
 #------------------------------------------------------------------------------
 class MreMusc(MelRecord):
     """Music Type."""
-    classType = 'MUSC'
+    classType = b'MUSC'
 
     melSet = MelSet(
         MelEdid(),
@@ -2011,7 +2011,7 @@ class MreMusc(MelRecord):
 #------------------------------------------------------------------------------
 class MreNavi(MelRecord):
     """Navigation Mesh Info Map."""
-    classType = 'NAVI'
+    classType = b'NAVI'
 
     melSet = MelSet(
         MelEdid(),
@@ -2028,7 +2028,7 @@ class MreNavi(MelRecord):
 #------------------------------------------------------------------------------
 class MreNavm(MelRecord):
     """Navigation Mesh."""
-    classType = 'NAVM'
+    classType = b'NAVM'
 
     melSet = MelSet(
         MelEdid(),
@@ -2057,7 +2057,7 @@ class MreNavm(MelRecord):
 #------------------------------------------------------------------------------
 class MreNote(MelRecord):
     """Note."""
-    classType = 'NOTE'
+    classType = b'NOTE'
 
     melSet = MelSet(
         MelEdid(),
@@ -2081,7 +2081,7 @@ class MreNote(MelRecord):
 #------------------------------------------------------------------------------
 class MreNpc(MreActor):
     """Non-Player Character."""
-    classType = 'NPC_'
+    classType = b'NPC_'
 
     _flags = Flags(0, Flags.getNames(
         ( 0,'female'),
@@ -2203,7 +2203,7 @@ class MreNpc(MreActor):
 #------------------------------------------------------------------------------
 class MrePack(MelRecord):
     """Package."""
-    classType = 'PACK'
+    classType = b'PACK'
 
     _flags = Flags(0,Flags.getNames(
         'offersServices','mustReachLocation','mustComplete','lockAtStart',
@@ -2353,7 +2353,7 @@ class MrePack(MelRecord):
 #------------------------------------------------------------------------------
 class MrePerk(MelRecord):
     """Perk."""
-    classType = 'PERK'
+    classType = b'PERK'
 
     _PerkScriptFlags = Flags(0, Flags.getNames(
         (0, 'runImmediately'),
@@ -2425,7 +2425,7 @@ class MrePerk(MelRecord):
 #------------------------------------------------------------------------------
 class MrePgre(MelRecord):
     """Placed Grenade."""
-    classType = 'PGRE'
+    classType = b'PGRE'
 
     _flags = Flags(0, Flags.getNames('oppositeParent'))
     _watertypeFlags = Flags(0, Flags.getNames('reflection','refraction'))
@@ -2474,7 +2474,7 @@ class MrePgre(MelRecord):
 #------------------------------------------------------------------------------
 class MrePmis(MelRecord):
     """Placed Missile."""
-    classType = 'PMIS'
+    classType = b'PMIS'
 
     _flags = Flags(0, Flags.getNames('oppositeParent'))
     _watertypeFlags = Flags(0, Flags.getNames('reflection','refraction'))
@@ -2523,7 +2523,7 @@ class MrePmis(MelRecord):
 #------------------------------------------------------------------------------
 class MreProj(MelRecord):
     """Projectile."""
-    classType = 'PROJ'
+    classType = b'PROJ'
 
     _flags = Flags(0,Flags.getNames(
         'hitscan',
@@ -2561,7 +2561,7 @@ class MreProj(MelRecord):
 #------------------------------------------------------------------------------
 class MrePwat(MelRecord):
     """Placeable Water."""
-    classType = 'PWAT'
+    classType = b'PWAT'
 
     _flags = Flags(0, Flags.getNames(
         ( 0,'reflects'),
@@ -2595,7 +2595,7 @@ class MrePwat(MelRecord):
 #------------------------------------------------------------------------------
 class MreQust(MelRecord):
     """Quest."""
-    classType = 'QUST'
+    classType = b'QUST'
 
     _questFlags = Flags(0,Flags.getNames('startGameEnabled',None,'repeatedTopics','repeatedStages'))
     stageFlags = Flags(0,Flags.getNames('complete'))
@@ -2644,7 +2644,7 @@ class MreQust(MelRecord):
 #------------------------------------------------------------------------------
 class MreRace(MelRecord):
     """Race."""
-    classType = 'RACE'
+    classType = b'RACE'
 
     _flags = Flags(0, Flags.getNames('playable', None, 'child'))
 
@@ -2762,7 +2762,7 @@ class MreRace(MelRecord):
 #------------------------------------------------------------------------------
 class MreRads(MelRecord):
     """Radiation Stage."""
-    classType = 'RADS'
+    classType = b'RADS'
     melSet = MelSet(
         MelEdid(),
         MelStruct('DATA','2I','trigerThreshold',(FID,'actorEffect')),
@@ -2772,7 +2772,7 @@ class MreRads(MelRecord):
 #------------------------------------------------------------------------------
 class MreRefr(MelRecord):
     """Placed Object."""
-    classType = 'REFR'
+    classType = b'REFR'
 
     _marker_flags = Flags(0, Flags.getNames(
         'visible',
@@ -2879,7 +2879,7 @@ class MreRefr(MelRecord):
 #------------------------------------------------------------------------------
 class MreRegn(MelRecord):
     """Region."""
-    classType = 'REGN'
+    classType = b'REGN'
 
     obflags = Flags(0, Flags.getNames(
         ( 0,'conform'),
@@ -2942,7 +2942,7 @@ class MreRegn(MelRecord):
 #------------------------------------------------------------------------------
 class MreRgdl(MelRecord):
     """Ragdoll."""
-    classType = 'RGDL'
+    classType = b'RGDL'
 
     _flags = Flags(0, Flags.getNames('disableOnMove'))
 
@@ -2972,7 +2972,7 @@ class MreRgdl(MelRecord):
 #------------------------------------------------------------------------------
 class MreScol(MelRecord):
     """Static Collection."""
-    classType = 'SCOL'
+    classType = b'SCOL'
 
     melSet = MelSet(
         MelEdid(),
@@ -2992,7 +2992,7 @@ class MreScol(MelRecord):
 #------------------------------------------------------------------------------
 class MreScpt(MelRecord):
     """Script."""
-    classType = 'SCPT'
+    classType = b'SCPT'
 
     melSet = MelSet(
         MelEdid(),
@@ -3003,7 +3003,7 @@ class MreScpt(MelRecord):
 #------------------------------------------------------------------------------
 class MreSoun(MelRecord):
     """Sound."""
-    classType = 'SOUN'
+    classType = b'SOUN'
 
     _flags = Flags(0, Flags.getNames(
             'randomFrequencyShift',
@@ -3045,7 +3045,7 @@ class MreSoun(MelRecord):
 #------------------------------------------------------------------------------
 class MreSpel(MelRecord,MreHasEffects):
     """Actor Effect"""
-    classType = 'SPEL'
+    classType = b'SPEL'
 
     class SpellFlags(Flags):
         """For SpellFlags, immuneToSilence activates bits 1 AND 3."""
@@ -3071,7 +3071,7 @@ class MreSpel(MelRecord,MreHasEffects):
 #------------------------------------------------------------------------------
 class MreStat(MelRecord):
     """Static."""
-    classType = 'STAT'
+    classType = b'STAT'
 
     melSet = MelSet(
         MelEdid(),
@@ -3083,7 +3083,7 @@ class MreStat(MelRecord):
 #------------------------------------------------------------------------------
 class MreTact(MelRecord):
     """Talking Activator."""
-    classType = 'TACT'
+    classType = b'TACT'
 
     melSet = MelSet(
         MelEdid(),
@@ -3100,7 +3100,7 @@ class MreTact(MelRecord):
 #------------------------------------------------------------------------------
 class MreTerm(MelRecord):
     """Terminal."""
-    classType = 'TERM'
+    classType = b'TERM'
 
     _flags = Flags(0, Flags.getNames('leveled','unlocked','alternateColors','hideWellcomeTextWhenDisplayingImage'))
     _menuFlags = Flags(0, Flags.getNames('addNote','forceRedraw'))
@@ -3133,7 +3133,7 @@ class MreTerm(MelRecord):
 #------------------------------------------------------------------------------
 class MreTree(MelRecord):
     """Tree."""
-    classType = 'TREE'
+    classType = b'TREE'
 
     melSet = MelSet(
         MelEdid(),
@@ -3153,7 +3153,7 @@ class MreTree(MelRecord):
 #------------------------------------------------------------------------------
 class MreTxst(MelRecord):
     """Texture Set."""
-    classType = 'TXST'
+    classType = b'TXST'
 
     TxstTypeFlags = Flags(0, Flags.getNames(
         (0, 'noSpecularMap'),
@@ -3185,7 +3185,7 @@ class MreTxst(MelRecord):
 #------------------------------------------------------------------------------
 class MreVtyp(MelRecord):
     """Voice Type."""
-    classType = 'VTYP'
+    classType = b'VTYP'
 
     _flags = Flags(0, Flags.getNames('allowDefaultDialog','female'))
 
@@ -3198,7 +3198,7 @@ class MreVtyp(MelRecord):
 #------------------------------------------------------------------------------
 class MreWatr(MelRecord):
     """Water."""
-    classType = 'WATR'
+    classType = b'WATR'
 
     _flags = Flags(0, Flags.getNames('causesDmg','reflective'))
 
@@ -3280,7 +3280,7 @@ class MreWatr(MelRecord):
 #------------------------------------------------------------------------------
 class MreWeap(MelRecord):
     """Weapon."""
-    classType = 'WEAP'
+    classType = b'WEAP'
 
     _flags = Flags(0, Flags.getNames('notNormalWeapon'))
     _dflags1 = Flags(0, Flags.getNames(
@@ -3371,7 +3371,7 @@ class MreWeap(MelRecord):
 #------------------------------------------------------------------------------
 class MreWrld(MelRecord):
     """Worldspace."""
-    classType = 'WRLD'
+    classType = b'WRLD'
 
     _flags = Flags(0, Flags.getNames('smallWorld','noFastTravel','oblivionWorldspace',None,
         'noLODWater','noLODNoise','noAllowNPCFallDamage'))
@@ -3412,7 +3412,7 @@ class MreWrld(MelRecord):
 #------------------------------------------------------------------------------
 class MreWthr(MelRecord):
     """Weather."""
-    classType = 'WTHR'
+    classType = b'WTHR'
 
     melSet = MelSet(
         MelEdid(),
