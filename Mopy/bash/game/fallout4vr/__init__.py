@@ -58,6 +58,10 @@ class Fallout4VRGameInfo(Fallout4GameInfo):
         exe = u'f4sevr_loader.exe'
         ver_files = [u'f4sevr_loader.exe', u'f4sevr_steam_loader.dll']
 
+    class xe(Fallout4GameInfo.xe):
+        full_name = u'FO4VREdit'
+        expert_key = 'fo4vrView.iKnowWhatImDoing'
+
     SkipBAINRefresh = {u'fo4vredit backups', u'fo4vredit cache'}
 
     # ---------------------------------------------------------------------

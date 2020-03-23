@@ -72,6 +72,10 @@ class SkyrimVRGameInfo(SkyrimSEGameInfo):
         exe = u'sksevr_loader.exe'
         ver_files = [u'sksevr_loader.exe', u'sksevr_steam_loader.dll']
 
+    class xe(SkyrimSEGameInfo.xe):
+        full_name = u'TES5VREdit'
+        expert_key = 'tes5vrview.iKnowWhatImDoing'
+
     SkipBAINRefresh = {u'tes5vredit backups', u'tes5vredit cache'}
 
     @classmethod

@@ -53,6 +53,3 @@ bethDataFiles = {
     u'skyrim - voices_en0.bsa',
     u'skyrim_vr - main.bsa'
 }
-
-# xEdit menu string and key for expert setting
-xEdit_expert = (_(u'TES5VREdit Expert'), 'tes5vrview.iKnowWhatImDoing')
