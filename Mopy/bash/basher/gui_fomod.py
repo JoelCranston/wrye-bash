@@ -30,7 +30,8 @@ import wx.adv as wiz
 
 from .. import balt, bass, bolt, bosh, bush, env
 from ..gui import CENTER, CheckBox, HBoxedLayout, HLayout, Label, \
-    LayoutOptions, TextArea, VLayout, WizardDialog, EventResult
+    LayoutOptions, TextArea, VLayout, WizardDialog, EventResult, \
+    PictureWithCursor
 from ..fomod import FailedCondition, FomodInstaller
 
 class FomodInstallInfo(object):
@@ -209,7 +210,7 @@ class PageSelect(PageInstaller):
     def __init__(self, parent, page):
         super(PageSelect, self).__init__(parent)
         self.group_option_map = defaultdict(list)
-        self.bmp_item = balt.Picture(self, 0, 0, background=None)
+        self.bmp_item = PictureWithCursor(self, 0, 0, background=None)
         self._img_cache = {} # creating images can be really expensive
         self.text_item = TextArea(self, editable=False, auto_tooltip=False)
         # TODO(inf) de-wx!
@@ -285,9 +286,8 @@ class PageSelect(PageInstaller):
             (HLayout(spacing=5, item_expand=True, item_weight=1, items=[
                 HBoxedLayout(self, title=page.name, item_expand=True,
                              item_weight=1, items=[panel_groups]),
-                VLayout(spacing=5, item_expand=True, item_weight=1, items=[
-                    self.bmp_item, self.text_item
-                ]),
+                VLayout(spacing=5, item_expand=True, item_weight=1,
+                        items=[self.bmp_item, self.text_item]),
             ]), LayoutOptions(weight=1)),
         ]).apply_to(self)
         self.Layout()
@@ -298,15 +298,12 @@ class PageSelect(PageInstaller):
         button = event.GetEventObject()
         option = button.option_object
         self._enableForward(True)
-        self.bmp_item.Freeze()
         img = self._page_parent.archive_path.join(option.image)
         try:
             image = self._img_cache[img]
         except KeyError:
-            image = self._img_cache.setdefault(img, (
-                    img.isfile() and balt.Image(img.s).GetBitmap()) or None)
-        self.bmp_item.SetBitmap(image)
-        self.bmp_item.Thaw()
+            image = img
+        self._img_cache[img] = self.bmp_item.set_bitmap(image)
         self.text_item.text_content = (self._option_type_string[option.type]
                                        + option.description)
 
