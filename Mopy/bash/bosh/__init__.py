@@ -1644,7 +1644,7 @@ class INIInfos(TableFileInfos):
             return False
 
     def _copy_to_new_tweak(self, info, new_tweak):
-        with open(self.store_dir.join(new_tweak).s, 'wb') as ini_file:
+        with open(self.store_dir.join(new_tweak).s, u'wb') as ini_file:
             ini_file.write(info.read_ini_content(as_unicode=False)) # binary
         return self.new_info(new_tweak.tail, notify_bain=True)
 
