@@ -1009,18 +1009,18 @@ class UIList(wx.Panel):
     def allCols(self): return self.labels.keys()
     @property
     def colWidths(self):
-        return _settings.getChanged(self.keyPrefix + '.colWidths', {})
+        return _settings.getChanged(self.keyPrefix + u'.colWidths', {})
     @property
     def colReverse(self): # not sure why it gets it changed but no harm either
         """Dictionary column->isReversed."""
-        return _settings.getChanged(self.keyPrefix + '.colReverse', {})
+        return _settings.getChanged(self.keyPrefix + u'.colReverse', {})
     @property
-    def cols(self): return _settings.getChanged(self.keyPrefix + '.cols')
+    def cols(self): return _settings.getChanged(self.keyPrefix + u'.cols')
     @property
     def autoColWidths(self):
         return _settings.get('bash.autoSizeListColumns', 0)
     @autoColWidths.setter
-    def autoColWidths(self, val): _settings['bash.autoSizeListColumns'] = val
+    def autoColWidths(self, val): _settings[u'bash.autoSizeListColumns'] = val
     # the current sort column
     @property
     def sort_column(self):
@@ -1423,19 +1423,19 @@ class UIList(wx.Panel):
         """Create/name columns in ListCtrl."""
         cols = self.cols # this may have been updated in ColumnsMenu.Execute()
         numCols = len(cols)
-        names = set(_settings['bash.colNames'].get(key) for key in cols)
+        names = set(_settings[u'bash.colNames'].get(key) for key in cols)
         self._colDict.clear()
         colDex, listCtrl = 0, self.__gList
         while colDex < numCols: ##: simplify!
             colKey = cols[colDex]
-            colName = _settings['bash.colNames'].get(colKey, colKey)
+            colName = _settings[u'bash.colNames'].get(colKey, colKey)
             colWidth = self.colWidths.get(colKey, 30)
             if colDex >= listCtrl.lc_get_columns_count(): # Make a new column
                 listCtrl.lc_insert_column(colDex, colName)
                 listCtrl.lc_set_column_width(colDex, colWidth)
             else: # Update an existing column
                 column = listCtrl.lc_get_column(colDex)
-                text = column.GetText()
+                text = column.GetText() # Py3: unicode?
                 if text == colName:
                     # Don't change it, just make sure the width is correct
                     listCtrl.lc_set_column_width(colDex, colWidth)
@@ -2262,7 +2262,7 @@ class DnDStatusBar(wx.StatusBar):
 
     @property
     def iconsSize(self): # +8 as each button has 4 px border on left and right
-        return _settings['bash.statusbar.iconSize'] + 8
+        return _settings[u'bash.statusbar.iconSize'] + 8
 
     def _addButton(self, link):
         gButton = link.GetBitmapButton(self)
@@ -2339,10 +2339,10 @@ class DnDStatusBar(wx.StatusBar):
                 # update settings
                 uid = self.GetLink(button=button).uid
                 overUid = self.GetLink(index=over).uid
-                overIndex = _settings['bash.statusbar.order'].index(overUid)
-                _settings['bash.statusbar.order'].remove(uid)
-                _settings['bash.statusbar.order'].insert(overIndex, uid)
-                _settings.setChanged('bash.statusbar.order')
+                overIndex = _settings[u'bash.statusbar.order'].index(overUid)
+                _settings[u'bash.statusbar.order'].remove(uid)
+                _settings[u'bash.statusbar.order'].insert(overIndex, uid)
+                _settings.setChanged(u'bash.statusbar.order')
                 # update self.buttons
                 self.buttons.remove(button)
                 self.buttons.insert(over, button)

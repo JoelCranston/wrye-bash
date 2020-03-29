@@ -36,12 +36,12 @@ class ColorDialog(DialogWindow):
     title = _(u'Color Configuration')
 
     _keys_to_tabs = {
-        'mods': _(u'[Mods] '),
-        'screens': _(u'[Saves, Screens] '),
-        'installers': _(u'[Installers] '),
-        'ini': _(u'[INI Edits] '),
-        'tweak': _(u'[INI Edits] '),
-        'default': _(u'[All] '),
+        u'mods': _(u'[Mods] '),
+        u'screens': _(u'[Saves, Screens] '),
+        u'installers': _(u'[Installers] '),
+        u'ini': _(u'[INI Edits] '),
+        u'tweak': _(u'[INI Edits] '),
+        u'default': _(u'[All] '),
     }
 
     def __init__(self):
@@ -50,7 +50,7 @@ class ColorDialog(DialogWindow):
         self.changes = dict()
         #--DropDown
         def _display_text(k):
-            return _(self._keys_to_tabs[k.split('.')[0]]) + colorInfo[k][0]
+            return _(self._keys_to_tabs[k.split(u'.')[0]]) + colorInfo[k][0]
         self.text_key = dict((_display_text(x), x) for x in colors)
         colored = self.text_key.keys()
         colored.sort(key=unicode.lower)
@@ -119,7 +119,7 @@ class ColorDialog(DialogWindow):
                 color = self.changes[key]
             else:
                 color = colors[key]
-            default = color == Color(*settingDefaults['bash.colors'][key])
+            default = color == Color(*settingDefaults[u'bash.colors'][key])
             if not default:
                 allDefault = False
                 break
@@ -130,7 +130,7 @@ class ColorDialog(DialogWindow):
             color = self.changes[color_key]
         else:
             color = colors[color_key]
-        default = color == Color(*settingDefaults['bash.colors'][color_key])
+        default = color == Color(*settingDefaults[u'bash.colors'][color_key])
         # Update the Buttons, DropDown, and ColorPicker
         self.apply.enabled = changed
         self.applyAll.enabled = anyChanged
@@ -141,13 +141,13 @@ class ColorDialog(DialogWindow):
 
     def OnDefault(self):
         color_key = self.GetColorKey()
-        newColor = Color(*settingDefaults['bash.colors'][color_key])
+        newColor = Color(*settingDefaults[u'bash.colors'][color_key])
         self.changes[color_key] = newColor
         self.UpdateUIButtons()
 
     def OnDefaultAll(self):
         for key in colors:
-            default = Color(*settingDefaults['bash.colors'][key])
+            default = Color(*settingDefaults[u'bash.colors'][key])
             if colors[key] != default:
                 self.changes[key] = default
         self.UpdateUIButtons()
@@ -157,7 +157,7 @@ class ColorDialog(DialogWindow):
         newColor = self.changes[color_key]
         #--Update settings and colors
         bass.settings[u'bash.colors'][color_key] = newColor.to_rgb_tuple()
-        bass.settings.setChanged('bash.colors')
+        bass.settings.setChanged(u'bash.colors')
         colors[color_key] = newColor
         self.UpdateUIButtons()
         self.UpdateUIColors()
@@ -166,7 +166,7 @@ class ColorDialog(DialogWindow):
         for key,newColor in self.changes.iteritems():
             bass.settings[u'bash.colors'][key] = newColor.to_rgb_tuple()
             colors[key] = newColor
-        bass.settings.setChanged('bash.colors')
+        bass.settings.setChanged(u'bash.colors')
         self.UpdateUIButtons()
         self.UpdateUIColors()
 

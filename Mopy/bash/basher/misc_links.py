@@ -284,7 +284,7 @@ class Master_ChangeTo(_Master_EditList):
             return
         #--Save Name
         masterInfo.set_name(newName)
-        bass.settings.getChanged('bash.mods.renames')[master_name] = newName
+        bass.settings.getChanged(u'bash.mods.renames')[master_name] = newName
         self.window.SetMasterlistEdited(repopulate=True)
 
 #------------------------------------------------------------------------------

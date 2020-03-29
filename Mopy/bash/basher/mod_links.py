@@ -538,7 +538,7 @@ class Mod_Groups(_Mod_Labels):
         if not balt.askContinue(self.listEditor, msg,
                                 'bash.groups.reset.continue',
                                 _(u'Reset Groups')): return
-        self.listEditor.SetItemsTo(list(settingDefaults['bash.mods.groups']))
+        self.listEditor.SetItemsTo(list(settingDefaults[u'bash.mods.groups']))
 
 #--Ratings --------------------------------------------------------------------
 class Mod_Ratings(_Mod_Labels):
