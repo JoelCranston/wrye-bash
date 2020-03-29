@@ -1529,8 +1529,7 @@ class InstallerProject(Installer):
 
     def wizard_file(self): return self.ipath.join(self.hasWizard)
 
-    def fomod_file(self):
-        return bass.dirs[u'installers'].join(self.archive, self.has_fomod_conf)
+    def fomod_file(self): return self.ipath.join(self.has_fomod_conf)
 
 def projects_walk_cache(func): ##: HACK ! Profile
     """Decorator to make sure I dont leak self._dir_dirs_files project cache.
