@@ -305,7 +305,7 @@ class Installer_Wizard(OneItemLink, _InstallerLink):
         lastApplied = None
         new_targets = {}
         for iniFile, wizardEdits in ret.ini_edits.iteritems():
-            outFile = bass.dirs['ini_tweaks'].join(u'%s - Wizard Tweak [%s].ini' %
+            outFile = bass.dirs[u'ini_tweaks'].join(u'%s - Wizard Tweak [%s].ini' %
                 (installer.archive, iniFile.sbody))
             with outFile.open('w') as out:
                 for line in generateTweakLines(wizardEdits, iniFile):
@@ -320,7 +320,7 @@ class Installer_Wizard(OneItemLink, _InstallerLink):
                 target_path = game_ini.abs_path
                 target_ini_file = game_ini
             else: # suppose that the target ini file is in the Data/ dir
-                target_path = bass.dirs['mods'].join(iniFile)
+                target_path = bass.dirs[u'mods'].join(iniFile)
                 new_targets[target_path.stail] = target_path
                 if not (iniFile.s in installer.ci_dest_sizeCrc and
                         ret.should_install):
@@ -568,7 +568,7 @@ class Installer_ExportAchlist(OneItemLink, _InstallerLink):
                                               bosh.InstallerMarker)
 
     def Execute(self):
-        info_dir = bass.dirs['app'].join(self.__class__._mode_info_dir)
+        info_dir = bass.dirs[u'app'].join(self.__class__._mode_info_dir)
         info_dir.makedirs()
         achlist = info_dir.join(self._selected_info.archive + u'.achlist')
         with balt.BusyCursor(), open(achlist.s, 'w') as out:
@@ -1266,7 +1266,7 @@ class InstallerConverter_Create(_InstallerConverter_Link):
                       u" be discarded.") % (
                               archives.defaultExt, BCFArchive.cext))
             BCFArchive = GPath(BCFArchive.sbody + archives.defaultExt).tail
-        if bass.dirs['converters'].join(BCFArchive).exists():
+        if bass.dirs[u'converters'].join(BCFArchive).exists():
             if not self._askYes(_(
                     u'%s already exists. Overwrite it?') % BCFArchive.s,
                                 title=self.dialogTitle, default=False): return

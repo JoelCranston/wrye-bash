@@ -56,7 +56,7 @@ class Settings_BackupSettings(ItemLink):
         msg = _(u'Do you want to backup your Bash settings now?')
         if not balt.askYes(Link.Frame, msg,_(u'Backup Bash Settings?')): return
         with balt.BusyCursor(): Link.Frame.SaveSettings()
-        base_dir = bass.settings['bash.backupPath'] or bass.dirs['modsBash']
+        base_dir = bass.settings['bash.backupPath'] or bass.dirs[u'modsBash']
         settings_file = balt.askSave(Link.Frame,
                                      title=_(u'Backup Bash Settings'),
                                      defaultDir=base_dir, wildcard=u'*.7z',
@@ -87,7 +87,7 @@ class Settings_RestoreSettings(ItemLink):
               u'restored.')]), _(u'Restore Bash Settings?')):
             return
         # former may be None
-        base_dir = bass.settings['bash.backupPath'] or bass.dirs['modsBash']
+        base_dir = bass.settings['bash.backupPath'] or bass.dirs[u'modsBash']
         settings_file = balt.askOpen(Link.Frame, _(u'Restore Bash Settings'),
                                      base_dir, u'', u'*.7z')
         if not settings_file: return
@@ -146,7 +146,7 @@ class Settings_ExportDllInfo(AppendableLink, ItemLink):
                                            bush.game.Sd.sd_abbrev)
 
     def Execute(self):
-        textDir = bass.dirs['patches']
+        textDir = bass.dirs[u'patches']
         textDir.makedirs()
         #--File dialog
         title = _(u'Export list of allowed/disallowed plugin DLLs to:')
@@ -182,7 +182,7 @@ class Settings_ImportDllInfo(AppendableLink, ItemLink):
                                            bush.game.Sd.sd_abbrev)
 
     def Execute(self):
-        textDir = bass.dirs['patches']
+        textDir = bass.dirs[u'patches']
         textDir.makedirs()
         #--File dialog
         defFile = bush.game.Se.se_abbrev + u' ' + _(
@@ -274,7 +274,7 @@ class Settings_Languages(TransLink):
     """Menu for available Languages."""
     def _decide(self, window, selection):
         languages = []
-        for f in bass.dirs['l10n'].list():
+        for f in bass.dirs[u'l10n'].list():
             if f.cext == u'.txt' and f.csbody[-3:] != u'new':
                 languages.append(f.body)
         if languages:
@@ -493,7 +493,7 @@ class Settings_DumpTranslator(AppendableLink, ItemLink):
             u'see Internationalization section of Bash readme.')
         if not self._askContinue(message, 'bash.dump_translator.continue',
                                 _(u'Dump Translator')): return
-        outPath = bass.dirs['l10n']
+        outPath = bass.dirs[u'l10n']
         with balt.BusyCursor():
             outFile = dump_translator(outPath.s, bass.active_locale)
         self._showOk(_(

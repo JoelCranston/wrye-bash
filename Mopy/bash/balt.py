@@ -156,7 +156,7 @@ class ColorChecks(ImageList):
                            u'red'):
                 shortKey = status + u'.' + state
                 image_key = u'checkbox.' + shortKey
-                img = GPath(bass.dirs['images'].join(
+                img = GPath(bass.dirs[u'images'].join(
                     u'checkbox_' + status + u'_' + state + u'.png'))
                 image = images[image_key] = Image(img, Image.typesDict[u'png'])
                 self.Add(image, shortKey)
@@ -2364,7 +2364,7 @@ class WryeBashSplashScreen(wx.adv.SplashScreen):
     """This Creates the Splash Screen widget. (The first image you see when
     starting the Application.)"""
     def __init__(self, parent=None):
-        splashScreenBitmap = wx.Image(name=bass.dirs['images'].join(
+        splashScreenBitmap = wx.Image(name=bass.dirs[u'images'].join(
             u'wryesplash.png').s).ConvertToBitmap()
         # Center image on the screen and image will stay until clicked by
         # user or is explicitly destroyed when the main window is ready
