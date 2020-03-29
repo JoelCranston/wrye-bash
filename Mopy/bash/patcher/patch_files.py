@@ -48,10 +48,9 @@ executing_patch = None # type: bolt.Path
 class _PFile(object):
     """Base class of patch files - factoring out common code __WIP__. Wraps an
     executing bashed Patch."""
-    def __init__(self, patchers, patch_path):
+    def __init__(self, patch_path):
         """:type patch_path: bolt.Path"""
         #--New attrs
-        self._patcher_instances = patchers
         self.patchName = patch_path # the bashed Patch
         # Aliases from one mod name to another. Used by text file patchers.
         self.aliases = {}
@@ -62,10 +61,7 @@ class _PFile(object):
         self.compiledAllMods = []
         self.patcher_mod_skipcount = defaultdict(Counter)
         #--Config
-        if bush.game.fsName in (u'FalloutNV', u'Fallout3',):
-            self.bodyTags = 'HAGPBFE' #--Default bodytags
-        else: #--Default bodytags
-            self.bodyTags = 'ARGHTCCPBS'
+        self.bodyTags = bush.game.body_tags
         #--Mods
         # checking for files to include in patch, investigate
         loadMods = [m for m in load_order.cached_lower_loading_espms(
@@ -76,13 +72,11 @@ class _PFile(object):
         self.loadSet = frozenset(self.loadMods)
         self.set_mergeable_mods([])
         self.p_file_minfos = bosh.modInfos
-        for patcher in self._patcher_instances:
-            patcher.initPatchFile(self)
 
     def set_mergeable_mods(self, mergeMods):
-        """Add to mod lists and sets the mergeable mods."""
-        self.mergeMods = mergeMods
-        self.mergeSet = set(self.mergeMods)
+        """Set `mergeSet` attribute to the srcs of APatchMerger. Upload allMods
+        and allSet to include the mergeMods"""
+        self.mergeSet = set(mergeMods)
         self.allMods = load_order.get_ordered(self.loadSet | self.mergeSet)
         self.allSet = frozenset(self.allMods)
 
@@ -164,20 +158,31 @@ class _PFile(object):
             for key, value in sorted(self.aliases.iteritems()):
                 log(u'* %s >> %s' % (key.s, value.s))
 
-    def init_patchers_data(self, progress): raise AbstractError
+    def init_patchers_data(self, patchers, progress):
+        """Gives each patcher a chance to get its source data."""
+        self._patcher_instances = [p for p in patchers if p.isActive]
+        if not self._patcher_instances: return
+        progress = progress.setFull(len(self._patcher_instances))
+        for index, patcher in enumerate( # that was the sorting for CBash patchers - for PBash we relied on group - FIXME test
+                sorted(self._patcher_instances, key=attrgetter('scanOrder'))):
+            progress(index, _(u'Preparing') + u'\n' + patcher.getName())
+            patcher.initData(SubProgress(progress, index))
+        progress(progress.full, _(u'Patchers prepared.'))
+        # initData may set isActive to zero - FIXME this should not be allowed
+        self._patcher_instances = [p for p in patchers if p.isActive]
 
 class PatchFile(_PFile, ModFile):
     """Defines and executes patcher configuration."""
 
     #--Instance
-    def __init__(self,modInfo,patchers):
+    def __init__(self, modInfo):
         """Initialization."""
         ModFile.__init__(self,modInfo,None)
         self.tes4.author = u'BASHED PATCH'
         self.tes4.masters = [bosh.modInfos.masterName]
         self.longFids = True
         self.keepIds = set()
-        _PFile.__init__(self, patchers, modInfo.name)
+        _PFile.__init__(self, modInfo.name)
 
     def getKeeper(self):
         """Returns a function to add fids to self.keepIds."""
@@ -185,15 +190,6 @@ class PatchFile(_PFile, ModFile):
             self.keepIds.add(fid)
             return fid
         return keep
-
-    def init_patchers_data(self, progress):
-        """Gives each patcher a chance to get its source data."""
-        if not self._patcher_instances: return
-        progress = progress.setFull(len(self._patcher_instances))
-        for index,patcher in enumerate(self._patcher_instances):
-            progress(index,_(u'Preparing')+u'\n'+patcher.getName())
-            patcher.initData(SubProgress(progress,index))
-        progress(progress.full,_(u'Patchers prepared.'))
 
     def initFactories(self,progress):
         """Gets load factories."""
@@ -251,8 +247,8 @@ class PatchFile(_PFile, ModFile):
                     self.update_patch_records_from_mod(modFile)
                 for patcher in sorted(self._patcher_instances, key=attrgetter('scanOrder')):
                     if iiMode and not patcher.iiMode: continue
-                    progress(pstate,u'%s\n%s' % (modName.s,patcher.name))
-                    patcher.scanModFile(modFile,nullProgress)
+                    progress(pstate,u'%s\n%s' % (modName.s,patcher.getName()))
+                    patcher.scan_mod_file(modFile,nullProgress)
                 # Clip max version at 1.0.  See explanation in the CBash version as to why.
                 self.tes4.version = min(max(modFile.tes4.version, self.tes4.version), max(bush.game.Esp.validHeaderVersions))
             except CancelError:
@@ -362,7 +358,7 @@ class CBash_PatchFile(_PFile, ObModFile):
     """Defines and executes patcher configuration."""
 
     #--Instance
-    def __init__(self, patch_name, patchers):
+    def __init__(self, patch_name):
         """Initialization."""
         self.group_patchers = defaultdict(list)
         self.indexMGEFs = False
@@ -375,16 +371,7 @@ class CBash_PatchFile(_PFile, ObModFile):
                               'imperial', 'khajiit', 'nord', 'orc', 'redguard',
                               'wood elf']
         self.races_data = {'EYES': [], 'HAIR': []}
-        _PFile.__init__(self, patchers, patch_name)
-
-    def init_patchers_data(self, progress):
-        """Gives each patcher a chance to get its source data."""
-        if not self._patcher_instances: return
-        progress = progress.setFull(len(self._patcher_instances))
-        for index,patcher in enumerate(sorted(self._patcher_instances, key=attrgetter('scanOrder'))):
-            progress(index,_(u'Preparing')+u'\n'+patcher.getName())
-            patcher.initData(self.group_patchers,SubProgress(progress,index))
-        progress(progress.full,_(u'Patchers prepared.'))
+        _PFile.__init__(self, patch_name)
 
     def mergeModFile(self,modFile,progress,doFilter,iiMode,group):
         """Copies contents of modFile group into self."""
