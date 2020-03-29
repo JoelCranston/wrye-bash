@@ -109,7 +109,7 @@ class DocBrowser(WindowFrame):
             btn.enabled = False
 
     @staticmethod
-    def _get_is_wtxt(path=None, data=None):
+    def _get_is_wtxt(path=None, string_data=None):
         """Determines whether specified path is a wtxt file."""
         rx = re.compile(u'' r'^=.+=#\s*$', re.U)
         if path is not None:
@@ -120,7 +120,7 @@ class DocBrowser(WindowFrame):
             except (OSError, UnicodeDecodeError):
                 return False
         else:
-            return rx.match(data) is not None
+            return rx.match(string_data) is not None
 
     def _do_open(self):
         """Handle "Open Doc" button."""
@@ -155,7 +155,7 @@ class DocBrowser(WindowFrame):
                     self._open_btn):
             btn.enabled = False
         self._doc_name_box.text_content = u''
-        self._load_data(data=u'')
+        self._load_data(string_data=u'')
 
     def _do_select_mod(self, lb_selection_dex, lb_selection_str):
         """Handle mod name combobox selection."""
@@ -210,21 +210,21 @@ class DocBrowser(WindowFrame):
             bolt.WryeText.genHtml(doc_path, None,
                                   bosh.modInfos.store_dir.join(u'Docs'))
 
-    def _load_data(self, path=None, data=None, editing=False):
+    def _load_data(self, path=None, string_data=None, editing=False):
         if path and path.cext in (u'.htm',u'.html',u'.mht') and not editing \
                 and web_viewer_available():
             self._doc_ctrl.try_load_html(path)
         else:
             # Oddly, wxPython's LoadFile function doesn't read unicode
             # correctly, even in unicode builds
-            if data is None and path:
+            if string_data is None and path:
                 try:
                     with path.open('r',encoding='utf-8-sig') as ins:
-                        data = ins.read()
+                        string_data = ins.read()
                 except UnicodeDecodeError:
                     with path.open('r') as ins:
-                        data = ins.read()
-            self._doc_ctrl.load_text(data)
+                        string_data = ins.read()
+            self._doc_ctrl.load_text(string_data)
 
     def SetMod(self, mod_name):
         """Sets the mod to show docs for."""
@@ -236,7 +236,7 @@ class DocBrowser(WindowFrame):
         self._mod_name = mod_name
         self._mod_name_box.text_content = mod_name.s
         if not mod_name:
-            self._load_data(data=u'')
+            self._load_data(string_data=u'')
             for btn in self._buttons:
                 btn.enabled = False
             return
@@ -250,7 +250,7 @@ class DocBrowser(WindowFrame):
             btn.enabled = bool(doc_path)
         # Set empty and uneditable if there's no doc path:
         if not doc_path:
-            self._load_data(data=u'')
+            self._load_data(string_data=u'')
         # Create new file if none exists
         elif not doc_path.exists():
             for template_file in (bosh.modInfos.store_dir.join(
@@ -262,8 +262,8 @@ class DocBrowser(WindowFrame):
             else:
                 template = u'= $modName {}#\n{}'.format(u'=' * (74-len(mod_name)),
                                                         doc_path.s)
-            self._load_data(data=string.Template(template)
-                                            .substitute(modName=mod_name.s))
+            self._load_data(string_data=string.Template(template).substitute(
+                modName=mod_name.s))
             # Start edit mode
             self._edit_box.is_checked = True
             self._doc_ctrl.set_text_editable(True)
@@ -419,9 +419,8 @@ class InstallerProject_OmodConfigDialog(WindowFrame):
     """Dialog for editing omod configuration data."""
     _size_hints = (300, 300)
 
-    def __init__(self,parent,data,project):
+    def __init__(self, parent, project):
         #--Data
-        self.data = data ##: unused?
         self.project = project
         self.config = config = omods.OmodConfig.getOmodConfig(project)
         #--GUI
