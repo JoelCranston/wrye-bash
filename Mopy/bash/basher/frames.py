@@ -421,7 +421,7 @@ class InstallerProject_OmodConfigDialog(WindowFrame):
 
     def __init__(self,parent,data,project):
         #--Data
-        self.data = data
+        self.data = data ##: unused?
         self.project = project
         self.config = config = omods.OmodConfig.getOmodConfig(project)
         #--GUI
