@@ -1022,6 +1022,7 @@ class MreLigh(MelRecord):
                            'green', 'blue', ('unused1', null1),
                            (_flags, 'flags', 0), 'falloff', 'fov', 'value',
                            'weight', old_versions={'iI3BsI2f'}),
+        # None here is on purpose! See AssortedTweak_LightFadeValueFix
         MelOptFloat('FNAM', ('fade', None)),
         MelFid('SNAM','sound'),
     )

@@ -1578,6 +1578,9 @@ class CBash_RacePatcher(CBash_MultiTweaker, CBash_ListPatcher):
         #Each part is a group of tags that are processed similarly
         self.tweakers = [tweak_cls(p_name, p_file, p_sources) for tweak_cls in
                          self.tweakers_cls] # p_name is not really used here
+        # Otherwise you'd need at least one src mod to enable tweaks and eye
+        # filtering. The isActive on the child patcher is *not* enough (#494).
+        self.isActive = True
 
     def initData(self, progress):
         for tweaker in self.tweakers:
