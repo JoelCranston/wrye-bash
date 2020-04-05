@@ -49,7 +49,7 @@ class EnderalGameInfo(SkyrimGameInfo):
     class Ini(SkyrimGameInfo.Ini):
         save_prefix = u'..\\Enderal\\Saves'
 
-    class bsa(SkyrimGameInfo.bsa):
+    class Bsa(SkyrimGameInfo.Bsa):
         vanilla_string_bsas = {
             u'skyrim.esm': [u'Skyrim - Interface.bsa'],
             u'update.esm': [u'Skyrim - Interface.bsa'],

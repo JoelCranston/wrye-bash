@@ -63,7 +63,7 @@ class MorrowindGameInfo(GameInfo):
         screenshot_index_key = (u'General', u'Screen Shot Index', u'0')
         supports_mod_inis = False
 
-    class bsa(GameInfo.bsa):
+    class Bsa(GameInfo.Bsa):
         allow_reset_timestamps = True
 
     class pnd(GameInfo.pnd): # Morrowind seems to have no such directories

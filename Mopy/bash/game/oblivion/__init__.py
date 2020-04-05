@@ -88,7 +88,7 @@ class OblivionGameInfo(GameInfo):
     class ess(GameInfo.ess):
         canEditMore = True
 
-    class bsa(GameInfo.bsa):
+    class Bsa(GameInfo.Bsa):
         allow_reset_timestamps = True
         valid_versions = {0x67}
 

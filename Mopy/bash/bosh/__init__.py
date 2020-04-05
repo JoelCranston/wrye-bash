@@ -650,7 +650,7 @@ class ModInfo(FileInfo):
         # games other than skyrim accept more general bsa names
         if bush.game.fsName not in (u'Enderal', u'Skyrim'):
             pattern +=  r'(?: \- \w+)?'
-        pattern += re.escape(bush.game.bsa.bsa_extension)
+        pattern += re.escape(bush.game.Bsa.bsa_extension)
         reg = re.compile(pattern, re.I | re.U)
         # bsaInfos must be updated and contain all existing bsas
         if bsa_infos is None: bsa_infos = bsaInfos
@@ -731,8 +731,8 @@ class ModInfo(FileInfo):
         """Return a list of bsas to get assets from.
         :rtype: list[BSAInfo]
         """
-        if self.name.cs in bush.game.bsa.vanilla_string_bsas: # lowercase !
-            string_bsas = bush.game.bsa.vanilla_string_bsas[self.name.cs]
+        if self.name.cs in bush.game.Bsa.vanilla_string_bsas: # lowercase !
+            string_bsas = bush.game.Bsa.vanilla_string_bsas[self.name.cs]
             bsa_infos = [bsaInfos[b] for b in (GPath(s) for s in string_bsas) if b in bsaInfos]
         else:
             bsa_infos = self.mod_bsas() # first check bsa with same name
@@ -2880,7 +2880,7 @@ class BSAInfos(FileInfos):
 
     def __init__(self):
         self.__class__.file_pattern = re.compile(
-            re.escape(bush.game.bsa.bsa_extension) + u'$', re.I | re.U)
+            re.escape(bush.game.Bsa.bsa_extension) + u'$', re.I | re.U)
         _bsa_type = bsa_files.get_bsa_type(bush.game.fsName)
 
         class BSAInfo(FileInfo, _bsa_type):
@@ -2910,7 +2910,7 @@ class BSAInfos(FileInfos):
                 self._assets = self.__class__._assets
 
             def _reset_bsa_mtime(self):
-                if bush.game.bsa.allow_reset_timestamps and inisettings[
+                if bush.game.Bsa.allow_reset_timestamps and inisettings[
                     'ResetBSATimestamps']:
                     if self._file_mod_time != self._default_mtime:
                         self.setmtime(self._default_mtime)

@@ -212,7 +212,7 @@ class GameInfo(object):
         canEditMore = False # Advanced editing
         ext = u'.ess'       # Save file extension
 
-    class bsa(object):
+    class Bsa(object):
         """Information about the BSAs (Bethesda Archives) used by this game."""
         # Whether or not the INI setting ResetBSATimestamps should have any
         # effect on this game

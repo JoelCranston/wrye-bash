@@ -78,7 +78,7 @@ class Fallout4GameInfo(GameInfo):
     class ess(GameInfo.ess):
         ext = u'.fos'
 
-    class bsa(GameInfo.bsa):
+    class Bsa(GameInfo.Bsa):
         bsa_extension = u'.ba2'
         valid_versions = {0x01}
         vanilla_string_bsas = {

@@ -76,7 +76,7 @@ class Fallout3GameInfo(GameInfo):
     class ess(GameInfo.ess):
         ext = u'.fos'
 
-    class bsa(GameInfo.bsa):
+    class Bsa(GameInfo.Bsa):
         allow_reset_timestamps = True
         # ArchiveInvalidation Invalidated, which we shipped unmodified for a
         # long time, uses an Oblivion BSA with version 0x67, so we have to

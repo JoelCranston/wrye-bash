@@ -75,7 +75,7 @@ class SkyrimSEGameInfo(SkyrimGameInfo):
         long_name = u''
         install_dir = u''
 
-    class bsa(SkyrimGameInfo.bsa):
+    class Bsa(SkyrimGameInfo.Bsa):
         valid_versions = {0x69}
         vanilla_string_bsas = {
             u'skyrim.esm': [u'Skyrim - Patch.bsa', u'Skyrim - Interface.bsa'],

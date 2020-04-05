@@ -79,7 +79,7 @@ class SkyrimGameInfo(GameInfo):
         resource_archives_keys = (u'sResourceArchiveList',
                                   u'sResourceArchiveList2')
 
-    class bsa(GameInfo.bsa):
+    class Bsa(GameInfo.Bsa):
         has_bsl = True
         valid_versions = {0x68}
         vanilla_string_bsas = {
