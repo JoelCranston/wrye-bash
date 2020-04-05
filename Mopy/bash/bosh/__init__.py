@@ -2571,7 +2571,7 @@ class ModInfos(FileInfos):
         moved = super(ModInfos, self).move_infos(sources, destinations, window,
                                                  bash_frame)
         self.refresh() # yak, it should have an "added" parameter
-        bash_frame.warn_corrupted(warn_saves=False)
+        bash_frame.warn_corrupted(warn_mods=True)
         return moved
 
     def get_hide_dir(self, name):
@@ -2823,7 +2823,7 @@ class SaveInfos(FileInfos):
                 self.new_info(d, notify_bain=True)
             except FileError:
                 pass # will warn below
-        bash_frame.warn_corrupted(warn_mods=False, warn_strings=False)
+        bash_frame.warn_corrupted(warn_saves=True)
         return moved
 
     def move_info(self, fileName, destDir):

@@ -3089,7 +3089,7 @@ class InstallersPanel(BashTab):
         self.uiList.RefreshUI()
         if mods_changed:
             BashFrame.modList.RefreshUI(refreshSaves=True, focus_list=False)
-            Link.Frame.warn_corrupted(warn_saves=False)
+            Link.Frame.warn_corrupted(warn_mods=True, warn_strings=True)
             Link.Frame.warn_load_order()
         if inis_changed:
             if BashFrame.iniList is not None:
@@ -3890,7 +3890,8 @@ class BashFrame(WindowFrame):
         if booting: self.warnTooManyModsBsas()
         self.warn_load_order()
         self._warn_reset_load_order()
-        self.warn_corrupted()
+        self.warn_corrupted(warn_mods=True, warn_saves=True, warn_strings=True,
+                            warn_bsas=True)
         self.warn_game_ini()
         self._missingDocsDir()
         #--Done (end recursion blocker)
@@ -3932,10 +3933,8 @@ class BashFrame(WindowFrame):
            warn(_(u'Files have been removed from load list:'), msg)
            bosh.modInfos.selectedExtra = set()
 
-    # WIP maybe move to ShowPanel()
-    # TODO(inf) When should warn_bsas be False?
-    def warn_corrupted(self, warn_mods=True, warn_saves=True,
-                       warn_strings=True, warn_bsas=True):
+    def warn_corrupted(self, warn_mods=False, warn_saves=False,
+                       warn_strings=False, warn_bsas=False):
         #--Any new corrupted files?
         message = []
         corruptMods = set(bosh.modInfos.corrupted.keys())
