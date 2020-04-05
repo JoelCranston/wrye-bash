@@ -46,7 +46,7 @@ class EnderalGameInfo(SkyrimGameInfo):
         u'Install_Path'
     )
 
-    class ini(SkyrimGameInfo.ini):
+    class Ini(SkyrimGameInfo.Ini):
         save_prefix = u'..\\Enderal\\Saves'
 
     class bsa(SkyrimGameInfo.bsa):

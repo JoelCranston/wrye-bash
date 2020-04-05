@@ -375,7 +375,7 @@ class Installers_BsaRedirection(AppendableLink, BoolLink, EnabledLink):
         else: return self._help
 
     def _append(self, window):
-        section, key = bush.game.ini.bsa_redirection_key
+        section, key = bush.game.Ini.bsa_redirection_key
         return bool(section) and bool(key)
 
     def _enable(self): return bosh.oblivionIni.abs_path.exists()

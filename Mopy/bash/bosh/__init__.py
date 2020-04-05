@@ -737,7 +737,7 @@ class ModInfo(FileInfo):
         else:
             bsa_infos = self.mod_bsas() # first check bsa with same name
             for iniFile in modInfos.ini_files():
-                for key in bush.game.ini.resource_archives_keys:
+                for key in bush.game.Ini.resource_archives_keys:
                     extraBsas = (
                         GPath(x.strip())
                         for x in iniFile.getSetting(u'Archive', key, u'').split(u',')
@@ -1958,7 +1958,7 @@ class ModInfos(FileInfos):
 
     _plugin_inis = OrderedDict() # cache active mod inis in active mods order
     def _refresh_mod_inis(self):
-        if not bush.game.ini.supports_mod_inis: return
+        if not bush.game.Ini.supports_mod_inis: return
         iniPaths = (self[m].getIniPath() for m in load_order.cached_active_tuple())
         iniPaths = [p for p in iniPaths if p.isfile()]
         # delete non existent inis from cache
@@ -2731,8 +2731,8 @@ class SaveInfos(FileInfos):
         local save attribute to that value."""
         # saveInfos singleton is constructed in InitData after bosh.oblivionIni
         self.localSave = oblivionIni.getSetting(
-            *bush.game.ini.save_profiles_key,
-            default=bush.game.ini.save_prefix)
+            *bush.game.Ini.save_profiles_key,
+            default=bush.game.Ini.save_prefix)
         if self.localSave.endswith(u'\\'): self.localSave = self.localSave[:-1]
         # Hopefully will solve issues with unicode usernames # TODO(ut) test
         self.localSave = decode(self.localSave) # encoding = 'cp1252' ?
@@ -2741,7 +2741,7 @@ class SaveInfos(FileInfos):
         _ext = re.escape(bush.game.ess.ext)
         patt = u'(%s|%sr)(f?)$' % (_ext, _ext[:-1]) # enabled/disabled save
         self.__class__.file_pattern = re.compile(patt, re.I | re.U)
-        self.localSave = bush.game.ini.save_prefix
+        self.localSave = bush.game.Ini.save_prefix
         self._setLocalSaveFromIni()
         super(SaveInfos, self).__init__(dirs['saveBase'].join(self.localSave),
                                         factory=SaveInfo)
@@ -2847,7 +2847,7 @@ class SaveInfos(FileInfos):
         self.localSave = localSave
         ##: not sure if appending the slash is needed for the game to parse
         # the setting correctly, kept previous behavior
-        oblivionIni.saveSetting(*bush.game.ini.save_profiles_key,
+        oblivionIni.saveSetting(*bush.game.Ini.save_profiles_key,
                                 value=localSave + u'\\')
         self._initDB(dirs['saveBase'].join(self.localSave))
         if refreshSaveInfos: self.refresh()

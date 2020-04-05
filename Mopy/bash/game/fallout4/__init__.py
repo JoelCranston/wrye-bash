@@ -68,7 +68,7 @@ class Fallout4GameInfo(GameInfo):
         url = u'http://f4se.silverlock.org/'
         url_tip = u'http://f4se.silverlock.org/'
 
-    class ini(GameInfo.ini):
+    class Ini(GameInfo.Ini):
         resource_archives_keys = (
             u'sResourceIndexFileList', u'sResourceStartUpArchiveList',
             u'sResourceArchiveList', u'sResourceArchiveList2',

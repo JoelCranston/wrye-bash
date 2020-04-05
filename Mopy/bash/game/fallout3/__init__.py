@@ -68,7 +68,7 @@ class Fallout3GameInfo(GameInfo):
         url = u'http://fose.silverlock.org/'
         url_tip = u'http://fose.silverlock.org/'
 
-    class ini(GameInfo.ini):
+    class Ini(GameInfo.Ini):
         allow_new_lines = False
         bsa_redirection_key = (u'Archive', u'sArchiveList')
         supports_mod_inis = False

@@ -80,7 +80,7 @@ class OblivionGameInfo(GameInfo):
         url = u'https://www.nexusmods.com/oblivion/mods/30054'
         url_tip = u'https://www.nexusmods.com/oblivion'
 
-    class ini(GameInfo.ini):
+    class Ini(GameInfo.Ini):
         allow_new_lines = False
         bsa_redirection_key = (u'Archive', u'sArchiveList')
         supports_mod_inis = False

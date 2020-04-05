@@ -56,7 +56,7 @@ class MorrowindGameInfo(GameInfo):
 
     # TODO(inf) MWSE and MGE are vastly different from the later game versions
 
-    class ini(GameInfo.ini): # No BSA Redirection, TODO need BSA Invalidation
+    class Ini(GameInfo.Ini): # No BSA Redirection, TODO need BSA Invalidation
         screenshot_enabled_key = (u'General', u'Screen Shot Enable', u'1')
         screenshot_base_key = (u'General', u'Screen Shot Base Name',
                                u'ScreenShot')

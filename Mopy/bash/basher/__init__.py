@@ -3830,7 +3830,7 @@ class BashFrame(WindowFrame):
             title += u': '
         # chop off save prefix - +1 for the path separator
         maProfile = bosh.saveInfos.localSave[len(
-            bush.game.ini.save_prefix) + 1:]
+            bush.game.Ini.save_prefix) + 1:]
         if maProfile:
             title += maProfile
         else:

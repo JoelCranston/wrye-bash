@@ -2219,10 +2219,10 @@ class InstallersData(DataStore):
                 tweakPath.remove()
                 continue
             # Re-write the tweak
-            with tweakPath.open('w') as ini:
-                ini.write(u'; INI Tweak created by Wrye Bash, using settings '
+            with tweakPath.open('w') as ini_:
+                ini_.write(u'; INI Tweak created by Wrye Bash, using settings '
                           u'from old file.\n\n')
-                ini.writelines(lines)
+                ini_.writelines(lines)
             # we notify BAIN below, although highly improbable the created ini
             # is included to a package
             iniInfos.new_info(tweakPath.tail, notify_bain=True)
@@ -2296,8 +2296,8 @@ class InstallersData(DataStore):
         self.data_sizeCrcDate.update((dest, (
             s, c, (d != -1 and d) or bass.dirs['mods'].join(dest).mtime)) for
             dest, (s, c, d) in data_sizeCrcDate_update.iteritems())
-        for ini in inis:
-            iniInfos.new_info(ini, owner=installer.archive)
+        for ini_path in inis:
+            iniInfos.new_info(ini_path, owner=installer.archive)
 
     def sorted_pairs(self, package_keys=None, reverse=False):
         """Return pairs of key, installer for package_keys in self, sorted by

@@ -177,7 +177,7 @@ class GameInfo(object):
         launchesSE = False  # Whether the launcher will automatically launch
                             # the SE
 
-    class ini(object):
+    class Ini(object):
         """Information about this game's INI handling."""
         # True means new lines are allowed to be added via INI tweaks
         # (by default)

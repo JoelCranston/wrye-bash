@@ -75,7 +75,7 @@ class SkyrimGameInfo(GameInfo):
         long_name = u'SkyProc'
         install_dir = u'SkyProc Patchers'
 
-    class ini(GameInfo.ini):
+    class Ini(GameInfo.Ini):
         resource_archives_keys = (u'sResourceArchiveList',
                                   u'sResourceArchiveList2')
 
