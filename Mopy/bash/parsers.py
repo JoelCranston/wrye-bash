@@ -3955,7 +3955,7 @@ class ModFile(object):
                     u'%r' % (topType, self.loadFactory))
             self.tops[topType].setChanged()
             return self.tops[topType]
-        elif topType == '__repr__':
+        elif topType == u'__repr__' or topType.startswith(u'cached_'):
             raise AttributeError
         else:
             raise ArgumentError(u'Invalid top group type: '+topType)
