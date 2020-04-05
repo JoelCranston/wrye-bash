@@ -116,7 +116,7 @@ class Fallout3GameInfo(GameInfo):
     }
     ignoreDataDirs = {u'LSData'} # u'FOSE\\Plugins\\ComponentDLLs\\CSE',
 
-    class esp(GameInfo.esp):
+    class Esp(GameInfo.Esp):
         canBash = True
         canEditHeader = True
         validHeaderVersions = (0.85, 0.94)

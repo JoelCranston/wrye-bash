@@ -85,7 +85,7 @@ class MorrowindGameInfo(GameInfo):
         u'tes3edit cache',
     }
 
-    class esp(GameInfo.esp):
+    class Esp(GameInfo.Esp):
         validHeaderVersions = (1.2, 1.3)
         stringsFiles = []
         plugin_header_sig = b'TES3'

@@ -382,7 +382,7 @@ def InitModLinks():
         files_menu = MenuLink(_(u'Files..'))
         files_menu.links.append(UIList_OpenStore())
         files_menu.links.append(Files_Unhide(u'mod'))
-        if bush.game.esp.canBash:
+        if bush.game.Esp.canBash:
             files_menu.links.append(SeparatorLink())
             files_menu.links.append(Mods_CreateBlankBashedPatch())
             files_menu.links.append(Mods_CreateBlank())
@@ -414,7 +414,7 @@ def InitModLinks():
     ModList.mainMenu.append(SeparatorLink())
     ModList.mainMenu.append(Mods_CrcRefresh())
     #--ModList: Item Links
-    if bass.inisettings['ShowDevTools'] and bush.game.esp.canBash:
+    if bass.inisettings['ShowDevTools'] and bush.game.Esp.canBash:
         ModList.itemMenu.append(Mod_FullLoad())
     if True: #--File
         file_menu = MenuLink(_(u'File..'))
@@ -442,7 +442,7 @@ def InitModLinks():
     ModList.itemMenu.append(Mod_Move())
     ModList.itemMenu.append(Mod_OrderByName())
     ModList.itemMenu.append(SeparatorLink())
-    if bush.game.esp.canBash:
+    if bush.game.Esp.canBash:
         ModList.itemMenu.append(Mod_Details())
     ModList.itemMenu.append(File_ListMasters())
     ModList.itemMenu.append(Mod_ShowReadme())
@@ -455,7 +455,7 @@ def InitModLinks():
     ModList.itemMenu.append(SeparatorLink())
     ModList.itemMenu.append(Mod_AllowGhosting())
     ModList.itemMenu.append(Mod_Ghost())
-    if bush.game.esp.canBash:
+    if bush.game.Esp.canBash:
         ModList.itemMenu.append(SeparatorLink())
         ModList.itemMenu.append(Mod_MarkMergeable())
         if CBashApi.Enabled:
@@ -562,7 +562,7 @@ def InitModLinks():
         if bush.game.check_esl:
             ModList.itemMenu.append(Mod_FlipEsl())
         ModList.itemMenu.append(Mod_FlipMasters())
-        if bush.game.esp.canBash:
+        if bush.game.Esp.canBash:
             ModList.itemMenu.append(Mod_CreateDummyMasters())
         if bush.game.fsName == u'Oblivion':
             ModList.itemMenu.append(Mod_SetVersion())

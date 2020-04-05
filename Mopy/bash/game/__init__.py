@@ -282,7 +282,7 @@ class GameInfo(object):
     ignoreDataDirs = set()
 
     # Plugin format stuff
-    class esp(object):
+    class Esp(object):
         # Wrye Bash capabilities
         canBash = False         # Can create Bashed Patches
         canCBash = False        # CBash can handle this game's records
@@ -546,7 +546,7 @@ class GameInfo(object):
 
     @property
     def plugin_header_class(self):
-        return brec.MreRecord.type_class[self.esp.plugin_header_sig]
+        return brec.MreRecord.type_class[self.Esp.plugin_header_sig]
 
     @classmethod
     def init(cls):

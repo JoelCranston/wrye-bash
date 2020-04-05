@@ -559,9 +559,9 @@ class ModInfo(FileInfo):
     #--Header Editing ---------------------------------------------------------
     def _read_tes4_record(self, ins):
         tes4_rec_header = ins.unpackRecHeader()
-        if tes4_rec_header.recType != bush.game.esp.plugin_header_sig:
+        if tes4_rec_header.recType != bush.game.Esp.plugin_header_sig:
             raise ModError(self.name, u'Expected %s, but got %s' % (
-                unicode(bush.game.esp.plugin_header_sig, encoding=u'ascii'),
+                unicode(bush.game.Esp.plugin_header_sig, encoding=u'ascii'),
                 unicode(tes4_rec_header.recType, encoding=u'ascii')))
         return tes4_rec_header
 
@@ -667,7 +667,7 @@ class ModInfo(FileInfo):
     def _string_files_paths(self, lang):
         # type: (basestring) -> Iterable[Path]
         sbody, ext = self.name.sbody, self.get_extension()
-        for join, format_str in bush.game.esp.stringsFiles:
+        for join, format_str in bush.game.Esp.stringsFiles:
             fname = format_str % {'body': sbody, 'ext': ext, 'language': lang}
             assetPath = empty_path.join(*join).join(fname)
             yield assetPath
@@ -2083,7 +2083,7 @@ class ModInfos(FileInfos):
                 # Do not mark esls as esl capable
                 if return_results: reasons.append(_(u'Already ESL-flagged.'))
                 canMerge = False
-            elif not bush.game.esp.canBash:
+            elif not bush.game.Esp.canBash:
                 canMerge = False
             else:
                 try:

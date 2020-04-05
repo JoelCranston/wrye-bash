@@ -556,7 +556,7 @@ class Installers_RenameStrings(AppendableLink, _Installers_Process_Skip):
     """Toggle auto-renaming of .STRINGS files"""
     _text = _(u'Auto-name String Translation Files')
     key = 'bash.installers.renameStrings'
-    def _append(self, window): return bool(bush.game.esp.stringsFiles)
+    def _append(self, window): return bool(bush.game.Esp.stringsFiles)
 
     @property
     def menu_help(self):

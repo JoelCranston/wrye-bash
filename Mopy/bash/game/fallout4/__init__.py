@@ -123,7 +123,7 @@ class Fallout4GameInfo(GameInfo):
     }
     SkipBAINRefresh = {u'fo4edit backups', u'fo4edit cache'}
 
-    class esp(GameInfo.esp):
+    class Esp(GameInfo.Esp):
         canBash = True
         canEditHeader = True
         validHeaderVersions = (0.95, 1.0)

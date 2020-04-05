@@ -622,7 +622,7 @@ class Installer(object):
             bethFilesSkip = False
         else:
             renameStrings = bass.settings['bash.installers.renameStrings'] \
-                if bush.game.esp.stringsFiles else False
+                if bush.game.Esp.stringsFiles else False
             bethFilesSkip = not bass.settings[
                 'bash.installers.autoRefreshBethsoft']
         if renameStrings:

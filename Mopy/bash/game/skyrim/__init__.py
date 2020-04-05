@@ -141,7 +141,7 @@ class SkyrimGameInfo(GameInfo):
     SkipBAINRefresh = {u'tes5edit backups', u'tes5edit cache'}
     ignoreDataDirs = {u'LSData'}
 
-    class esp(GameInfo.esp):
+    class Esp(GameInfo.Esp):
         canBash = True
         canEditHeader = True
         validHeaderVersions = (0.94, 1.70,)

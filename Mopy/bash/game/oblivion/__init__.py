@@ -130,7 +130,7 @@ class OblivionGameInfo(GameInfo):
         u'LSData'
     }
 
-    class esp(GameInfo.esp):
+    class Esp(GameInfo.Esp):
         canBash = True
         canCBash = True
         canEditHeader = True

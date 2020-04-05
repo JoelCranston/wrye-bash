@@ -380,7 +380,7 @@ class MasterList(_ModsUIList):
         if not fileInfo:
             return
         #--Fill data and populate
-        has_sizes = bush.game.esp.check_master_sizes and isinstance(
+        has_sizes = bush.game.Esp.check_master_sizes and isinstance(
             fileInfo, bosh.ModInfo) # only mods have master sizes
         for mi, masters_name in enumerate(fileInfo.get_masters()):
             masters_size = fileInfo.header.master_sizes[mi] if has_sizes else 0
@@ -950,7 +950,7 @@ class ModList(_ModsUIList):
         elif mod_info.isGhost:
             item_format.back_key = 'mods.bkgd.ghosted'
             mouseText += _(u"File is ghosted.  ")
-        elif (bush.game.esp.check_master_sizes
+        elif (bush.game.Esp.check_master_sizes
               and mod_info.has_master_size_mismatch()):
             item_format.back_key = u'mods.bkgd.size_mismatch'
             mouseText += _(u'Has one or more size-mismatched masters. ')
@@ -1353,7 +1353,7 @@ class _ModsSavesDetails(_EditableMixinOnFileInfos, _SashDetailsPanel):
 
 class _ModMasterList(MasterList):
     """Override to avoid doing size checks on save master lists."""
-    _do_size_checks = bush.game.esp.check_master_sizes
+    _do_size_checks = bush.game.Esp.check_master_sizes
 
 class ModDetails(_ModsSavesDetails):
     """Details panel for mod tab."""
@@ -1365,7 +1365,7 @@ class ModDetails(_ModsSavesDetails):
     @property
     def file_infos(self): return bosh.modInfos
     @property
-    def allowDetailsEdit(self): return bush.game.esp.canEditHeader
+    def allowDetailsEdit(self): return bush.game.Esp.canEditHeader
 
     def __init__(self, parent, ui_list_panel):
         super(ModDetails, self).__init__(parent, ui_list_panel)
@@ -3950,7 +3950,7 @@ class BashFrame(WindowFrame):
             message.append(m)
             self.knownCorrupted |= corruptSaves
         invalidVersions = set([x.name for x in bosh.modInfos.values() if round(
-            x.header.version, 6) not in bush.game.esp.validHeaderVersions])
+            x.header.version, 6) not in bush.game.Esp.validHeaderVersions])
         if warn_mods and not invalidVersions <= self.knownInvalidVerions:
             m = [_(u'Unrecognized Versions'),
                  _(u'The following mods have unrecognized header versions: ')]
@@ -4146,7 +4146,7 @@ class BashApp(wx.App):
         bosh.iniInfos.refresh(refresh_target=False)
         # screens/people/installers data are refreshed upon showing the panel
         #--Patch check
-        if bush.game.esp.canBash:
+        if bush.game.Esp.canBash:
             if not bosh.modInfos.bashed_patches and bass.inisettings['EnsurePatchExists']:
                 progress(0.68, _(u'Generating Blank Bashed Patch'))
                 try:
