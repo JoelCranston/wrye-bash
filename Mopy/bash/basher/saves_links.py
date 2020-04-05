@@ -242,7 +242,7 @@ class Save_ImportFace(OneItemLink):
         #--Select source face file
         srcDir = self._selected_info.dir
         exts = u';*'.join(bush.game.espm_extensions | {
-            bush.game.ess.ext, bush.game.ess.ext[-1] + u'r'})
+            bush.game.Ess.ext, bush.game.Ess.ext[-1] + u'r'})
         wildcard = _(u'%s Files') % bush.game.displayName + \
                    u' (*' + exts + u')|*' + exts
         #--File dialog

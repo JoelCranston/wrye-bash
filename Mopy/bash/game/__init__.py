@@ -205,7 +205,7 @@ class GameInfo(object):
         # Whether this game supports mod ini files aka ini fragments
         supports_mod_inis = True
 
-    class ess(object):
+    class Ess(object):
         """Information about WB's capabilities with regards to save file
         viewing and editing for this game."""
         canReadBasic = True # Can read the info needed for the Save Tab display

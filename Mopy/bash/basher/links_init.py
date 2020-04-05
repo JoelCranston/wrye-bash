@@ -622,11 +622,11 @@ def InitSaveLinks():
     SaveList.itemMenu.append(Save_LoadMasters())
     SaveList.itemMenu.append(File_ListMasters())
     SaveList.itemMenu.append(Save_DiffMasters())
-    if bush.game.ess.canEditMore:
+    if bush.game.Ess.canEditMore:
         SaveList.itemMenu.append(Save_Stats())
     SaveList.itemMenu.append(Save_StatObse())
     SaveList.itemMenu.append(Save_StatPluggy())
-    if bush.game.ess.canEditMore:
+    if bush.game.Ess.canEditMore:
         #--------------------------------------------
         SaveList.itemMenu.append(SeparatorLink())
         SaveList.itemMenu.append(Save_EditPCSpells())
@@ -643,7 +643,7 @@ def InitSaveLinks():
     SaveList.itemMenu.append(Save_ExportScreenshot())
     SaveList.itemMenu.append(Save_Renumber())
     #--------------------------------------------
-    if bush.game.ess.canEditMore:
+    if bush.game.Ess.canEditMore:
         SaveList.itemMenu.append(SeparatorLink())
         SaveList.itemMenu.append(Save_Unbloat())
         SaveList.itemMenu.append(Save_RepairAbomb())

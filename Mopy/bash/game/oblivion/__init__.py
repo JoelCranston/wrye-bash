@@ -85,7 +85,7 @@ class OblivionGameInfo(GameInfo):
         bsa_redirection_key = (u'Archive', u'sArchiveList')
         supports_mod_inis = False
 
-    class ess(GameInfo.ess):
+    class Ess(GameInfo.Ess):
         canEditMore = True
 
     class Bsa(GameInfo.Bsa):

@@ -73,7 +73,7 @@ class Fallout3GameInfo(GameInfo):
         bsa_redirection_key = (u'Archive', u'sArchiveList')
         supports_mod_inis = False
 
-    class ess(GameInfo.ess):
+    class Ess(GameInfo.Ess):
         ext = u'.fos'
 
     class Bsa(GameInfo.Bsa):

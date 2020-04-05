@@ -75,7 +75,7 @@ class Fallout4GameInfo(GameInfo):
             u'sResourceArchiveListBeta'
         )
 
-    class ess(GameInfo.ess):
+    class Ess(GameInfo.Ess):
         ext = u'.fos'
 
     class Bsa(GameInfo.Bsa):

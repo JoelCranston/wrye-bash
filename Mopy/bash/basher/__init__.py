@@ -1913,8 +1913,8 @@ class SaveList(balt.UIList):
                                                     'pcLocation')),
     ])
 
-    __ext_group = u'(\.(' + bush.game.ess.ext[1:] + u'|' + \
-                  bush.game.ess.ext[1:-1] + u'r' + u'))' # add bak !!!
+    __ext_group = u'(\.(' + bush.game.Ess.ext[1:] + u'|' + \
+                  bush.game.Ess.ext[1:-1] + u'r' + u'))' # add bak !!!
     def validate_filename(self, name_new, has_digits=False, ext=u'',
             is_filename=True, _old_path=None):
         if _old_path and bosh.bak_file_pattern.match(_old_path.s): ##: YAK add cosave support for bak
@@ -1948,7 +1948,7 @@ class SaveList(balt.UIList):
 
     @staticmethod
     def _unhide_wildcard():
-        starred = u'*' + bush.game.ess.ext
+        starred = u'*' + bush.game.Ess.ext
         return bush.game.displayName + u' ' + _(
             u'Save files') + u' (' + starred + u')|' + starred
 
@@ -1977,7 +1977,7 @@ class SaveList(balt.UIList):
         msg = _(u"Clicking on a save icon will disable/enable the save "
                 u"by changing its extension to %(ess)s (enabled) or .esr "
                 u"(disabled). Autosaves and quicksaves will be left alone."
-                 % {'ess': bush.game.ess.ext})
+                % {'ess': bush.game.Ess.ext})
         if not balt.askContinue(self, msg, 'bash.saves.askDisable.continue'):
             return
         newEnabled = not bosh.SaveInfos.is_save_enabled(hitItem)
@@ -2135,7 +2135,7 @@ class SavePanel(BashTab):
     _details_panel_type = SaveDetails
 
     def __init__(self,parent):
-        if not bush.game.ess.canReadBasic:
+        if not bush.game.Ess.canReadBasic:
             raise BoltError(u'Wrye Bash cannot read save games for %s.' %
                 bush.game.displayName)
         self.listData = bosh.saveInfos

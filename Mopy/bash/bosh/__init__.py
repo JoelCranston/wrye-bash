@@ -2738,7 +2738,7 @@ class SaveInfos(FileInfos):
         self.localSave = decode(self.localSave) # encoding = 'cp1252' ?
 
     def __init__(self):
-        _ext = re.escape(bush.game.ess.ext)
+        _ext = re.escape(bush.game.Ess.ext)
         patt = u'(%s|%sr)(f?)$' % (_ext, _ext[:-1]) # enabled/disabled save
         self.__class__.file_pattern = re.compile(patt, re.I | re.U)
         self.localSave = bush.game.Ini.save_prefix
@@ -2856,7 +2856,7 @@ class SaveInfos(FileInfos):
     @staticmethod
     def is_save_enabled(fileName):
         """True if fileName is enabled."""
-        return fileName.cext == bush.game.ess.ext
+        return fileName.cext == bush.game.Ess.ext
 
     def enable(self,fileName,value=True):
         """Enables file by changing extension to 'ess' (True) or 'esr' (False)."""
@@ -2865,7 +2865,7 @@ class SaveInfos(FileInfos):
                                           re.I | re.U):
             return fileName
         newName = fileName.root + (
-            bush.game.ess.ext if value else fileName.ext[:-1] + u'r')
+            bush.game.Ess.ext if value else fileName.ext[:-1] + u'r')
         try:
             self.rename_info(fileName, newName)
             return newName
