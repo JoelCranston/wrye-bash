@@ -46,7 +46,7 @@ def getPersonalPath(bash_ini_, my_docs_path):
         my_docs_path = GPath(my_docs_path)
         sErrorInfo = _(u"Folder path specified on command line (-p)")
     else:
-        my_docs_path = get_path_from_ini(bash_ini_, 'sPersonalPath')
+        my_docs_path = get_path_from_ini(bash_ini_, u'sPersonalPath')
         if my_docs_path:
             sErrorInfo = _(
                 u"Folder path specified in bash.ini (%s)") % u'sPersonalPath'
