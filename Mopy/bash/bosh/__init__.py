@@ -2583,7 +2583,7 @@ class ModInfos(FileInfos):
         moved = super(ModInfos, self).move_infos(sources, destinations, window,
                                                  bash_frame)
         self.refresh() # yak, it should have an "added" parameter
-        bash_frame.warn_corrupted(warn_mods=True)
+        bash_frame.warn_corrupted(warn_mods=True, warn_strings=True)
         return moved
 
     def get_hide_dir(self, name):
