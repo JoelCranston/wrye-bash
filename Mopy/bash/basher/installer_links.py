@@ -93,7 +93,7 @@ class _InstallerLink(Installers_Link, EnabledLink):
         if archive_path.cext in archives.noSolidExts:
             isSolid = False
         else:
-            if not u'-ms=' in bass.inisettings['7zExtraCompressionArguments']:
+            if not u'-ms=' in bass.inisettings[u'7zExtraCompressionArguments']:
                 isSolid = self._askYes(_(u'Use solid compression for %s?')
                                        % archive_path.s, default=False)
                 if isSolid:

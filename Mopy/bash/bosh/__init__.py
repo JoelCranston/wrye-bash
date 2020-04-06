@@ -2925,7 +2925,7 @@ class BSAInfos(FileInfos):
 
             def _reset_bsa_mtime(self):
                 if bush.game.Bsa.allow_reset_timestamps and inisettings[
-                    'ResetBSATimestamps']:
+                    u'ResetBSATimestamps']:
                     if self._file_mod_time != self._default_mtime:
                         self.setmtime(self._default_mtime)
 
@@ -2960,7 +2960,7 @@ class BSAInfos(FileInfos):
         This is done to make sure they load in the correct order (that's why
         the dates are all in incremental order) and so they load before any
         mod-added content (that's why early 2006 is chosen)."""
-        bsa_times = ((1138162634, inisettings['OblivionTexturesBSAName']),
+        bsa_times = ((1138162634, inisettings[u'OblivionTexturesBSAName']),
                      (1138162934, u'Oblivion - Voices1.bsa'),
                      (1138166742, u'Oblivion - Voices2.bsa'),
                      (1138575220, u'Oblivion - Meshes.bsa'),
@@ -3181,27 +3181,27 @@ def initDefaultTools():
 
 def initDefaultSettings():
     #other settings from the INI:
-    inisettings['ScriptFileExt'] = u'.txt'
-    inisettings['ResetBSATimestamps'] = True
-    inisettings['EnsurePatchExists'] = True
-    inisettings['OblivionTexturesBSAName'] = GPath(u'Oblivion - Textures - Compressed.bsa')
-    inisettings['ShowDevTools'] = False
-    inisettings['Tes4GeckoJavaArg'] = u'-Xmx1024m'
-    inisettings['OblivionBookCreatorJavaArg'] = u'-Xmx1024m'
-    inisettings['ShowTextureToolLaunchers'] = True
-    inisettings['ShowModelingToolLaunchers'] = True
-    inisettings['ShowAudioToolLaunchers'] = True
-    inisettings['7zExtraCompressionArguments'] = u''
-    inisettings['xEditCommandLineArguments'] = u''
-    inisettings['AutoItemCheck'] = True
-    inisettings['SkipHideConfirmation'] = False
-    inisettings['SkipResetTimeNotifications'] = False
-    inisettings['SoundSuccess'] = GPath(u'')
-    inisettings['SoundError'] = GPath(u'')
-    inisettings['EnableSplashScreen'] = True
-    inisettings['PromptActivateBashedPatch'] = True
-    inisettings['WarnTooManyFiles'] = True
-    inisettings['SkippedBashInstallersDirs'] = u''
+    inisettings[u'ScriptFileExt'] = u'.txt'
+    inisettings[u'ResetBSATimestamps'] = True
+    inisettings[u'EnsurePatchExists'] = True
+    inisettings[u'OblivionTexturesBSAName'] = GPath(u'Oblivion - Textures - Compressed.bsa')
+    inisettings[u'ShowDevTools'] = False
+    inisettings[u'Tes4GeckoJavaArg'] = u'-Xmx1024m'
+    inisettings[u'OblivionBookCreatorJavaArg'] = u'-Xmx1024m'
+    inisettings[u'ShowTextureToolLaunchers'] = True
+    inisettings[u'ShowModelingToolLaunchers'] = True
+    inisettings[u'ShowAudioToolLaunchers'] = True
+    inisettings[u'7zExtraCompressionArguments'] = u''
+    inisettings[u'xEditCommandLineArguments'] = u''
+    inisettings[u'AutoItemCheck'] = True
+    inisettings[u'SkipHideConfirmation'] = False
+    inisettings[u'SkipResetTimeNotifications'] = False
+    inisettings[u'SoundSuccess'] = GPath(u'')
+    inisettings[u'SoundError'] = GPath(u'')
+    inisettings[u'EnableSplashScreen'] = True
+    inisettings[u'PromptActivateBashedPatch'] = True
+    inisettings[u'WarnTooManyFiles'] = True
+    inisettings[u'SkippedBashInstallersDirs'] = u''
 
 def initOptions(bashIni):
     initDefaultTools()

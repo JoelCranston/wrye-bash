@@ -389,7 +389,7 @@ class App_Tes4View(_ExeButton):
         is_expert = bush.game.Xe.expert_key and bass.settings[
             bush.game.Xe.expert_key]
         extraArgs = bass.inisettings[
-            'xEditCommandLineArguments'].split() if is_expert else []
+            u'xEditCommandLineArguments'].split() if is_expert else []
         if balt.getKeyState_Control():
             extraArgs.append(u'-FixupPGRD')
         if balt.getKeyState_Shift():

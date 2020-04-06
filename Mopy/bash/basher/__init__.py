@@ -3806,7 +3806,7 @@ class BashFrame(WindowFrame):
     @balt.conversation
     def warnTooManyModsBsas(self):
         if bush.game.fsName != u'Oblivion': return
-        if not bass.inisettings['WarnTooManyFiles']: return
+        if not bass.inisettings[u'WarnTooManyFiles']: return
         if not len(bosh.bsaInfos): bosh.bsaInfos.refresh()
         if len(bosh.bsaInfos) + len(bosh.modInfos) >= 325 and not \
                 settings[u'bash.mods.autoGhost']:
@@ -3931,7 +3931,7 @@ class BashFrame(WindowFrame):
 
     def _warn_reset_load_order(self):
         if load_order.warn_locked and not bass.inisettings[
-            'SkipResetTimeNotifications']:
+            u'SkipResetTimeNotifications']:
             balt.showWarning(self, _(u"Load order has changed outside of Bash "
                 u"and has been reverted to the one saved in Bash. You can hit "
                 u"Ctrl + Z while the mods list has focus to undo this."),
@@ -4133,7 +4133,7 @@ class BashApp(wx.App):
         with balt.Progress(u'Wrye Bash', _(u'Initializing') + u' ' * 10,
                            elapsed=False) as progress:
             # Is splash enabled in ini ?
-            if bass.inisettings['EnableSplashScreen']:
+            if bass.inisettings[u'EnableSplashScreen']:
                 if bass.dirs[u'images'].join(u'wryesplash.png').exists():
                     try:
                             splashScreen = balt.WryeBashSplashScreen()
@@ -4191,7 +4191,7 @@ class BashApp(wx.App):
         # screens/people/installers data are refreshed upon showing the panel
         #--Patch check
         if bush.game.Esp.canBash:
-            if not bosh.modInfos.bashed_patches and bass.inisettings['EnsurePatchExists']:
+            if not bosh.modInfos.bashed_patches and bass.inisettings[u'EnsurePatchExists']:
                 progress(0.68, _(u'Generating Blank Bashed Patch'))
                 try:
                     bosh.modInfos.generateNextBashedPatch(selected_mods=())
