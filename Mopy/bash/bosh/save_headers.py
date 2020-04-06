@@ -64,7 +64,7 @@ class SaveFileHeader(object):
     def __init__(self, save_path):
         self._save_path = save_path
         try:
-            with save_path.open('rb') as ins:
+            with save_path.open(u'rb') as ins:
                 self.load_header(ins)
         #--Errors
         except (OSError, struct.error, OverflowError):

@@ -154,7 +154,7 @@ class Settings_ExportDllInfo(AppendableLink, ItemLink):
         textPath = self._askSave(title=title, defaultDir=textDir,
                                  defaultFile=file_, wildcard=u'*.txt')
         if not textPath: return
-        with textPath.open('w',encoding='utf-8-sig') as out:
+        with textPath.open(u'w',encoding='utf-8-sig') as out:
             out.write(u'goodDlls '+_(u'(those dlls that you have chosen to allow to be installed)')+u'\r\n')
             if bass.settings[u'bash.installers.goodDlls']:
                 for dll in bass.settings[u'bash.installers.goodDlls']:
@@ -199,7 +199,7 @@ class Settings_ImportDllInfo(AppendableLink, ItemLink):
         replace = not balt.askYes(Link.Frame, message,
                                   _(u'Merge permissions?'))
         try:
-            with textPath.open('r',encoding='utf-8-sig') as ins:
+            with textPath.open(u'r',encoding='utf-8-sig') as ins:
                 Dlls = {'goodDlls':{},'badDlls':{}}
                 for line in ins:
                     line = line.strip()

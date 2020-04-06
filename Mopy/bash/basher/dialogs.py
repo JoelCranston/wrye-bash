@@ -183,7 +183,7 @@ class ColorDialog(DialogWindow):
                                outDir, _(u'Colors.txt'), u'*.txt')
         if not outPath: return
         try:
-            with outPath.open('w') as file:
+            with outPath.open(u'w') as file:
                 for key in sorted(colors):
                     if key in self.changes:
                         color = self.changes[key]
@@ -203,7 +203,7 @@ class ColorDialog(DialogWindow):
                               mustExist=True)
         if not inPath: return
         try:
-            with inPath.open('r') as file:
+            with inPath.open(u'r') as file:
                 for line in file:
                     # Format validation
                     if u':' not in line:
@@ -432,7 +432,7 @@ class CreateNewProject(DialogWindow):
         if self.checkWizard.is_checked:
             # Create empty wizard.txt
             wizardPath = tempProject.join(u'wizard.txt')
-            with wizardPath.open('w',encoding='utf-8') as out:
+            with wizardPath.open(u'w',encoding='utf-8') as out:
                 out.write(u'; %s BAIN Wizard Installation Script\n' % projectName)
         if self.checkWizardImages.is_checked:
             # Create 'Wizard Images' directory

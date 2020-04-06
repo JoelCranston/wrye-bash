@@ -340,7 +340,7 @@ class SaveFile(object):
         outPath -- Path of the output file to write to. Defaults to original file path."""
         if not self.canSave: raise StateError(u"Insufficient data to write file.")
         outPath = outPath or self.fileInfo.getPath()
-        with outPath.open('wb') as out:
+        with outPath.open(u'wb') as out:
             def _pack(fmt, *data):
                 out.write(struct_pack(fmt, *data))
             #--Progress

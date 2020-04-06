@@ -42,11 +42,11 @@ from .localize import format_date
 
 def _write_plugins_txt_(path, lord, active, _star):
     try:
-        with path.open('wb') as out:
+        with path.open(u'wb') as out:
             __write_plugins(out, lord, active, _star)
     except IOError:
         env.clear_read_only(path)
-        with path.open('wb') as out:
+        with path.open(u'wb') as out:
             __write_plugins(out, lord, active, _star)
 
 def __write_plugins(out, lord, active, _star):
@@ -78,7 +78,7 @@ def _parse_plugins_txt_(path, mod_infos, _star):
     :type _star: bool
     :rtype: (list[bolt.Path], list[bolt.Path])
     """
-    with path.open('r') as ins:
+    with path.open(u'r') as ins:
         #--Load Files
         active, modnames = [], []
         for line in ins:

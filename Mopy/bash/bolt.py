@@ -677,7 +677,7 @@ class Path(object):
     def crc(self):
         """Calculates and returns crc value for self."""
         crc = 0
-        with self.open('rb') as ins:
+        with self.open(u'rb') as ins:
             for block in iter(partial(ins.read, 2097152), ''):
                 crc = crc32(block, crc) # 2MB at a time, probably ok
         return crc & 0xffffffff
@@ -765,10 +765,10 @@ class Path(object):
                         try: chmod(rootJoin(filename),stat_flags)
                         except: pass
 
-    def open(self,*args,**kwdargs):
+    def open(self,*args,**kwdargs): # PY3: drop - open() accepts encoding now
         if self.shead and not os.path.exists(self.shead):
             os.makedirs(self.shead)
-        if 'encoding' in kwdargs:
+        if u'encoding' in kwdargs:
             return codecs.open(self._s,*args,**kwdargs)
         else:
             return open(self._s,*args,**kwdargs)
@@ -946,7 +946,7 @@ class CsvReader(object):
             yield line.encode('utf8')
 
     def __init__(self,path):
-        self.ins = path.open('rb',encoding='utf-8-sig')
+        self.ins = path.open(u'rb',encoding='utf-8-sig')
         excel_fmt = ('excel','excel-tab')[u'\t' in self.ins.readline()]
         if excel_fmt == 'excel':
             delimiter = (',',';')[u';' in self.ins.readline()]
@@ -1419,7 +1419,7 @@ class PickleDict(object):
                 cor = None
             if path.exists():
                 try:
-                    with path.open('rb') as ins:
+                    with path.open(u'rb') as ins:
                         try:
                             firstPickle = pickle.load(ins)
                         except ValueError:
@@ -1449,7 +1449,7 @@ class PickleDict(object):
         if self.readOnly: return False
         #--Pickle it
         self.vdata['boltPaths'] = True # needed so pre 307 versions don't blow
-        with self.path.temp.open('wb') as out:
+        with self.path.temp.open(u'wb') as out:
             for data in ('VDATA2',self.vdata,self.data):
                 pickle.dump(data,out,-1)
         self.path.untemp(doBackup=True)
@@ -2141,7 +2141,7 @@ class WryeText(object):
             outPath = GPath(out) or srcPath.root+u'.html'
             cssDirs = (srcPath.head,) + cssDirs
             ins = srcPath.open(encoding='utf-8-sig')
-            out = outPath.open('w',encoding='utf-8-sig')
+            out = outPath.open(u'w',encoding='utf-8-sig')
         else:
             srcPath = outPath = None
         # Setup
@@ -2409,7 +2409,7 @@ class WryeText(object):
                 if cssPath.exists(): break
             else:
                 raise exception.BoltError(u'Css file not found: ' + cssName.s)
-            with cssPath.open('r',encoding='utf-8-sig') as cssIns:
+            with cssPath.open(u'r',encoding='utf-8-sig') as cssIns:
                 css = u''.join(cssIns.readlines())
             if u'<' in css:
                 raise exception.BoltError(u'Non css tag in ' + cssPath.s)

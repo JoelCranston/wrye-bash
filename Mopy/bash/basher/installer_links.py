@@ -307,7 +307,7 @@ class Installer_Wizard(OneItemLink, _InstallerLink):
         for iniFile, wizardEdits in ret.ini_edits.iteritems():
             outFile = bass.dirs[u'ini_tweaks'].join(u'%s - Wizard Tweak [%s].ini' %
                 (installer.archive, iniFile.sbody))
-            with outFile.open('w') as out:
+            with outFile.open(u'w') as out:
                 for line in generateTweakLines(wizardEdits, iniFile):
                     out.write(line + u'\n')
             bosh.iniInfos.new_info(outFile.tail, owner=installer.archive)

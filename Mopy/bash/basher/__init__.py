@@ -776,7 +776,7 @@ class TargetINILineCtrl(INIListCtrl):
             self.DeleteAllItems()
         num = self.GetItemCount()
         try:
-            with bosh.iniInfos.ini.abs_path.open('r') as target_ini_file:
+            with bosh.iniInfos.ini.abs_path.open(u'r') as target_ini_file:
                 lines = target_ini_file.readlines()
             if bush.game.iniFiles[0] == bosh.iniInfos.ini.abs_path.stail:
                 Link.Frame.oblivionIniMissing = False

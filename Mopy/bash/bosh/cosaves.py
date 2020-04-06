@@ -1216,7 +1216,7 @@ class ACosave(_Dumpable, _Remappable, AFile):
             # Need to reset these to avoid adding duplicates
             self.cosave_chunks = []
             self.remappable_chunks = []
-            with self.abs_path.open('rb') as ins:
+            with self.abs_path.open(u'rb') as ins:
                 self._read_cosave_header(ins)
                 self._read_cosave_body(ins, light)
             self.loading_state = target_state
@@ -1356,7 +1356,7 @@ class xSECosave(ACosave):
             for plugin_ch in self.cosave_chunks: # type: _xSEPluginChunk
                 plugin_ch.write_chunk(buff)
             final_data = buff.getvalue()
-        with out_path.open('wb') as out:
+        with out_path.open(u'wb') as out:
             out.write(final_data)
         out_path.mtime = prev_mtime
 
@@ -1474,7 +1474,7 @@ class PluggyCosave(ACosave):
             # but the last 12 bytes, which is used for reading the header and
             # chunks, and once all but the last 4 bytes, for a CRC check.
             total_size = self.abs_path.size
-            with self.abs_path.open('rb') as ins:
+            with self.abs_path.open(u'rb') as ins:
                 # This is what we'll read the header and chunks from later.
                 buffered_data = ins.read(total_size - 12)
                 # These are compared by Pluggy to the ones in the matching .ess
@@ -1539,7 +1539,7 @@ class PluggyCosave(ACosave):
             _pack(out, '=I', out.tell())
             final_data = out.getvalue()
         prev_mtime = self.abs_path.mtime
-        with out_path.open('wb') as out:
+        with out_path.open(u'wb') as out:
             out.write(final_data)
             _pack(out, '=i', binascii.crc32(final_data))
         out_path.mtime = prev_mtime
