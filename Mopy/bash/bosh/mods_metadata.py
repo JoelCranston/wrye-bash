@@ -300,7 +300,7 @@ class ConfigHelpers(object):
                 # Always an ASCII byte string, so this is fine
                 header_sig = unicode(
                     bush.game_mod.records.MreHeader.classType,
-                    encoding='ascii')
+                    encoding=u'ascii')
                 ver_list = u', '.join(sorted([
                     unicode(v) for v in bush.game.Esp.validHeaderVersions]))
                 log.setHeader(

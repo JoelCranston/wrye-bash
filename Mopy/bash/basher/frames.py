@@ -114,7 +114,7 @@ class DocBrowser(WindowFrame):
         rx = re.compile(u'' r'^=.+=#\s*$', re.U)
         if path is not None:
             try:
-                with path.open(u'r', encoding='utf-8-sig') as text_file:
+                with path.open(u'r', encoding=u'utf-8-sig') as text_file:
                     match_text = rx.match(text_file.readline())
                 return match_text is not None
             except (OSError, UnicodeDecodeError):
@@ -204,7 +204,7 @@ class DocBrowser(WindowFrame):
         doc_path = self._db_doc_paths.get(self._mod_name)
         if not doc_path: return  # nothing to save if no file is loaded
         self._doc_ctrl.set_text_modified(False)
-        with doc_path.open(u'w', encoding='utf-8-sig') as out:
+        with doc_path.open(u'w', encoding=u'utf-8-sig') as out:
             out.write(self._doc_ctrl.fallback_text)
         if self._doc_is_wtxt:
             bolt.WryeText.genHtml(doc_path, None,
@@ -219,7 +219,7 @@ class DocBrowser(WindowFrame):
             # correctly, even in unicode builds
             if string_data is None and path:
                 try:
-                    with path.open(u'r',encoding='utf-8-sig') as ins:
+                    with path.open(u'r',encoding=u'utf-8-sig') as ins:
                         string_data = ins.read()
                 except UnicodeDecodeError:
                     with path.open(u'r') as ins:

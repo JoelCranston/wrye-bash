@@ -322,11 +322,11 @@ class OmodConfig(object):
             with open(configPath.s,'rb') as ins:
                 ins.read(1) #--Skip first four bytes
                 # OBMM can support UTF-8, so try that first, then fail back to
-                config.name = decode(_readNetString(ins), encoding='utf-8')
+                config.name = decode(_readNetString(ins), encoding=u'utf-8')
                 config.vMajor = unpack_int_signed(ins)
                 config.vMinor = unpack_int_signed(ins)
                 for attr in ('author','email','website','abstract'):
-                    setattr(config, attr, decode(_readNetString(ins), encoding='utf-8'))
+                    setattr(config, attr, decode(_readNetString(ins), encoding=u'utf-8'))
                 ins.read(8) #--Skip date-time
                 ins.read(1) #--Skip zip-compression
                 #config['vBuild'], = ins.unpack('I',4)

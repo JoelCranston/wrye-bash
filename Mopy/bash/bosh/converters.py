@@ -566,7 +566,7 @@ class InstallerConverter(object):
         tempList = bolt.Path.baseTempDir().join(u'WryeBash_listfile.txt')
         #--Dump file list
         try:
-            with tempList.open(u'w', encoding='utf-8-sig') as out:
+            with tempList.open(u'w', encoding=u'utf-8-sig') as out:
                 out.write(u'\n'.join(fileNames))
         except Exception as e:
             raise StateError, (u"Error creating file list for 7z:\nError: %s"

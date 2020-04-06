@@ -79,29 +79,29 @@ except ImportError:
 #  This is only useful when reading fields from mods, as the encoding is not
 #  known.  For normal filesystem interaction, these functions are not needed
 encodingOrder = (
-    'ascii',    # Plain old ASCII (0-127)
-    'gbk',      # GBK (simplified Chinese + some)
-    'cp932',    # Japanese
-    'cp949',    # Korean
-    'cp1252',   # English (extended ASCII)
-    'utf8',
-    'cp500',
-    'UTF-16LE',
-    )
+    u'ascii',    # Plain old ASCII (0-127)
+    u'gbk',      # GBK (simplified Chinese + some)
+    u'cp932',    # Japanese
+    u'cp949',    # Korean
+    u'cp1252',   # English (extended ASCII)
+    u'utf8',
+    u'cp500',
+    u'UTF-16LE',
+)
 if os.name == u'nt':
-    encodingOrder += ('mbcs',)
+    encodingOrder += (u'mbcs',)
 
 _encodingSwap = {
     # The encoding detector reports back some encodings that
     # are subsets of others.  Use the better encoding when
     # given the option
     # 'reported encoding':'actual encoding to use',
-    'GB2312': 'gbk',        # Simplified Chinese
-    'SHIFT_JIS': 'cp932',   # Japanese
-    'windows-1252': 'cp1252',
-    'windows-1251': 'cp1251',
-    'utf-8': 'utf8',
-    }
+    u'GB2312': u'gbk',        # Simplified Chinese
+    u'SHIFT_JIS': u'cp932',   # Japanese
+    u'windows-1252': u'cp1252',
+    u'windows-1251': u'cp1251',
+    u'utf-8': u'utf8',
+}
 
 # Preferred encoding to use when decoding/encoding strings in plugin files
 # None = auto
@@ -124,8 +124,8 @@ def decode(byte_str, encoding=None, avoidEncodings=()):
     if isinstance(byte_str, unicode) or byte_str is None: return byte_str
     # Try the user specified encoding first
     # TODO(ut) monkey patch
-    if encoding == 'cp65001':
-        encoding = 'utf-8'
+    if encoding == u'cp65001':
+        encoding = u'utf-8'
     if encoding:
         try: return unicode(byte_str, encoding)
         except UnicodeDecodeError: pass
@@ -946,7 +946,7 @@ class CsvReader(object):
             yield line.encode('utf8')
 
     def __init__(self,path):
-        self.ins = path.open(u'rb',encoding='utf-8-sig')
+        self.ins = path.open(u'rb',encoding=u'utf-8-sig')
         excel_fmt = ('excel','excel-tab')[u'\t' in self.ins.readline()]
         if excel_fmt == 'excel':
             delimiter = (',',';')[u';' in self.ins.readline()]
@@ -2140,8 +2140,8 @@ class WryeText(object):
             srcPath = GPath(ins)
             outPath = GPath(out) or srcPath.root+u'.html'
             cssDirs = (srcPath.head,) + cssDirs
-            ins = srcPath.open(encoding='utf-8-sig')
-            out = outPath.open(u'w',encoding='utf-8-sig')
+            ins = srcPath.open(encoding=u'utf-8-sig')
+            out = outPath.open(u'w',encoding=u'utf-8-sig')
         else:
             srcPath = outPath = None
         # Setup
@@ -2409,7 +2409,7 @@ class WryeText(object):
                 if cssPath.exists(): break
             else:
                 raise exception.BoltError(u'Css file not found: ' + cssName.s)
-            with cssPath.open(u'r',encoding='utf-8-sig') as cssIns:
+            with cssPath.open(u'r',encoding=u'utf-8-sig') as cssIns:
                 css = u''.join(cssIns.readlines())
             if u'<' in css:
                 raise exception.BoltError(u'Non css tag in ' + cssPath.s)

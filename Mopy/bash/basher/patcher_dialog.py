@@ -218,7 +218,7 @@ class PatchDialog(DialogWindow):
             readme = bosh.modInfos.store_dir.join(u'Docs', patch_name.sroot + u'.txt')
             docsDir = bass.settings.get(u'balt.WryeLog.cssDir', GPath(u''))
             if self.doCBash: ##: eliminate this if/else
-                with readme.open(u'w',encoding='utf-8') as file:
+                with readme.open(u'w',encoding=u'utf-8') as file:
                     file.write(logValue)
                 #--Convert log/readme to wtxt and show log
                 bolt.WryeText.genHtml(readme,None,docsDir)
@@ -226,7 +226,7 @@ class PatchDialog(DialogWindow):
                 tempReadmeDir = Path.tempDir().join(u'Docs')
                 tempReadme = tempReadmeDir.join(patch_name.sroot+u'.txt')
                 #--Write log/readme to temp dir first
-                with tempReadme.open(u'w',encoding='utf-8-sig') as file:
+                with tempReadme.open(u'w',encoding=u'utf-8-sig') as file:
                     file.write(logValue)
                 #--Convert log/readmeto wtxt
                 bolt.WryeText.genHtml(tempReadme,None,docsDir)

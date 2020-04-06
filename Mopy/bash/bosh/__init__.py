@@ -3027,7 +3027,7 @@ class PeopleData(DataStore):
 
     def dumpText(self,path,names):
         """Dump to text file."""
-        with path.open(u'w',encoding='utf-8-sig') as out:
+        with path.open(u'w',encoding=u'utf-8-sig') as out:
             for name in sorted(names,key=unicode.lower):
                 out.write(u'== %s %s\n' % (name,u'='*(75-len(name))))
                 out.write(self[name][2].strip())
