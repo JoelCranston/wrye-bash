@@ -1133,7 +1133,7 @@ class Mod_ListPatchConfig(_Mod_BP_Link):
         _gui_patchers = [copy.deepcopy(x) for x in
                     (CBash_gui_patchers if doCBash else PBash_gui_patchers)]
         _gui_patchers.sort(key=lambda a: a.__class__.patcher_name)
-        _gui_patchers.sort(key=lambda a: groupOrder[a.patcher_instance.group])
+        _gui_patchers.sort(key=lambda a: groupOrder[a.patcher_type.group])
         #--Log & Clipboard text
         log = bolt.LogFile(StringIO.StringIO())
         log.setHeader(u'= %s %s' % (self._selected_item, _(u'Config')))
