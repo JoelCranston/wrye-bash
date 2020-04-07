@@ -351,7 +351,7 @@ class MasterList(_ModsUIList):
     def allowEdit(self, val):
         if val and (not self.detailsPanel.allowDetailsEdit or not
                balt.askContinue(
-                   self, self.message, self.keyPrefix + '.update.continue',
+                   self, self.message, self.keyPrefix + u'.update.continue',
                    _(u'Update Masters') + u' ' + _(u'BETA'))):
             return
         bass.settings[self._allowEditKey] = val
@@ -845,7 +845,7 @@ class ModList(_ModsUIList):
 
     def dndAllow(self, event):
         msg = u''
-        continue_key = 'bash.mods.dnd.column.continue'
+        continue_key = u'bash.mods.dnd.column.continue'
         if not self.sort_column in self._dndColumns:
             msg = _(u'Reordering mods is only allowed when they are sorted '
                     u'by Load Order.')
@@ -854,7 +854,7 @@ class ModList(_ModsUIList):
             if pinned:
                 msg = _(u"You can't reorder the following mods:\n" +
                         u', '.join(map(unicode, pinned)))
-                continue_key = 'bash.mods.dnd.pinned.continue'
+                continue_key = u'bash.mods.dnd.pinned.continue'
         if msg:
             balt.askContinue(self, msg, continue_key)
             return super(ModList, self).dndAllow(event) # disallow
@@ -1553,7 +1553,7 @@ class ModDetails(_ModsSavesDetails):
                     u'able to activate this plugin because of this.  Do you '
                     u'want to rename the plugin anyway?')
                                      % (newName.s,bush.game.displayName),
-                                     'bash.rename.isBadFileName.continue')
+                                     u'bash.rename.isBadFileName.continue')
                 ):
                 return
             settings.getChanged(u'bash.mods.renames')[oldName] = newName

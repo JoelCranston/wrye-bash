@@ -973,10 +973,10 @@ class _Mod_Patch_Update(_Mod_BP_Link):
         # Verify they want to build a previous Python patch in CBash mode, or vice versa
         if self.doCBash and not self._askContinue(_(
                 u"Building with CBash is cool.  It's faster and allows more "
-                u"things to be handled, but it is still in BETA.  If you "
-                u"have problems, post them in the official thread, then use "
-                u"the non-CBash build function."),
-            'bash.patch.ReallyUseCBash.295.continue'):
+                u'things to be handled, but it is still in BETA.  If you '
+                u'have problems, post them in the official thread, then use '
+                u'the non-CBash build function.'),
+            u'bash.patch.ReallyUseCBash.295.continue'):
             return
         importConfig = True
         msg = _(u"The patch you are rebuilding (%s) was created in %s "
@@ -1888,9 +1888,9 @@ class _Mod_Export_Link(_Import_Export_Link, ItemLink):
     def _parser(self): raise AbstractError
 
 class _Mod_Import_Link(_Import_Export_Link, OneItemLink):
-    noChange = _(u"No changes required.")
+    noChange = _(u'No changes required.')
     supportedExts = {u'.csv'}
-    progressTitle = continueInfo = continueKey = 'OVERRIDE'
+    progressTitle = continueInfo = continueKey = u'OVERRIDE'
 
     def _parser(self): raise AbstractError
     @property
@@ -1988,7 +1988,7 @@ class Mod_ActorLevels_Import(_Mod_Import_Link):
     continueInfo = _(
         u'This command will import NPC level info from a previously exported '
         u'file.') + u'\n\n' + _(u'See the Bash help file for more info.')
-    continueKey = 'bash.actorLevels.import.continue'
+    continueKey = u'bash.actorLevels.import.continue'
     noChange = _(u'No relevant NPC levels to import.')
 
     def _parser(self):
@@ -2017,10 +2017,10 @@ class Mod_FactionRelations_Import(_Mod_Import_Link):
     _text = _(u'Relations...')
     _help = _(u'Import faction relations from text file to mod')
     continueInfo = _(
-        u"This command will import faction relation info from a previously "
-        u"exported file.") + u'\n\n' + _(
-        u"See the Bash help file for more info.")
-    continueKey = 'bash.factionRelations.import.continue'
+        u'This command will import faction relation info from a previously '
+        u'exported file.') + u'\n\n' + _(
+        u'See the Bash help file for more info.')
+    continueKey = u'bash.factionRelations.import.continue'
     noChange = _(u'No relevant faction relations to import.')
 
     def _parser(self):
@@ -2049,9 +2049,9 @@ class Mod_Factions_Import(_Mod_Import_Link):
     _text = _(u'Factions...')
     _help = _(u'Import factions from text file to mod')
     continueInfo = _(
-        u"This command will import faction ranks from a previously exported "
-        u"file.") + u'\n\n' + _(u'See the Bash help file for more info.')
-    continueKey = 'bash.factionRanks.import.continue'
+        u'This command will import faction ranks from a previously exported '
+        u'file.') + u'\n\n' + _(u'See the Bash help file for more info.')
+    continueKey = u'bash.factionRanks.import.continue'
     noChange = _(u'No relevant faction ranks to import.')
 
     def _parser(self):
@@ -2135,9 +2135,9 @@ class Mod_Scripts_Import(_Mod_Import_Link):
     _text = _(u'Scripts...')
     _help = _(u'Import scripts from text file')
     continueInfo = _(
-        u"Import script from a text file.  This will replace existing "
-        u"scripts and is not reversible (except by restoring from backup)!")
-    continueKey = 'bash.scripts.import.continue'
+        u'Import script from a text file.  This will replace existing '
+        u'scripts and is not reversible (except by restoring from backup)!')
+    continueKey = u'bash.scripts.import.continue'
     progressTitle = _(u'Import Scripts')
 
     def _parser(self):
@@ -2211,10 +2211,10 @@ class Mod_Stats_Import(_Mod_Import_Link):
     progressTitle = _(u'Import Stats')
     _text = _(u'Stats...')
     _help = _(u'Import stats from text file')
-    continueInfo = _(u"Import item stats from a text file. This will replace "
-                     u"existing stats and is not reversible!")
-    continueKey = 'bash.stats.import.continue'
-    noChange = _(u"No relevant stats to import.")
+    continueInfo = _(u'Import item stats from a text file. This will replace '
+                     u'existing stats and is not reversible!')
+    continueKey = u'bash.stats.import.continue'
+    noChange = _(u'No relevant stats to import.')
 
     def _parser(self):
         return CBash_ItemStats() if CBashApi.Enabled else ItemStats()
@@ -2247,9 +2247,9 @@ class Mod_Prices_Import(_Mod_Import_Link):
     progressTitle = _(u'Import Prices')
     _text = _(u'Prices...')
     _help = _(u'Import item prices from text file or other mod')
-    continueInfo = _(u"Import item prices from a text file.  This will "
-                     u"replace existing prices and is not reversible!")
-    continueKey = 'bash.prices.import.continue'
+    continueInfo = _(u'Import item prices from a text file.  This will '
+                     u'replace existing prices and is not reversible!')
+    continueKey = u'bash.prices.import.continue'
     noChange = _(u'No relevant prices to import.')
     supportedExts = {u'.csv', u'.ghost'} | bush.game.espm_extensions
 
@@ -2286,10 +2286,10 @@ class Mod_SigilStoneDetails_Import(_Mod_Import_Link):
     _text = _(u'Sigil Stones...')
     _help = _(u'Import Sigil Stone details from text file')
     continueInfo = _(
-        u"Import Sigil Stone details from a text file.  This will replace "
-        u"the existing data on sigil stones with the same form ids and is "
-        u"not reversible!")
-    continueKey = 'bash.SigilStone.import.continue'
+        u'Import Sigil Stone details from a text file.  This will replace '
+        u'the existing data on sigil stones with the same form ids and is '
+        u'not reversible!')
+    continueKey = u'bash.SigilStone.import.continue'
     noChange = _(u'No relevant Sigil Stone details to import.')
 
     def _parser(self):
@@ -2342,10 +2342,10 @@ class Mod_SpellRecords_Import(_SpellRecords_Link, _Mod_Import_Link):
     progressTitle = _(u'Import Spell details')
     _text = _(u'Spells...')
     _help = _(u'Import Spell details from text file')
-    continueInfo = _(u"Import Spell details from a text file.  This will "
-        u"replace the existing data on spells with the same form ids and is "
-        u"not reversible!")
-    continueKey = 'bash.SpellRecords.import.continue'
+    continueInfo = _(u'Import Spell details from a text file.  This will '
+        u'replace the existing data on spells with the same form ids and is '
+        u'not reversible!')
+    continueKey = u'bash.SpellRecords.import.continue'
     noChange = _(u'No relevant Spell details to import.')
     _do_what = _(u'Import flags and effects?')
 
@@ -2379,10 +2379,10 @@ class Mod_IngredientDetails_Import(_Mod_Import_Link):
     progressTitle = _(u'Import Ingredient details')
     _text = _(u'Ingredients...')
     _help = _(u'Import Ingredient details from text file')
-    continueInfo = _(u"Import Ingredient details from a text file.  This will "
-                     u"replace the existing data on Ingredients with the same "
-                     u"form ids and is not reversible!")
-    continueKey = 'bash.Ingredient.import.continue'
+    continueInfo = _(u'Import Ingredient details from a text file.  This will '
+                     u'replace the existing data on Ingredients with the same '
+                     u'form ids and is not reversible!')
+    continueKey = u'bash.Ingredient.import.continue'
     noChange = _(u'No relevant Ingredient details to import.')
 
     def _parser(self):
@@ -2415,9 +2415,9 @@ class Mod_EditorIds_Import(_Mod_Import_Link):
     """Import editor ids from text file."""
     askTitle = _(u'Import eids from:')
     csvFile = u'_Eids.csv'
-    continueInfo = _(u"Import editor ids from a text file. This will replace "
-                     u"existing ids and is not reversible!")
-    continueKey = 'bash.editorIds.import.continue'
+    continueInfo = _(u'Import editor ids from a text file. This will replace '
+                     u'existing ids and is not reversible!')
+    continueKey = u'bash.editorIds.import.continue'
     progressTitle = _(u'Import Editor Ids')
     _text = _(u'Editor Ids...')
     _help = _(u'Import faction editor ids from text file')
@@ -2493,9 +2493,9 @@ class Mod_FullNames_Import(_Mod_Import_Link):
     csvFile = u'_Names.csv'
     progressTitle = _(u'Import Names')
     continueInfo = _(
-        u"Import record names from a text file. This will replace existing "
-        u"names and is not reversible!")
-    continueKey = 'bash.fullNames.import.continue'
+        u'Import record names from a text file. This will replace existing '
+        u'names and is not reversible!')
+    continueKey = u'bash.fullNames.import.continue'
     _text = _(u'Names...')
     _help = _(u'Import full names from text file or other mod')
     supportedExts = {u'.csv', u'.ghost'} | bush.game.espm_extensions
@@ -2541,10 +2541,10 @@ class CBash_Mod_MapMarkers_Import(_Mod_Import_Link, _CBash_Link):
     _text = _(u'Map Markers...')
     _help = _(u'Import MapMarkers from text file')
     continueInfo = _(
-        u"Import Map Markers data from a text file.  This will replace "
-        u"the existing data on map markers with the same editor ids and is "
-        u"not reversible!")
-    continueKey = 'bash.MapMarkers.import.continue'
+        u'Import Map Markers data from a text file.  This will replace '
+        u'the existing data on map markers with the same editor ids and is '
+        u'not reversible!')
+    continueKey = u'bash.MapMarkers.import.continue'
 
     def _parser(self): return CBash_MapMarkers()
 
@@ -2616,9 +2616,9 @@ class Mod_ItemData_Import(_Mod_Import_Link): # CRUFT
     _help = _(u'Import pretty much complete item data from text file or other'
              u' mod')
     continueInfo = _(
-        u"Import pretty much complete item data from a text file.  This will "
-        u"replace existing data and is not reversible!")
-    continueKey = 'bash.itemdata.import.continue'
+        u'Import pretty much complete item data from a text file.  This will '
+        u'replace existing data and is not reversible!')
+    continueKey = u'bash.itemdata.import.continue'
     noChange = _(u'No relevant data to import.')
 
     def _parser(self):
