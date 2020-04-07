@@ -302,13 +302,13 @@ class _xSEChunkARVR(_xSEChunk, _Dumpable):
 
     class _xSEEntryARVR(_ChunkEntry, _Dumpable):
         """A single ARVR entry. An ARVR chunk contains several of these."""
-        __slots__ = ('_key_type', 'key', 'element_type', 'stored_data')
+        __slots__ = ('_key_type', 'entry_key', 'element_type', 'stored_data')
 
         def __init__(self, ins, key_type):
             if key_type == 1:
-                self.key = unpack_double(ins)
+                self.entry_key = unpack_double(ins)
             elif key_type == 3:
-                self.key = _unpack_cosave_str16(ins)
+                self.entry_key = _unpack_cosave_str16(ins)
             else:
                 raise RuntimeError(u'Unknown or unsupported key type %u.' %
                                    key_type)
@@ -326,9 +326,9 @@ class _xSEChunkARVR(_xSEChunk, _Dumpable):
 
         def write_entry(self, out):
             if self._key_type == 1:
-                _pack(out, '=d', self.key)
+                _pack(out, '=d', self.entry_key)
             elif self._key_type == 3:
-                _pack_cosave_str16(out, self.key)
+                _pack_cosave_str16(out, self.entry_key)
             else:
                 raise RuntimeError(u'Unknown or unsupported key type %u.' %
                                    self._key_type)
@@ -345,7 +345,7 @@ class _xSEChunkARVR(_xSEChunk, _Dumpable):
 
         def entry_length(self):
             # element_type is B, key is either d or H + str
-            total_len = 1 + (8 if self._key_type == 1 else 2 + len(self.key))
+            total_len = 1 + (8 if self._key_type == 1 else 2 + len(self.entry_key))
             if self.element_type == 1:
                 total_len += 8
             elif self.element_type in (2, 4):
@@ -356,9 +356,9 @@ class _xSEChunkARVR(_xSEChunk, _Dumpable):
 
         def dump_to_log(self, log, save_masters):
             if self._key_type == 1:
-                key_str = u'%f' % self.key
+                key_str = u'%f' % self.entry_key
             elif self._key_type == 3:
-                key_str = self.key
+                key_str = self.entry_key
             else:
                 key_str = u'BAD'
             if self.element_type == 1:
