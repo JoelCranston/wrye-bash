@@ -296,7 +296,7 @@ class Installers_AutoRefreshProjects(BoolLink):
 class Installers_AutoApplyEmbeddedBCFs(ItemLink):
     """Automatically apply Embedded BCFs to archives that have one."""
     _text = _(u'Auto-Apply Embedded BCFs')
-    key = 'bash.installers.autoApplyEmbeddedBCFs'
+    _apply_bcf_key = u'bash.installers.autoApplyEmbeddedBCFs'
     _help = _(
         u'Automatically apply Embedded BCFs to their containing archives.')
 
