@@ -30,9 +30,9 @@ from itertools import imap
 from .. import bass, bosh, balt
 from ..balt import ItemLink, BoolLink, EnabledLink, OneItemLink
 
-__all__ = ['INI_SortValid', 'INI_AllowNewLines', 'INI_ListINIs', 'INI_Apply',
-           'INI_CreateNew', 'INI_ListErrors', 'INI_FileOpenOrCopy',
-           'INI_Delete']
+__all__ = [u'INI_SortValid', u'INI_AllowNewLines', u'INI_ListINIs',
+           u'INI_Apply', u'INI_CreateNew', u'INI_ListErrors',
+           u'INI_FileOpenOrCopy', u'INI_Delete']
 
 class INI_SortValid(BoolLink):
     """Sort valid INI Tweaks to the top."""

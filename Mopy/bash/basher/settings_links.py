@@ -35,13 +35,13 @@ from ..exception import BoltError
 from ..localize import dump_translator
 # TODO(ut): settings links do not seem to use Link.data attribute - it's None..
 
-__all__ = ['Settings_BackupSettings', 'Settings_RestoreSettings',
-           'Settings_SaveSettings', 'Settings_ExportDllInfo',
-           'Settings_ImportDllInfo', 'Settings_Colors', 'Settings_IconSize',
-           'Settings_UnHideButtons', 'Settings_StatusBar_ShowVersions',
-           'Settings_Languages', 'Settings_PluginEncodings', 'Settings_Games',
-           'Settings_UseAltName', 'Settings_Deprint',
-           'Settings_DumpTranslator', 'Settings_UAC']
+__all__ = [u'Settings_BackupSettings', u'Settings_RestoreSettings',
+           u'Settings_SaveSettings', u'Settings_ExportDllInfo',
+           u'Settings_ImportDllInfo', u'Settings_Colors', u'Settings_IconSize',
+           u'Settings_UnHideButtons', u'Settings_StatusBar_ShowVersions',
+           u'Settings_Languages', u'Settings_PluginEncodings', u'Settings_Games',
+           u'Settings_UseAltName', u'Settings_Deprint',
+           u'Settings_DumpTranslator', u'Settings_UAC']
 
 #------------------------------------------------------------------------------
 # Settings Links --------------------------------------------------------------

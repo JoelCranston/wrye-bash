@@ -35,9 +35,9 @@ from ....patcher.base import Patcher, CBash_Patcher, Abstract_Patcher, \
     AListPatcher
 from ....patcher.patchers.base import ListPatcher, CBash_ListPatcher
 
-__all__ = ['AlchemicalCatalogs', 'CBash_AlchemicalCatalogs', 'CoblExhaustion',
-           'MFactMarker', 'CBash_MFactMarker', 'CBash_CoblExhaustion',
-           'SEWorldEnforcer', 'CBash_SEWorldEnforcer']
+__all__ = [u'AlchemicalCatalogs', u'CBash_AlchemicalCatalogs', u'CoblExhaustion',
+           u'MFactMarker', u'CBash_MFactMarker', u'CBash_CoblExhaustion',
+           u'SEWorldEnforcer', u'CBash_SEWorldEnforcer']
 _cobl_main = GPath(u'COBL Main.esm')
 
 # Util Functions --------------------------------------------------------------

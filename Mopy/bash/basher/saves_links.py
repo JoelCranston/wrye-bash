@@ -40,13 +40,13 @@ from ..bolt import GPath, SubProgress, struct_pack, struct_unpack
 from ..bosh import faces, SaveInfo
 from ..exception import ArgumentError, BoltError, CancelError, ModError
 
-__all__ = ['Saves_Profiles', 'Save_Rename', 'Save_Renumber', 'Save_Move',
-           'Save_LoadMasters', 'Save_DiffMasters', 'Save_Stats',
-           'Save_StatObse', 'Save_EditPCSpells', 'Save_RenamePlayer',
-           'Save_EditCreatedEnchantmentCosts', 'Save_ImportFace',
-           'Save_EditCreated', 'Save_ReweighPotions', 'Save_UpdateNPCLevels',
-           'Save_ExportScreenshot', 'Save_Unbloat', 'Save_RepairAbomb',
-           'Save_RepairHair', 'Save_StatPluggy']
+__all__ = [u'Saves_Profiles', u'Save_Rename', u'Save_Renumber', u'Save_Move',
+           u'Save_LoadMasters', u'Save_DiffMasters', u'Save_Stats',
+           u'Save_StatObse', u'Save_EditPCSpells', u'Save_RenamePlayer',
+           u'Save_EditCreatedEnchantmentCosts', u'Save_ImportFace',
+           u'Save_EditCreated', u'Save_ReweighPotions', u'Save_UpdateNPCLevels',
+           u'Save_ExportScreenshot', u'Save_Unbloat', u'Save_RepairAbomb',
+           u'Save_RepairHair', u'Save_StatPluggy']
 
 #------------------------------------------------------------------------------
 # Saves Links -----------------------------------------------------------------

@@ -32,11 +32,11 @@ from ..balt import ItemLink, CheckLink, BoolLink, EnabledLink, ChoiceLink, \
     SeparatorLink, Link
 from ..bolt import GPath
 
-__all__ = ['Mods_EsmsFirst', 'Mods_LoadList', 'Mods_SelectedFirst',
-           'Mods_OblivionVersion', 'Mods_CreateBlankBashedPatch',
-           'Mods_CreateBlank', 'Mods_ListMods', 'Mods_ListBashTags',
-           'Mods_CleanDummyMasters', 'Mods_AutoGhost', 'Mods_LockLoadOrder',
-           'Mods_ScanDirty', 'Mods_CrcRefresh', 'Mods_AutoESLFlagBP',
+__all__ = [u'Mods_EsmsFirst', u'Mods_LoadList', u'Mods_SelectedFirst',
+           u'Mods_OblivionVersion', u'Mods_CreateBlankBashedPatch',
+           u'Mods_CreateBlank', u'Mods_ListMods', u'Mods_ListBashTags',
+           u'Mods_CleanDummyMasters', u'Mods_AutoGhost', u'Mods_LockLoadOrder',
+           u'Mods_ScanDirty', u'Mods_CrcRefresh', u'Mods_AutoESLFlagBP',
            u'Mods_LockActivePlugins']
 
 # "Load" submenu --------------------------------------------------------------
