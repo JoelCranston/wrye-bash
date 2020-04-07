@@ -392,7 +392,7 @@ class _Settings_Game(RadioLink):
                                   u'switch.\n\nThat means manually added '
                                   u'application launchers in the status bar '
                                   u'will not change after switching.'),
-                                'bash.switch_games_warning.shown'):
+                                u'bash.switch_games_warning.continue'):
             return
         Link.Frame.Restart(['--oblivionPath', bush.game_path(self._text).s])
 

@@ -1324,8 +1324,8 @@ class UIList(wx.Panel):
         selected = selected if selected else self.GetSelected()
         num = len(selected)
         if num > UIList.max_items_open and not askContinue(self,
-            _(u'Trying to open %(num)s items - are you sure ?') % {'num': num},
-            'bash.maxItemsOpen.continue'): return
+            _(u'Trying to open %(num)s items - are you sure ?') % {u'num': num},
+            u'bash.maxItemsOpen.continue'): return
         for filename in selected:
             filepath = self.data_store.store_dir.join(filename)
             try:
