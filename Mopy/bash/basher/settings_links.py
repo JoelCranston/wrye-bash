@@ -443,9 +443,10 @@ class Settings_UnHideButton(ItemLink):
 
 #------------------------------------------------------------------------------
 class Settings_UseAltName(BoolLink):
-    _text, key, _help = _(u'Use Alternate Wrye Bash Name'), 'bash.useAltName',\
-        _(u'Use an alternate display name for Wrye Bash based on the game it'
-          u' is managing.')
+    _text = _(u'Use Alternate Wrye Bash Name'), u'bash.useAltName'
+    _bl_key = u'bash.useAltName'
+    _help = _(u'Use an alternate display name for Wrye Bash based on the '
+              u'game it is managing.')
 
     def Execute(self):
         super(Settings_UseAltName, self).Execute()
