@@ -1024,9 +1024,9 @@ class UIList(wx.Panel):
     # the current sort column
     @property
     def sort_column(self):
-        return _settings.get(self.keyPrefix + '.sort', self._default_sort_col)
+        return _settings.get(self.keyPrefix + u'.sort', self._default_sort_col)
     @sort_column.setter
-    def sort_column(self, val): _settings[self.keyPrefix + '.sort'] = val
+    def sort_column(self, val): _settings[self.keyPrefix + u'.sort'] = val
 
     def _handle_select(self, item_key):
         self._select(item_key)
@@ -1462,12 +1462,12 @@ class UIList(wx.Panel):
 
     # gList scroll position----------------------------------------------------
     def SaveScrollPosition(self, isVertical=True):
-        _settings[self.keyPrefix + '.scrollPos'] = self.__gList._native_widget.GetScrollPos(
+        _settings[self.keyPrefix + u'.scrollPos'] = self.__gList._native_widget.GetScrollPos(
             wx.VERTICAL if isVertical else wx.HORIZONTAL)
 
     def SetScrollPosition(self):
         self.__gList._native_widget.ScrollLines(
-            _settings.get(self.keyPrefix + '.scrollPos', 0))
+            _settings.get(self.keyPrefix + u'.scrollPos', 0))
 
     # Data commands (WIP)------------------------------------------------------
     def Rename(self, selected=None):
@@ -2387,7 +2387,7 @@ class WryeBashSplashScreen(wx.adv.SplashScreen):
 class NotebookPanel(PanelWin):
     """Parent class for notebook panels."""
     # UI settings keys prefix - used for sashPos and uiList gui settings
-    keyPrefix = 'OVERRIDE'
+    keyPrefix = u'OVERRIDE'
 
     def __init__(self, *args, **kwargs):
         super(NotebookPanel, self).__init__(*args, **kwargs)
