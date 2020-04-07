@@ -273,7 +273,7 @@ class ImportFaceDialog(DialogWindow):
         self.listBox.set_min_size(175, 150)
         #--Name,Race,Gender Checkboxes
         fi_flgs = bosh.faces.PCFaces.pcf_flags(
-            bass.settings.get('bash.faceImport.flags', 0x4))
+            bass.settings.get(u'bash.faceImport.flags', 0x4))
         self.nameCheck = CheckBox(self, _(u'Name'), checked=fi_flgs.name)
         self.raceCheck = CheckBox(self, _(u'Race'), checked=fi_flgs.race)
         self.genderCheck = CheckBox(self, _(u'Gender'), checked=fi_flgs.gender)

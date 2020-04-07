@@ -513,7 +513,7 @@ class WryeLog(_Log):
         if isinstance(logText, bolt.Path):
             logPath = logText
         else:
-            logPath = _settings.get('balt.WryeLog.temp',
+            logPath = _settings.get(u'balt.WryeLog.temp',
                 bolt.Path.getcwd().join(u'WryeLogTemp.html'))
             convert_wtext_to_html(logPath, logText)
         super(WryeLog, self).__init__(parent, title, asDialog, log_icons)
@@ -535,7 +535,7 @@ class WryeLog(_Log):
         self.ShowLog()
 
 def convert_wtext_to_html(logPath, logText):
-    cssDir = _settings.get('balt.WryeLog.cssDir', GPath(u''))
+    cssDir = _settings.get(u'balt.WryeLog.cssDir', GPath(u''))
     with logPath.open('w', encoding='utf-8-sig') as out, bolt.sio(
                     logText + u'\n{{CSS:wtxt_sand_small.css}}') as ins:
         bolt.WryeText.genHtml(ins, out, cssDir)
@@ -1018,7 +1018,7 @@ class UIList(wx.Panel):
     def cols(self): return _settings.getChanged(self.keyPrefix + u'.cols')
     @property
     def autoColWidths(self):
-        return _settings.get('bash.autoSizeListColumns', 0)
+        return _settings.get(u'bash.autoSizeListColumns', 0)
     @autoColWidths.setter
     def autoColWidths(self, val): _settings[u'bash.autoSizeListColumns'] = val
     # the current sort column

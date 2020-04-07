@@ -334,14 +334,14 @@ def __load_pickled_load_orders():
     _current_list_index = _lords_pickle.data.get('_current_list_index', -1)
     _active_mods_lists = _lords_pickle.data.get('_active_mods_lists',
                                                 active_mods_list)
-    locked = bass.settings.get('bosh.modInfos.resetMTimes', False)
+    locked = bass.settings.get(u'bosh.modInfos.resetMTimes', False)
 
 def get_active_mods_lists():
     """Get the user active mods lists from BashLoadOrder.dat, except if they
     are still saved in BashSettings.dat"""
     global _active_mods_lists
     if _active_mods_lists is __active_mods_sentinel:
-        settings_mods_list = bass.settings.get('bash.loadLists.data',
+        settings_mods_list = bass.settings.get(u'bash.loadLists.data',
                                                __active_mods_sentinel)
         # if settings_mods_list is not __active_mods_sentinel:
         #     del bass.settings[u'bash.loadLists.data']

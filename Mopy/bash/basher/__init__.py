@@ -1704,7 +1704,7 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
                                              self.current_ini_path.start())
         #--Ini file
         self.iniContents = TargetINILineCtrl(right._native_widget)
-        self.lastDir = settings.get('bash.ini.lastDir', bass.dirs[u'mods'].s)
+        self.lastDir = settings.get(u'bash.ini.lastDir', bass.dirs[u'mods'].s)
         #--Tweak file
         self.tweakContents = INITweakLineCtrl(left._native_widget, self.iniContents)
         self.iniContents.SetTweakLinesCtrl(self.tweakContents)
@@ -2968,7 +2968,7 @@ class InstallersPanel(BashTab):
 
     @balt.conversation
     def _first_run_set_enabled(self):
-        if settings.get('bash.installers.isFirstRun',True):
+        if settings.get(u'bash.installers.isFirstRun',True):
             settings[u'bash.installers.isFirstRun'] = False
             message = _(u'Do you want to enable Installers?') + u'\n\n\t' + _(
                 u'If you do, Bash will first need to initialize some data. '
@@ -2999,7 +2999,7 @@ class InstallersPanel(BashTab):
     @bosh.bain.projects_walk_cache
     def _refresh_installers_if_needed(self, canCancel, fullRefresh,
                                       scan_data_dir):
-        if settings.get('bash.installers.updatedCRCs',True): #only checked here
+        if settings.get(u'bash.installers.updatedCRCs',True): #only checked here
             settings[u'bash.installers.updatedCRCs'] = False
             self._data_dir_scanned = False
         installers_paths = bass.dirs[
