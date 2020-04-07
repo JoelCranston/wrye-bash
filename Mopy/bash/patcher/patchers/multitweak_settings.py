@@ -31,10 +31,10 @@ from ...brec import MreRecord, RecordHeader
 from ...exception import StateError
 from ...patcher.patchers.base import MultiTweakItem, CBash_MultiTweakItem
 from ...patcher.patchers.base import MultiTweaker, CBash_MultiTweaker
-from ...patcher.base import AMultiTweaker, DynamicNamedTweak
+from ...patcher.base import AMultiTweaker, DynamicTweak
 
 # Patchers: 30 ----------------------------------------------------------------
-class _AGlobalsTweak(DynamicNamedTweak):
+class _AGlobalsTweak(DynamicTweak):
     """Shared code of CBash/PBash globals tweaks."""
     tweak_read_classes = b'GLOB',
 
@@ -96,7 +96,7 @@ class CBash_GlobalsTweak(_AGlobalsTweak, CBash_MultiTweakItem):
 #     deprint(u"GMST values can't be negative - currently %s - "
 #             u'skipping setting GMST.' % target_value)
 #     return False
-class _AGmstTweak(DynamicNamedTweak):
+class _AGmstTweak(DynamicTweak):
     """Shared code of PBash/CBash GMST tweaks."""
     tweak_read_classes = b'GMST',
 
