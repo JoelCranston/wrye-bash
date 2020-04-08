@@ -64,10 +64,7 @@ _vanilla_races = [u'argonian', u'breton', u'dremora', u'dark elf',
 class _ARaceTweakItem(AMultiTweakItem):
     """ABC for race tweaks."""
     tweak_read_classes = b'RACE',
-
-    def __init__(self):
-        super(_ARaceTweakItem, self).__init__()
-        self.logMsg = u'* '+ _(u'Races Tweaked: %d')
+    tweak_log_msg = _(u'Races Tweaked: %(total_changed)d')
 
     def _calc_changed_face_parts(self, face_attr, collected_races_data):
         """Calculates a changes dictionary for the specified face attribute,
@@ -403,10 +400,7 @@ class ARaceTweaker_PlayableEyes(_ARaceTweakItem):
     tweak_tip = _(u'Sets all eyes to be playable.')
     tweak_key = u'playableeyes'
     tweak_choices = [(u'Get it done', 1)]
-
-    def __init__(self):
-        super(ARaceTweaker_PlayableEyes, self).__init__()
-        self.logMsg = u'* '+ _(u'Eyes Tweaked: %d')
+    tweak_log_msg = _(u'Eyes Tweaked: %(total_changed)d')
 
 class RaceTweaker_PlayableEyes(ARaceTweaker_PlayableEyes,
                                _PPlayableTweak): pass
@@ -421,10 +415,7 @@ class ARaceTweaker_PlayableHairs(_ARaceTweakItem):
     tweak_tip = _(u'Sets all Hairs to be playable.')
     tweak_key = u'playablehairs'
     tweak_choices = [(u'Get it done', 1)]
-
-    def __init__(self):
-        super(ARaceTweaker_PlayableHairs, self).__init__()
-        self.logMsg = u'* '+ _(u'Hairs Tweaked: %d')
+    tweak_log_msg = _(u'Hairs Tweaked: %(total_changed)d')
 
 class RaceTweaker_PlayableHairs(ARaceTweaker_PlayableHairs,
                                 _PPlayableTweak): pass
@@ -439,10 +430,7 @@ class ARaceTweaker_SexlessHairs(_ARaceTweakItem):
     tweak_tip = _(u'Lets any sex of character use any hair.')
     tweak_key = u'sexlesshairs'
     tweak_choices = [(u'Get it done', 1)]
-
-    def __init__(self):
-        super(ARaceTweaker_SexlessHairs, self).__init__()
-        self.logMsg = u'* '+ _(u'Hairs Tweaked: %d')
+    tweak_log_msg = _(u'Hairs Tweaked: %(total_changed)d')
 
 class RaceTweaker_SexlessHairs(ARaceTweaker_SexlessHairs, _PRaceTweak):
     def wants_record(self, record):
