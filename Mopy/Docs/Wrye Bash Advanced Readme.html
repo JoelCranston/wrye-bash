@@ -2924,7 +2924,7 @@ C.Location, -C.LockList
                             <li>Tilt Front/Back</li>
                             <li>Tilt Left/Right</li>
                             <li>Walks</li>
-                            <li>Weapon & Shield</li>
+                            <li>Weapon &amp; Shield</li>
                         </ul>
                     </li>
                     <li>(NPC_ only) Flags:
@@ -4834,23 +4834,8 @@ C.Location, -C.LockList
                     <li>"widget"
                 </ul>
             </ul>
-        <tr><td>All Clothing Playable<td>Modifies non-playable clothes to make them playable, unless the clothing satisfies one of the following conditions:
-            <ul>
-                <li>It is unnamed.
-                <li>It is scripted.
-                <li>It contains no body flags set other than right ring.
-                <li>It contains any of the following (case-insensitive) words:
-                <ul>
-                    <li>"mark"
-                    <li>"token"
-                    <li>"willful"
-                    <li>"see" and "me"
-                    <li>"werewolf"
-                    <li>"no wings"
-                    <li>"tsaesci tail"
-                    <li>"widget"
-                </ul>
-            </ul>
+        <tr><td>All Clothing Playable</td><td>Modifies non-playable clothes to make them playable.
+            The same conditions described above for <code>All Armor Playable</code> apply here too.</td></tr>
         <tr><td>Armor Shows Amulets<td>Modifies playable armor to show amulets.
         <tr><td>Armor Shows Rings<td>Modifies playable armor to show rings.
         <tr><td>Bow Reach Fix<td>Some of the bows in Oblivion (and a few in user mods) have a reach of zero. Due to a bug in the Oblivion engine, if these bows are equipped by an NPC, the game will crash. This patch changes bows with zero reach to have reach of 1.
@@ -4859,9 +4844,13 @@ C.Location, -C.LockList
         <tr><td>DarNified Books<td>Tweaks book colours and fonts for use with DarNified UI.
         <tr><td>Default Icons<td>Sets a default icon for any records that don't have any icon assigned.
         <tr><td>Disable Wind<td>Sets wind speed for all weathers to 0; this means that bushes and trees don't move in the wind since there isn't any. May help on machines with low end graphic cards.
-        <tr><td>Faction Crime Gold Multplier Fix<td>Fix factions with unset crimeGoldMultiplier to have a crimeGoldMultiplier of 1.0.
+        <tr><td>Faction Crime Gold Multplier Fix</td><td>Fix factions with unset Crime Gold Multiplier
+            to have a Crime Gold Multiplier of 1.0.</td></tr>
         <tr><td>Harvest Chance<td>Sets the harvest chance of all flora to the desired chance.
+        <tr><td>Magic: Script Effect Icon Changer</td><td>Changes the Script Effect icon to one of
+            several choices, or to a custom icon.</td></tr>
         <tr><td>Magic: Script Effect Silencer<td>Script Effects will be silenced and have no graphics.
+        <tr><td>No Description Loading Screens</td><td>Removes the description from loading screens.</td></tr>
         <tr><td>No Light Fade Value Fix<td>Sets the fade values on all lights to a default of 1.0 if not already set.
         <tr><td>No Light Flicker<td>Turns off flickering effects for lights. May help on machines with low end graphic cards.
         <tr><td>Number of uses for pre-enchanted weapons and Staffs/Staves<td>The charge amount and cast cost will be edited so that all enchanted weapons and staffs have the amount of uses specified. Cost will be rounded up to 1 (unless set to unlimited) so number of uses may not exactly match for all weapons.
