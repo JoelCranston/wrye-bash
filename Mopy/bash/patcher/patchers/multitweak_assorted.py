@@ -778,7 +778,7 @@ class AAssortedTweak_DefaultIcons(_AAssortedTweak):
                    u'Armor\\Iron\\F\\Cuirass.dds'),
                  (u'Armor\\Iron\\M\\Greaves.dds',
                   u'Armor\\Iron\\F\\Greaves.dds'),
-                 (u'Armor\\Iron\\M\\Helmet.dds'),
+                 (u'Armor\\Iron\\M\\Helmet.dds',),
                  (u'Armor\\Iron\\M\\Gauntlets.dds',
                   u'Armor\\Iron\\F\\Gauntlets.dds'),
                  (u'Armor\\Iron\\M\\Boots.dds',),
